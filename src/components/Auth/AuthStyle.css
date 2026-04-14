@@ -1,0 +1,44 @@
+.Auth_Wrapper {
+  height: 70vh;
+  width: 40vw;
+  background: linear-gradient(-45deg, #7f37fcf4, #8517d9f4);
+  color: white;
+  display: flex;
+  flex-direction:column;
+  align-items:center;
+  padding-top:0.8rem;
+  border-radius: 0.6rem;
+  box-shadow: 3px 5px 15px black;
+  
+}
+
+#SigIn_Form {
+  height: 70%;
+  width: 78%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  text-align: start;
+}
+
+#SigIn_Form .fields {
+  height: calc(30% / 3);
+  width: 100%;
+}
+
+#SigIn_Form input {
+  height: 100%;
+  width: 100%;
+  border-radius: 0.3rem;
+  border: none;
+  padding: 0rem 0.3rem;
+}
+
+#Submit_Button {
+  height: 10%;
+  width: 60%;
+  background-color: rgba(81, 0, 255, 0.925);
+  border:none;
+  border-radius:0.2rem;
+}
