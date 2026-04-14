@@ -26,7 +26,7 @@ export default function Authentication() {
   return (
     <section className="Auth_Wrapper">
       <h1>Convo</h1>
-      <form id="SigIn_Form" onSubmit={(e) => handleSubmit(e)}>
+      <form id="SignIn_Form" onSubmit={(e) => handleSubmit(e)}>
         <div className="fields">
           <label>Email</label>
           <input

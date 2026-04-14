@@ -1,18 +1,17 @@
 .Auth_Wrapper {
   height: 70vh;
   width: 40vw;
-  background: linear-gradient(-45deg, #7f37fcf4, #8517d9f4);
+  background-image: linear-gradient(to top, #0ba360 0%, #3cba92 100%);
   color: white;
   display: flex;
-  flex-direction:column;
-  align-items:center;
-  padding-top:0.8rem;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 0.8rem;
   border-radius: 0.6rem;
-  box-shadow: 3px 5px 15px black;
-  
+  /* box-shadow: 3px 5px 15px black; */
 }
 
-#SigIn_Form {
+#SignIn_Form {
   height: 70%;
   width: 78%;
   display: flex;
@@ -22,23 +21,38 @@
   text-align: start;
 }
 
-#SigIn_Form .fields {
+#SignIn_Form .fields {
   height: calc(30% / 3);
   width: 100%;
+  position: relative;
 }
 
-#SigIn_Form input {
+#SignIn_Form input {
   height: 100%;
   width: 100%;
   border-radius: 0.3rem;
   border: none;
   padding: 0rem 0.3rem;
+
+  &:focus{
+    outline: none;
+  }
 }
+
+.fields label {
+  position: absolute;
+  top: 0%;
+  transform: translateY(-100%);
+  left: 1%;
+  color: Black;
+}
+
 
 #Submit_Button {
   height: 10%;
   width: 60%;
-  background-color: rgba(81, 0, 255, 0.925);
-  border:none;
-  border-radius:0.2rem;
+  background-image: white ;
+  border: none;
+  font-weight: 700;
+  border-radius: 0.4rem;
 }
