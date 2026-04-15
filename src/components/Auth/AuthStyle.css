@@ -1,8 +1,7 @@
 .Auth_Wrapper {
   height: 70vh;
   width: 40vw;
-  background-image: linear-gradient(to top, #0ba360 0%, #3cba92 100%);
-  color: white;
+  /* background-image: linear-gradient(to top, #0ba360 0%, #3cba92 100%); */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -19,6 +18,8 @@
   justify-content: space-around;
   align-items: center;
   text-align: start;
+  color: white;
+
 }
 
 #SignIn_Form .fields {
@@ -34,24 +35,23 @@
   border: none;
   padding: 0rem 0.3rem;
 
-  &:focus{
+  &:focus {
     outline: none;
   }
 }
 
 .fields label {
+  font-size:0.9rem;
   position: absolute;
   top: 0%;
   transform: translateY(-100%);
-  left: 1%;
   color: Black;
 }
-
 
 #Submit_Button {
   height: 10%;
   width: 60%;
-  background-image: white ;
+  background-color:white;
   border: none;
   font-weight: 700;
   border-radius: 0.4rem;

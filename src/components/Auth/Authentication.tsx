@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "react-router";
 import "./AuthStyle.css";
+import axios from "axios";
 
 export default function Authentication() {
   const params = useLocation();
@@ -8,30 +9,28 @@ export default function Authentication() {
   const [email, setEmail] = useState<string>();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // make a request to create user
-    console.log(
-      "Email: ",
-      email,
-      "/nUsername: ",
-      username,
-      "/nPassword: ",
-      password,
-    );
+    const User = {
+      email:email,
+      username:username,
+      password:password,
+    }
+    const user = await axios.post(`${import.meta.env.VITE_API}/auth/signup`,User)
+    console.log(user)
   };
 
   
 
   return (
     <section className="Auth_Wrapper">
-      <h1>Convo</h1>
+      <h1 id="AppName">Convo</h1>
       <form id="SignIn_Form" onSubmit={(e) => handleSubmit(e)}>
         <div className="fields">
           <label>Email</label>
           <input
             type="email"
-            placeholder="fake@email.com"
+            placeholder="fake@email.com..."
             onChange={(e) => setUsername(e.target.value)}
             required
           />
@@ -41,7 +40,7 @@ export default function Authentication() {
           <label>Username</label>
           <input
             type="text"
-            placeholder="Rajesh"
+            placeholder="Rajesh..."
             onChange={(e) => setEmail(e.target.value)}
             required
           />
@@ -51,6 +50,7 @@ export default function Authentication() {
           <label>Password</label>
           <input
             type="password"
+            placeholder="Rajesh1234..."
             onChange={(e) => setPassword(e.target.value)}
             required
           />

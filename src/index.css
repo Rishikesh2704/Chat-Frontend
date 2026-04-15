@@ -1,18 +1,37 @@
-*{
-  padding:0;
-  margin:0;
+@font-face {
+  font-family: Beverage;
+  src: url(./assets/LT\ Beverage.otf);
 }
 
-body{
-  background-color: #ffff;
-  color:black;
-  font-family:serif;
+@font-face {
+  font-family: Inter;
+  src: url(./assets/Inter-Light-BETA.otf);
 }
 
-main{
-  height:100vh;
-  width:100vw;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+* {
+  padding: 0;
+  margin: 0;
+  --primary-gradient: linear-gradient(to top, #0ba360 0%, #3cba92 100%);
+  --primary-color: #0ba360;
+  --secondary-color: #3cba92;
+}
+
+body {
+  background: var(--primary-gradient);
+  color: black;
+  font-family: Inter;
+}
+
+main {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#AppName {
+  font-family: Beverage;
+  font-size: 3.1rem;
+  letter-spacing: 0.3rem;
 }

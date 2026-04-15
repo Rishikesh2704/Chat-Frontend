@@ -1,0 +1,23 @@
+.Home_Wrapper{
+    height: 100vh;
+    width:100vw;
+    display:flex;
+    justifuy-content:center;
+    align-items:center;
+}
+
+.Navbar{
+    height: inherit;
+    width:20%;
+    background:var(--secondary-color);
+    text-align: center;
+}
+
+.Chat_Space{
+    height: 100%;
+    width:80%;
+    background-color:rgb(236, 232, 233);
+    border-bottom-left-radius: 0.8rem;
+    border-top-left-radius: 0.8rem;
+    z-index: 1;
+}
