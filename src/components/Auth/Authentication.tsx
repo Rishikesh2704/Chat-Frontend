@@ -5,22 +5,23 @@ import axios from "axios";
 
 export default function Authentication() {
   const params = useLocation();
-  const type = params.pathname.split('/')[2]
+  const type = params.pathname.split("/")[2];
   const [email, setEmail] = useState<string>();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
-  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit =  (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const User = {
-      email:email,
-      username:username,
-      password:password,
-    }
-    const user = await axios.post(`${import.meta.env.VITE_API}/auth/signup`,User)
-    console.log(user)
+      email: email,
+      username: username,
+      password: password,
+    };
+    axios
+      .post(`http://localhost:3000/auth/signup`, User)
+      .then((res) => res)
+      .catch((err) => err.response.data);
+    
   };
-
-  
 
   return (
     <section className="Auth_Wrapper">
@@ -31,7 +32,7 @@ export default function Authentication() {
           <input
             type="email"
             placeholder="fake@email.com..."
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
@@ -41,7 +42,7 @@ export default function Authentication() {
           <input
             type="text"
             placeholder="Rajesh..."
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>

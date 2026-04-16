@@ -19,7 +19,7 @@
 body {
   background: var(--primary-gradient);
   color: black;
-  font-family: Inter;
+  font-family:sans-serif
 }
 
 main {

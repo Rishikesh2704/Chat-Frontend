@@ -42,6 +42,7 @@
 
 .fields label {
   font-size:0.9rem;
+  font-weight: 550;
   position: absolute;
   top: 0%;
   transform: translateY(-100%);
