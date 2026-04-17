@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import "./AuthStyle.css";
 import axios from "axios";
 
@@ -9,6 +9,7 @@ export default function Authentication() {
   const [email, setEmail] = useState<string>();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
+  const navigate = useNavigate()
   const handleSubmit =  (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const User = {
@@ -21,6 +22,7 @@ export default function Authentication() {
       .then((res) => res)
       .catch((err) => err.response.data);
     
+    navigate('/')
   };
 
   return (

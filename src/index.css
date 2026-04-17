@@ -17,9 +17,9 @@
 }
 
 body {
-  background: var(--primary-gradient);
   color: black;
-  font-family:sans-serif
+  font-family:sans-serif;
+  overflow: clip;
 }
 
 main {

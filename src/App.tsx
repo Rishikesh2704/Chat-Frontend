@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
 import Home from "./components/Home.tsx";
 import Authentication from "./components/Auth/Authentication.tsx";
 
@@ -9,7 +9,7 @@ function App() {
       element: <Home />,
     },
     {
-      path: "/Authentication/signin",
+      path: "/authentication/signin",
       element: <Authentication />,
     },
   ]);
