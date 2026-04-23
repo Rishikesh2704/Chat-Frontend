@@ -1,24 +1,44 @@
-.Home_Wrapper{
-    height: 100vh;
-    width:100vw;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:var(--secondary-color);
-
+.Home_Wrapper {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--secondary-color);
 }
 
-.Navbar{
-    height: inherit;
-    width:20%;
-    text-align: center;
+.Navbar {
+  height: inherit;
+  width: 20%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  padding-top: 1.5rem;
 }
 
-.Chat_Space{
-    height: 100%;
-    width:80%;
-    background-color:rgb(232, 230, 230);
-    border-bottom-left-radius: 0.8rem;
-    border-top-left-radius: 0.8rem;
-    z-index: 1;
+.Chat_Space {
+  height: 100%;
+  width: 80%;
+  background-color: rgb(232, 230, 230);
+  border-bottom-left-radius: 0.8rem;
+  border-top-left-radius: 0.8rem;
+  z-index: 1;
+}
+
+.Header {
+  height: fit-content;
+  width: 100%;
+  font-size: 1.6rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.Account {
+  position: absolute;
+  right: 1rem;
+  top: 53%;
+  transform: translateY(-50%);
+  color: black; 
 }
