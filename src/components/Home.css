@@ -12,7 +12,9 @@
   width: 20%;
   text-align: center;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6rem;
   padding-top: 1.5rem;
 }
 
@@ -40,5 +42,81 @@
   right: 1rem;
   top: 53%;
   transform: translateY(-50%);
-  color: black; 
+  color: black;
+}
+
+.Search_Form {
+  width: 95%;
+  height: 4.5%;
+  background-color: rgb(251, 249, 249);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  overflow: clip;
+}
+
+#search_label {
+  height: 1px;
+  width: 1px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: -1;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+#search_input {
+  width: 80%;
+  font-size: 1rem;
+  padding: 0.2rem 0.5rem;
+  border: none;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+#search_btn {
+  height: 100%;
+  font-size: 1.15rem;
+  padding: 0rem 0.6rem;
+  border: none;
+}
+
+.Chat_Friends {
+  height: 78%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.User_Wrapper {
+  height: 10%;
+  width: 90%;
+  display: flex;
+  justify-content: flex-start;
+  align-items:center;
+  background-color:#ffff;
+  border-radius:0.3rem;
+  padding-left:1rem;
+  gap:1rem;
+}
+
+.User_Wrapper figure i {
+  font-size: 2.5rem;
+}
+
+.User_Details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  &>h2{
+    font-size:1.18vmax;
+  }
 }

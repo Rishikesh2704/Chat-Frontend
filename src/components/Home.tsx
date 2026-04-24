@@ -11,6 +11,27 @@ export default function Home() {
             <i className="fa-solid fa-circle-user"></i>
           </a>
         </div>
+        <form className="Search_Form">
+          <label id="search_label" htmlFor="search_input">
+            Search
+          </label>
+          <input type="text" id="search_input" />
+          <button id="search_btn" aria-label="Search" type="submit">
+            <i className="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </form>
+
+        <div className="Chat_Friends">
+          <div className="User_Wrapper">
+            <figure>
+              <i className="fa-solid fa-circle-user"></i>
+            </figure>
+            <div className="User_Details">
+              <h2>User 1</h2>
+              <p>Hi</p>
+            </div>
+          </div>
+        </div>
       </nav>
       <section className="Chat_Space"></section>
     </div>
