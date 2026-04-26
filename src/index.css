@@ -12,8 +12,8 @@
   padding: 0;
   margin: 0;
   --primary-gradient: linear-gradient(to top, #0ba360 0%, #3cba92 100%);
-  --primary-color: #0ba360;
-  --secondary-color: #3cba92;
+  --primary-color: #3cba92;
+  --secondary-color: #ffff;
 }
 
 body {

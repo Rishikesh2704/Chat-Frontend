@@ -9,20 +9,24 @@ export default function Authentication() {
   const [email, setEmail] = useState<string>();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
-  const navigate = useNavigate()
-  const handleSubmit =  (e: React.SubmitEvent<HTMLFormElement>) => {
+  const navigate = useNavigate();
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const User = {
       email: email,
       username: username,
       password: password,
     };
+    
     axios
       .post(`http://localhost:3000/auth/signup`, User)
-      .then((res) => res)
-      .catch((err) => err.response.data);
-    
-    navigate('/')
+      .then((res) => {
+        console.log(res);
+        localStorage.setItem("Token", res.data?.accessToken);
+        localStorage.setItem("RefreshToken", res.data?.refreshToken);
+        navigate("/");
+      })
+      .catch((err) => err.response);
   };
 
   return (
