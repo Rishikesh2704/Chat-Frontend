@@ -10,20 +10,30 @@ export default function Authentication() {
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
   const navigate = useNavigate();
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleLogInSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const User = {
+      email,
+      password,
+    };
+    console.log("LogIn: \n", User)
+    axios
+      .post(`${import.meta.env.VITE_API}/login`, User)
+      .then((user) => console.log(user))
+      .catch((error) => console.log(error.response));
+  };
+  const handleSignInSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const User = {
       email: email,
       username: username,
       password: password,
     };
-    
+
     axios
-      .post(`http://localhost:3000/auth/signup`, User)
+      .post(`${import.meta.env.VITE_API}/auth/signup`, User)
       .then((res) => {
-        console.log(res);
-        localStorage.setItem("Token", res.data?.accessToken);
-        localStorage.setItem("RefreshToken", res.data?.refreshToken);
+        console.log('AccessToken:',res.data);
         navigate("/");
       })
       .catch((err) => err.response);
@@ -32,7 +42,12 @@ export default function Authentication() {
   return (
     <section className="Auth_Wrapper">
       <h1 id="AppName">Convo</h1>
-      <form id="SignIn_Form" onSubmit={(e) => handleSubmit(e)}>
+      <form
+        id="SignIn_Form"
+        onSubmit={(e) => {
+          type === "signin" ? handleSignInSubmit(e) : handleLogInSubmit(e);
+        }}
+      >
         <div className="fields">
           <label>Email</label>
           <input
@@ -43,15 +58,17 @@ export default function Authentication() {
           />
         </div>
 
-        <div className="fields">
-          <label>Username</label>
-          <input
-            type="text"
-            placeholder="Rajesh..."
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
+        {type !== "login" && (
+          <div className="fields">
+            <label>Username</label>
+            <input
+              type="text"
+              placeholder="Rajesh..."
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+        )}
 
         <div className="fields">
           <label>Password</label>

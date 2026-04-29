@@ -14,6 +14,10 @@ function App() {
       element: <Authentication />,
     },
     {
+      path: "/authentication/login",
+      element: <Authentication />,
+    },
+    {
       path: "/account",
       element: <Account />,
     },

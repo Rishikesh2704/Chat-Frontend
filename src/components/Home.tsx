@@ -1,7 +1,18 @@
 import { Link } from "react-router";
 import "./Home.css";
+import { useEffect } from "react";
+import axios from "axios";
 
 export default function Home() {
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const data = await axios.get(`${import.meta.env.VITE_API}/messages/users`,{
+        withCredentials:true
+      })
+     console.log("Users:", data)
+    } 
+    fetchUsers()
+  },[])
   return (
     <div className="Home_Wrapper">
       <nav className="Navbar">
