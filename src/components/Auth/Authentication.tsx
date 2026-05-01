@@ -16,10 +16,12 @@ export default function Authentication() {
       email,
       password,
     };
-    console.log("LogIn: \n", User)
+    console.log("LogIn: \n", User);
     axios
-      .post(`${import.meta.env.VITE_API}/login`, User)
-      .then((user) => console.log(user))
+      .post(`${import.meta.env.VITE_API}/auth/login`, User, {
+        withCredentials: true,
+      })
+      .then(() => navigate("/"))
       .catch((error) => console.log(error.response));
   };
   const handleSignInSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -31,9 +33,11 @@ export default function Authentication() {
     };
 
     axios
-      .post(`${import.meta.env.VITE_API}/auth/signup`, User)
+      .post(`${import.meta.env.VITE_API}/auth/signup`, User, {
+        withCredentials: true,
+      })
       .then((res) => {
-        console.log('AccessToken:',res.data);
+        console.log("AccessToken:", res.data);
         navigate("/");
       })
       .catch((err) => err.response);
