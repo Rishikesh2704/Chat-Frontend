@@ -1,17 +1,25 @@
-import { Link } from "react-router";
+import { useNavigate } from "react-router";
 import "./Home.css";
 import { useEffect } from "react";
 import axios from "axios";
 
+
 export default function Home() {
+  const navigate = useNavigate()
   useEffect(() => {
-    const fetchUsers = async () => {
-      const data = await axios.get(`${import.meta.env.VITE_API}/messages/users`,{
-        withCredentials:true
-      })
-     console.log("Users:", data)
-    } 
-    fetchUsers()
+      
+      const fetchUsers = async () => {
+        try{
+
+          const data = await axios.get(`${import.meta.env.VITE_API}/messages/users`)
+          console.log("Users", data)
+        }catch(error:any){
+          if(error.response.data.message === "Unauthorized")
+          navigate('/authentication/login')
+        }
+      } 
+      fetchUsers()
+    
   },[])
   return (
     <div className="Home_Wrapper">

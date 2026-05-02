@@ -10,21 +10,26 @@ export default function Authentication() {
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
   const navigate = useNavigate();
-  const handleLogInSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleLogInSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const User = {
       email,
       password,
     };
     console.log("LogIn: \n", User);
-    axios
-      .post(`${import.meta.env.VITE_API}/auth/login`, User, {
+    try {
+      await axios.post(`${import.meta.env.VITE_API}/auth/login`, User, {
         withCredentials: true,
-      })
-      .then(() => navigate("/"))
-      .catch((error) => console.log(error.response));
+      });
+      navigate("/");
+    } catch (error: any) {
+      console.log(error.response.data);
+      setEmail("");
+      setPassword("");
+    }
   };
-  const handleSignInSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+
+  const handleSignInSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const User = {
       email: email,
@@ -32,15 +37,21 @@ export default function Authentication() {
       password: password,
     };
 
-    axios
-      .post(`${import.meta.env.VITE_API}/auth/signup`, User, {
-        withCredentials: true,
-      })
-      .then((res) => {
-        console.log("AccessToken:", res.data);
-        navigate("/");
-      })
-      .catch((err) => err.response);
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API}/auth/signup`,
+        User,
+        {
+          withCredentials: true,
+        },
+      );
+      console.log("AccessToken:", res.data);
+      navigate("/");
+    } catch (error: any) {
+      setEmail("");
+      setPassword("");
+      console.log(error.response.data.message);
+    }
   };
 
   return (
@@ -58,6 +69,7 @@ export default function Authentication() {
             type="email"
             placeholder="fake@email.com..."
             onChange={(e) => setEmail(e.target.value)}
+            value={email}
             required
           />
         </div>
@@ -69,6 +81,7 @@ export default function Authentication() {
               type="text"
               placeholder="Rajesh..."
               onChange={(e) => setUsername(e.target.value)}
+              value={username}
               required
             />
           </div>
@@ -80,6 +93,7 @@ export default function Authentication() {
             type="password"
             placeholder="Rajesh1234..."
             onChange={(e) => setPassword(e.target.value)}
+            value={password}
             required
           />
         </div>
