@@ -2,6 +2,8 @@ import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
 import Home from "./components/Home.tsx";
 import Authentication from "./components/Auth/Authentication.tsx";
 import Account from "./components/Account.tsx";
+import Toast from "./utils/toast.tsx";
+import './utils/toast.css'
 
 function App() {
   const routes = createBrowserRouter([
@@ -15,7 +17,7 @@ function App() {
     },
     {
       path: "/authentication/login",
-      element: <Authentication />,
+      element: <><Authentication /> <Toast/> </>,
     },
     {
       path: "/account",
