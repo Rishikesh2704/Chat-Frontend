@@ -26,6 +26,8 @@ export default function Authentication() {
       console.log(error.response.data);
       setEmail("");
       setPassword("");
+      alert(error.response.data.message)
+
     }
   };
 
@@ -50,6 +52,7 @@ export default function Authentication() {
     } catch (error: any) {
       setEmail("");
       setPassword("");
+      alert(error.response.data.message)
       console.log(error.response.data.message);
     }
   };
