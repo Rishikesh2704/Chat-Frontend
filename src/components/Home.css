@@ -94,10 +94,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap:1rem;
+  overflow-y:scroll;
+  padding:1.5rem 0rem;
 }
 
 .User_Wrapper {
-  height: 10%;
+  height: 12%;
   width: 90%;
   display: flex;
   justify-content: flex-start;

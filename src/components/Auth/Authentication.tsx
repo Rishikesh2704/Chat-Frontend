@@ -26,7 +26,7 @@ export default function Authentication() {
       console.log(error.response.data);
       setEmail("");
       setPassword("");
-      alert(error.response.data.message)
+      alert(error.response.data[0].msg || error.response.data)
 
     }
   };

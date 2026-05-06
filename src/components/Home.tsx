@@ -1,26 +1,28 @@
 import { useNavigate } from "react-router";
 import "./Home.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
-
 export default function Home() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [ users, setUsers ] = useState([])
   useEffect(() => {
-      
-      const fetchUsers = async () => {
-        try{
-
-          const data = await axios.get(`${import.meta.env.VITE_API}/messages/users`)
-          console.log("Users", data)
-        }catch(error:any){
-          if(error.response.data.message === "Unauthorized")
-          navigate('/authentication/login')
-        }
-      } 
-      fetchUsers()
-    
-  },[])
+    const fetchUsers = async () => {
+      try {
+        const data = await axios.get(
+          `${import.meta.env.VITE_API}/messages/users`,
+          {
+            withCredentials: true,
+          },
+        );
+        setUsers(data?.data)
+      } catch (error: any) {
+        if (error.response.data.message === "Unauthorized")
+          navigate("/authentication/login");
+      }
+    };
+    fetchUsers();
+  }, []);
   return (
     <div className="Home_Wrapper">
       <nav className="Navbar">
@@ -41,15 +43,22 @@ export default function Home() {
         </form>
 
         <div className="Chat_Friends">
+        {users&& users.map((user:any) => (
+          <>
+          
+           {console.log(user)}
           <div className="User_Wrapper">
             <figure>
               <i className="fa-solid fa-circle-user"></i>
             </figure>
             <div className="User_Details">
-              <h2>User 1</h2>
+              <h2>{user.username}</h2>
               <p>Hi</p>
             </div>
           </div>
+          </>
+        ))}
+          
         </div>
       </nav>
       <section className="Chat_Space"></section>
