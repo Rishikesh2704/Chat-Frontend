@@ -99,6 +99,10 @@
   padding:1.5rem 0rem;
 }
 
+.Chat_Friends::-webkit-scrollbar{
+  display: none;
+}
+
 .User_Wrapper {
   height: 12%;
   width: 90%;
