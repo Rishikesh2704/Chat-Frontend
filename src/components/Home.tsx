@@ -70,7 +70,7 @@ export default function Home() {
       <section className="Chat_Space">
         {selectedChat && (
           <>
-            <div className="chatheader">
+            <div className="Chat_header">
               <div className="profile">
                 <i className="fa-solid fa-circle-user"></i>
                 <h1>{selectedChat.username}</h1>
@@ -80,14 +80,14 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="chat_main">
+            <div className="Chat_main">
               <div className="chat_messages">
-
+                Messages
               </div>
               <form className="message_form">
-                <label htmlFor="message_input" >message</label>
+                <label id="message_label" htmlFor="message_input" >message</label>
                 <input type='text' id='message_input' onChange={(e) => setMessage(e.target.value) } value={message}></input>
-                <button type="submit" aria-label="send message">
+                <button type="submit" id="sendMessage_button" aria-label="send message">
                   <i className="fa-regular fa-paper-plane"></i>
                 </button>
               </form>
