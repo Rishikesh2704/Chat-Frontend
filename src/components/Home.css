@@ -160,6 +160,9 @@
 .Chat_main {
   height: 100%;
   width: 100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 
 .chat_messages {
@@ -168,8 +171,15 @@
 
 .message_form {
   height: 6%;
-  width: 100%;
+  width: 98%;
   display: flex;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:1rem; 
+  border-radius:0.6rem;
+  overflow:hidden;
+  border:2px solid black
 }
 
 #message_label {
@@ -187,9 +197,20 @@
 }
 
 #message_input {
-  width: 94%;
+  width: 90%;
+  font-size:1.1vmax;
+  padding: 0rem 1rem;
+  border:none;
+  &:focus{
+    outline:none;
+  }
 }
 
 #sendMessage_button {
-  width: 6%;
+  height: 96%;
+  width: 3%;
+  font-size:2.1vmin;
+  border-radius:50%;
+  text-align:center;
+  line-height: 100%;
 }
