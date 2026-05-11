@@ -13,6 +13,7 @@
   margin: 0;
   --primary-gradient: linear-gradient(to top, #0ba360 0%, #3cba92 100%);
   --primary-color: #3cba92;
+  --primary-hover-color:#0d9167;
   --secondary-color: #ffff;
 }
 
