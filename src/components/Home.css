@@ -1,10 +1,10 @@
 .Home_Wrapper {
-  height: 100vh;
-  width: 100vw;
+  height: 95vh;
+  width: 99vw;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--primary-color);
+  gap:0.2rem;
 }
 
 .Navbar {
@@ -16,6 +16,9 @@
   align-items: center;
   gap: 1.6rem;
   padding-top: 1.5rem;
+  border-radius:0.5rem;
+  background: var(--primary-color);
+
 }
 
 .Header {
@@ -123,18 +126,21 @@
   flex-direction: column;
   align-items: start;
   justify-content: center;
+  gap:0.3rem; 
 
   & > h2 {
-    font-size: 1.18vmax;
+    font-size: 1vmax;
+    font-weight: 700;
   }
 
   & > p {
+    font-size: 1vmax;
     color: #3d3d3d;
   }
 }
 
 .Chat_Space {
-  height: 100%;
+  height: 98vh;
   width: 80%;
   background-color: var(--secondary-color);
   border-bottom-left-radius: 0.8rem;
@@ -142,6 +148,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  border-radius:0.4rem;
   z-index: 1;
 }
 
@@ -161,7 +168,8 @@
 }
 
 .profile h1 {
-  font-size: 1.3vmax;
+  font-size: 1vmax;
+  font-weight:800
 }
 
 .profile i {

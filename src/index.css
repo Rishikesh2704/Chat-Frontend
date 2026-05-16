@@ -5,7 +5,7 @@
 
 @font-face {
   font-family: Inter;
-  src: url(./assets/Inter-Light-BETA.otf);
+  src: url(./assets/Inter-Regular.otf);
 }
 
 * {
@@ -14,13 +14,14 @@
   --primary-gradient: linear-gradient(to top, #0ba360 0%, #3cba92 100%);
   --primary-color: #3cba92;
   --primary-hover-color:#0d9167;
-  --secondary-color: #ffff;
+  --secondary-color: #ecfffe;
 }
 
 body {
   color: black;
-  font-family:sans-serif;
+  font-family:Inter;
   overflow: clip;
+  background-color: #dbd9d9;
 }
 
 main {
