@@ -17,7 +17,7 @@
   gap: 1.6rem;
   padding-top: 1.5rem;
   border-radius:0.5rem;
-  background: var(--primary-color);
+  background: var(--primary-gradient);
 
 }
 
@@ -102,7 +102,6 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  border-bottom: 2px solid white;
   border-radius: 0.3rem;
   padding-bottom: 0.5rem;
   padding-top: 0.5rem;
@@ -142,7 +141,6 @@
 .Chat_Space {
   height: 98vh;
   width: 80%;
-  background-color: var(--secondary-color);
   border-bottom-left-radius: 0.8rem;
   border-top-left-radius: 0.8rem;
   display: flex;
@@ -154,10 +152,10 @@
 
 .Chat_header {
   height: 8%;
-  width: 90%;
+  width: 100%;
   display: flex;
   align-items: center;
-  border-bottom: 2px solid #000000;
+  border-bottom: 1px solid #787676;
 }
 
 .profile {
@@ -196,8 +194,8 @@
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  border-radius: 0.6rem;
-  border: 2px solid black;
+  border-radius: 0.3rem;
+  border: 1px solid rgb(116, 114, 114);
 }
 
 #message_label {
@@ -215,10 +213,12 @@
 }
 
 #message_input {
-  width: 90%;
+  height: 100%;
+  width: 100%;
   font-size: 1.1vmax;
   padding: 0rem 1rem;
   border: none;
+  border-radius: inherit;
   &:focus {
     outline: none;
   }
