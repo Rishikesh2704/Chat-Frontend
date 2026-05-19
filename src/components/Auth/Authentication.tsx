@@ -18,12 +18,13 @@ export default function Authentication() {
     };
     console.log("LogIn: \n", User);
     try {
-      await axios.post(`${import.meta.env.VITE_API}/auth/login`, User, {
+      const res = await axios.post(`${import.meta.env.VITE_API}/auth/login`, User, {
         withCredentials: true,
       });
-      navigate("/");
+      console.log("AccessToken:", res.data);
+
+      // navigate("/");
     } catch (error: any) {
-      console.log(error.response.data);
       setEmail("");
       setPassword("");
       alert(error.response.data[0].msg || error.response.data)
@@ -48,7 +49,7 @@ export default function Authentication() {
         },
       );
       console.log("AccessToken:", res.data);
-      navigate("/");
+      // navigate("/");
     } catch (error: any) {
       setEmail("");
       setPassword("");
@@ -72,7 +73,6 @@ export default function Authentication() {
             type="email"
             placeholder="fake@email.com..."
             onChange={(e) => setEmail(e.target.value)}
-            value={email}
             required
           />
         </div>
@@ -84,7 +84,6 @@ export default function Authentication() {
               type="text"
               placeholder="Rajesh..."
               onChange={(e) => setUsername(e.target.value)}
-              value={username}
               required
             />
           </div>
@@ -96,7 +95,6 @@ export default function Authentication() {
             type="password"
             placeholder="Rajesh1234..."
             onChange={(e) => setPassword(e.target.value)}
-            value={password}
             required
           />
         </div>

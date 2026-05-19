@@ -138,6 +138,23 @@
   }
 }
 
+.Logout_Btn{
+  height:6%;
+  width:3%;
+  font-size:1.2vmax;
+  position:absolute;
+  top:1rem;
+  right:3rem;
+  border-radius:50%;
+  border:1px solid rgb(205, 205, 205);
+  background-color:#e9e7e7;
+  cursor:pointer;
+  z-index:2
+}
+
+
+/*  Message Box  */ 
+
 .Chat_Space {
   height: 98vh;
   width: 80%;

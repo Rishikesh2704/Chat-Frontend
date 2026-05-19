@@ -25,13 +25,23 @@ export default function Home() {
         );
         setUsers(data?.data);
       } catch (error: any) {
-        console.log(error )
+        console.log("Error: ",error.response.data.message)
         if (error.response.data.message === "Unauthorized")
           navigate("/authentication/login");
       }
     };
     fetchUsers();
   }, []);
+
+  const handleLogOut = async() => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API}/auth/logout`)
+      
+      console.log(response)
+    } catch (error) {
+      console.log(error)
+    }
+  }
   return (
     <div className="Home_Wrapper">
       <nav className="Navbar">
@@ -67,6 +77,9 @@ export default function Home() {
               </>
             ))}
         </div>
+        <button className="Logout_Btn" aria-label="Logout" onClick={handleLogOut}>
+          <i className="fa-solid fa-arrow-right-from-bracket"></i>
+        </button>
       </nav>
       <section className="Chat_Space">
         {selectedChat && (
@@ -96,6 +109,7 @@ export default function Home() {
           </>
         )}
       </section>
+      
     </div>
   );
 }
