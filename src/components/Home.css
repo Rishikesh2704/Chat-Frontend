@@ -4,7 +4,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap:0.2rem;
+  gap: 0.2rem;
 }
 
 .Navbar {
@@ -16,9 +16,8 @@
   align-items: center;
   gap: 1.6rem;
   padding-top: 1.5rem;
-  border-radius:0.5rem;
+  border-radius: 0.5rem;
   background: var(--primary-gradient);
-
 }
 
 .Header {
@@ -125,7 +124,7 @@
   flex-direction: column;
   align-items: start;
   justify-content: center;
-  gap:0.3rem; 
+  gap: 0.3rem;
 
   & > h2 {
     font-size: 1vmax;
@@ -138,22 +137,27 @@
   }
 }
 
-.Logout_Btn{
-  height:6%;
-  width:3%;
-  font-size:1.2vmax;
-  position:absolute;
-  top:1rem;
-  right:3rem;
-  border-radius:50%;
-  border:1px solid rgb(205, 205, 205);
-  background-color:#e9e7e7;
-  cursor:pointer;
-  z-index:2
+.Logout_Btn {
+  height: 6%;
+  width: 3%;
+  font-size: 1.2vmax;
+  position: absolute;
+  top: 1rem;
+  right: 3rem;
+  border-radius: 50%;
+  border: 1px solid rgb(205, 205, 205);
+  background-color: #dbdbdb;
+  cursor: pointer;
+  z-index: 2;
+  transition: 0.1s ease-out;
+
+  &:hover {
+    transition: 0.1s ease-out;
+    background-color: var(--primary-color);
+  }
 }
 
-
-/*  Message Box  */ 
+/*  Message Box  */
 
 .Chat_Space {
   height: 98vh;
@@ -163,7 +167,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-radius:0.4rem;
+  border-radius: 0.4rem;
   z-index: 1;
 }
 
@@ -184,7 +188,7 @@
 
 .profile h1 {
   font-size: 1vmax;
-  font-weight:800
+  font-weight: 800;
 }
 
 .profile i {

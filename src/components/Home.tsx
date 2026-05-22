@@ -13,7 +13,7 @@ export default function Home() {
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [selectedChat, setSelectChat] = useState<User | undefined>();
-  const [message, setMessage] = useState<string>('')
+  const [message, setMessage] = useState<string>("");
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -25,7 +25,16 @@ export default function Home() {
         );
         setUsers(data?.data);
       } catch (error: any) {
-        console.log("Error: ",error.response.data.message)
+        if ((error.response.status = "401")) {
+          console.log(document.cookie);
+          const data = await axios.post(
+            `${import.meta.env.VITE_API}/auth/refresh`,
+            {
+              withCredentials: true,
+            },
+          );
+          console.log(data);
+        }
         if (error.response.data.message === "Unauthorized")
           navigate("/authentication/login");
       }
@@ -33,15 +42,17 @@ export default function Home() {
     fetchUsers();
   }, []);
 
-  const handleLogOut = async() => {
+  const handleLogOut = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API}/auth/logout`)
-      
-      console.log(response)
+      const response = await axios.get(
+        `${import.meta.env.VITE_API}/auth/logout`,
+      );
+
+      console.log(response);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
   return (
     <div className="Home_Wrapper">
       <nav className="Navbar">
@@ -65,7 +76,10 @@ export default function Home() {
           {users &&
             users.map((user: any) => (
               <>
-                <div className="User_Wrapper" onClick={() => setSelectChat(user)}>
+                <div
+                  className="User_Wrapper"
+                  onClick={() => setSelectChat(user)}
+                >
                   <figure>
                     <i className="fa-solid fa-circle-user"></i>
                   </figure>
@@ -77,7 +91,11 @@ export default function Home() {
               </>
             ))}
         </div>
-        <button className="Logout_Btn" aria-label="Logout" onClick={handleLogOut}>
+        <button
+          className="Logout_Btn"
+          aria-label="Logout"
+          onClick={handleLogOut}
+        >
           <i className="fa-solid fa-arrow-right-from-bracket"></i>
         </button>
       </nav>
@@ -95,13 +113,22 @@ export default function Home() {
             </div>
 
             <div className="Chat_main">
-              <div className="chat_messages">
-                Messages
-              </div>
+              <div className="chat_messages">Messages</div>
               <form className="message_form">
-                <label id="message_label" htmlFor="message_input" >message</label>
-                <input type='text' id='message_input' onChange={(e) => setMessage(e.target.value) } value={message}></input>
-                <button type="submit" id="sendMessage_button" aria-label="send message">
+                <label id="message_label" htmlFor="message_input">
+                  message
+                </label>
+                <input
+                  type="text"
+                  id="message_input"
+                  onChange={(e) => setMessage(e.target.value)}
+                  value={message}
+                ></input>
+                <button
+                  type="submit"
+                  id="sendMessage_button"
+                  aria-label="send message"
+                >
                   <i className="fa-regular fa-paper-plane"></i>
                 </button>
               </form>
@@ -109,7 +136,6 @@ export default function Home() {
           </>
         )}
       </section>
-      
     </div>
   );
 }
