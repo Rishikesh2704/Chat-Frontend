@@ -25,15 +25,14 @@ export default function Home() {
         );
         setUsers(data?.data);
       } catch (error: any) {
-        if ((error.response.status = "401")) {
+        if (error.response.status == "401") {
           console.log(document.cookie);
-          const data = await axios.post(
-            `${import.meta.env.VITE_API}/auth/refresh`,
-            {
-              withCredentials: true,
-            },
-          );
-          console.log(data);
+          const data = await axios.get(
+          `${import.meta.env.VITE_API}/auth/refresh`,
+          {
+            withCredentials: true,
+          },
+        );
         }
         if (error.response.data.message === "Unauthorized")
           navigate("/authentication/login");
