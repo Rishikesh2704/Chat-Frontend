@@ -35,21 +35,21 @@
 }
 
 .Auth_Wrapper {
-  height: 10%;
-  width: 10%;
+  height: 80%;
+  width: 40%;
   background: var(--primary-gradient);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  animation: AuthPageAnimation 0.8s ease-in;
-  animation-fill-mode: forwards;
+  border-radius: 0.7rem;
+  /* animation: AuthPageAnimation 0.8s ease-in;
+  animation-fill-mode: forwards; */
 }
 
 #SignIn_Form {
-  height: 45%;
-  width: 28%;
+  height: 55%;
+  width: 70%;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
