@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import "./Home.css";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../lib/axios.js";
 
 type User = {
   id: number;
@@ -25,17 +25,9 @@ export default function Home() {
         );
         setUsers(data?.data);
       } catch (error: any) {
-        if (error.response.status == "401") {
-          console.log(document.cookie);
-          const data = await axios.get(
-          `${import.meta.env.VITE_API}/auth/refresh`,
-          {
-            withCredentials: true,
-          },
-        );
-        }
-        if (error.response.data.message === "Unauthorized")
-          navigate("/authentication/login");
+        
+        // if (error.response.data.message === "Unauthorized")
+        //   navigate("/authentication/login");
       }
     };
     fetchUsers();
@@ -76,6 +68,7 @@ export default function Home() {
             users.map((user: any) => (
               <>
                 <div
+                  key={user.username + 2}
                   className="User_Wrapper"
                   onClick={() => setSelectChat(user)}
                 >

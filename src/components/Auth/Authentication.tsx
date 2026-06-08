@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import "./AuthStyle.css";
-import axios from "axios";
+import axios from "../../lib/axios.js";
+import { useUser } from "../../lib/context.js";
 
 export default function Authentication() {
+  const { setUser } = useUser();
   const params = useLocation();
   const type = params.pathname.split("/")[2];
   const [email, setEmail] = useState<string>();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
   const navigate = useNavigate();
+  
   const handleLogInSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const User = {
@@ -26,11 +29,10 @@ export default function Authentication() {
         },
       );
       console.log("AccessToken:", res.data);
-
+      setUser(res.data);
       navigate("/");
     } catch (error: any) {
-      setEmail("");
-      setPassword("");
+      console.log(error.response.data)
       alert(error.response.data[0].msg || error.response.data);
     }
   };
@@ -60,6 +62,7 @@ export default function Authentication() {
       console.log(error.response.data.message);
     }
   };
+
 
   return (
     <section className="Auth_Wrapper">
