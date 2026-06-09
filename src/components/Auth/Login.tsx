@@ -1,18 +1,14 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import "./AuthStyle.css";
 import axios from "../../lib/axios.js";
 import { useUser } from "../../lib/context.js";
 
-export default function Authentication() {
-  const { setUser } = useUser();
-  const params = useLocation();
-  const type = params.pathname.split("/")[2];
+export default function Login() {
   const [email, setEmail] = useState<string>();
-  const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
   const navigate = useNavigate();
-  
+
   const handleLogInSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const User = {
@@ -27,41 +23,14 @@ export default function Authentication() {
           withCredentials: true,
         },
       );
-      console.log("AccessToken:", res.data);
-      setUser(res.data.User);
       navigate("/");
+      console.log(res.data.User)
+      localStorage.setItem('CurrentUser',JSON.stringify(res.data.User))
     } catch (error: any) {
-      console.log(error.response.data)
+      console.log(error.response.data);
       alert(error.response.data[0].msg || error.response.data);
     }
   };
-
-  const handleSignInSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const User = {
-      email: email,
-      username: username,
-      password: password,
-    };
-
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API}/auth/signup`,
-        User,
-        {
-          withCredentials: true,
-        },
-      );
-      console.log("AccessToken:", res.data);
-      navigate("/");
-    } catch (error: any) {
-      setEmail("");
-      setPassword("");
-      alert(error.response.data.message);
-      console.log(error.response.data.message);
-    }
-  };
-
 
   return (
     <section className="Auth_Wrapper">
@@ -69,7 +38,7 @@ export default function Authentication() {
       <form
         id="SignIn_Form"
         onSubmit={(e) => {
-          type === "signin" ? handleSignInSubmit(e) : handleLogInSubmit(e);
+          handleLogInSubmit(e);
         }}
       >
         <div className="fields">
@@ -83,19 +52,6 @@ export default function Authentication() {
           />
         </div>
 
-        {type !== "login" && (
-          <div className="fields">
-            <label>Username</label>
-            <input
-              type="text"
-              placeholder="Rajesh..."
-              onChange={(e) => setUsername(e.target.value)}
-              value={username}
-              required
-            />
-          </div>
-        )}
-
         <div className="fields">
           <label>Password</label>
           <input
@@ -108,7 +64,7 @@ export default function Authentication() {
         </div>
 
         <button id="Submit_Button" type="submit">
-          {type?.toUpperCase()}
+          Login
         </button>
       </form>
     </section>

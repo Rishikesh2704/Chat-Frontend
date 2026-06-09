@@ -1,12 +1,11 @@
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
 import Home from "./components/Home.tsx";
-import Authentication from "./components/Auth/Authentication.tsx";
 import Account from "./components/Account.tsx";
-import { useContext, useEffect } from "react";
-import { useUser } from "./lib/context.tsx";
+import Login from "./components/Auth/Login.tsx";
+import SignIn from "./components/Auth/Sigin.tsx";
 
 function App() {
-  const { user } = useUser()
+  const  user  = localStorage.getItem('CurrentUser');
   console.log(user)
   const routes = createBrowserRouter([
     {
@@ -15,11 +14,11 @@ function App() {
     },
     {
       path: "/authentication/signin",
-      element:  <Authentication />,
+      element: <SignIn />,
     },
     {
       path: "/authentication/login",
-      element: <Authentication />,
+      element: <Login />,
     },
     {
       path: "/account",

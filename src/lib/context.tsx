@@ -7,28 +7,23 @@ type User = {
 };
 
 type UserContextType = {
-    user:User | undefined;
-    setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
-    loggedUser: (user:User) => void;
-}
+  users: User[] | null;
+  setUsers: React.Dispatch<React.SetStateAction<User[] | null>>;
+};
 
 const userContextState = {
-    user:undefined,
-    setUser:() => '' ,
-    loggedUser:() => '',
-}
+  users: null,
+  setUsers: () => "",
+};
 const userContext = createContext<UserContextType>(userContextState);
 
 export const useUser = () => useContext(userContext);
 
-export const User = ({ children }: { children: any }) => {
-  const [user, setUser] = useState<User | undefined>();
-  const loggedUser = (user:User) => {
-    setUser(user);
-  };
+export const User = ({ children }: { children: React.ReactNode }) => {
+  const [users, setUsers] = useState<User[] | null>(null);
 
   return (
-    <userContext.Provider value={{ loggedUser, user, setUser }}>
+    <userContext.Provider value={{ users, setUsers }}>
       {children}
     </userContext.Provider>
   );

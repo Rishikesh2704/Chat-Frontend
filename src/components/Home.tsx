@@ -1,20 +1,28 @@
 import { useNavigate } from "react-router";
 import "./Home.css";
 import { useEffect, useState } from "react";
+import { useUser } from "../lib/context.js";
+import { io } from "socket.io-client";
 import axios from "../lib/axios.js";
-
 type User = {
-  id: number;
+  _id: string;
   username: string;
   profile?: string;
 };
 
 export default function Home() {
+  const { setUsers: setUserSocketIds, users: SocketIds } = useUser();
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
-  const [selectedChat, setSelectChat] = useState<User | undefined>();
+  const [selectedUser, setSelectUser] = useState<User | null>(null);
   const [message, setMessage] = useState<string>("");
+
   useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("CurrentUser") as string);
+    console.log(user);
+    const socket = io(`${import.meta.env.VITE_API}`, {
+      query: { userId: user?.id, username: user?.username },
+    });
     const fetchUsers = async () => {
       try {
         const data = await axios.get(
@@ -25,12 +33,22 @@ export default function Home() {
         );
         setUsers(data?.data);
       } catch (error: any) {
-        
-        // if (error.response.data.message === "Unauthorized")
-        //   navigate("/authentication/login");
+        // navigate("/authentication/login");
       }
     };
+    socket.on("connect", () => {
+      socket.emit("chat", "Connected to the server!");
+    });
+    console.log("My SocketId : ", socket)
+    socket.on("getUsers", (msg: any) => setUserSocketIds(msg));
+    // socket.on('users', () => console.log(users))
+    socket.on("privateMessage", (message) => console.log(message));
+
     fetchUsers();
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   const handleLogOut = async () => {
@@ -38,12 +56,35 @@ export default function Home() {
       const response = await axios.get(
         `${import.meta.env.VITE_API}/auth/logout`,
       );
-
+      navigate("/authentication/login");
       console.log(response);
+      // setUser(null)
     } catch (error) {
       console.log(error);
     }
   };
+
+  const sendMessage = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    let selectedUserSocketId;
+    try {
+      console.log(SocketIds);
+
+      for (let id in SocketIds) {
+        if (id === selectedUser?._id) selectedUserSocketId = SocketIds[id];
+        console.log(selectedUserSocketId);
+      }
+
+      const messageRequest = await axios.post(
+        `${import.meta.env.VITE_API}/messages/sendMessage/${selectedUserSocketId}`,
+        { message },
+      );
+      console.log(messageRequest);
+    } catch (error: any) {
+      console.log(error.response.data);
+    }
+  };
+
   return (
     <div className="Home_Wrapper">
       <nav className="Navbar">
@@ -70,7 +111,7 @@ export default function Home() {
                 <div
                   key={user.username + 2}
                   className="User_Wrapper"
-                  onClick={() => setSelectChat(user)}
+                  onClick={() => setSelectUser(user)}
                 >
                   <figure>
                     <i className="fa-solid fa-circle-user"></i>
@@ -91,13 +132,14 @@ export default function Home() {
           <i className="fa-solid fa-arrow-right-from-bracket"></i>
         </button>
       </nav>
+
       <section className="Chat_Space">
-        {selectedChat && (
+        {selectedUser && (
           <>
             <div className="Chat_header">
               <div className="profile">
                 <i className="fa-solid fa-circle-user"></i>
-                <h1>{selectedChat.username}</h1>
+                <h1>{selectedUser.username}</h1>
               </div>
               <div className="chatheader_options">
                 <i className="fa-solid fa-call"></i>
@@ -106,7 +148,7 @@ export default function Home() {
 
             <div className="Chat_main">
               <div className="chat_messages">Messages</div>
-              <form className="message_form">
+              <form className="message_form" onSubmit={(e) => sendMessage(e)}>
                 <label id="message_label" htmlFor="message_input">
                   message
                 </label>

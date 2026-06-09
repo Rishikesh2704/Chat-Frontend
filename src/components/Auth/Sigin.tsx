@@ -1,40 +1,14 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import "./AuthStyle.css";
 import axios from "../../lib/axios.js";
 import { useUser } from "../../lib/context.js";
 
-export default function Authentication() {
-  const { setUser } = useUser();
-  const params = useLocation();
-  const type = params.pathname.split("/")[2];
+export default function SignIn() {
   const [email, setEmail] = useState<string>();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
   const navigate = useNavigate();
-  
-  const handleLogInSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const User = {
-      email,
-      password,
-    };
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API}/auth/login`,
-        User,
-        {
-          withCredentials: true,
-        },
-      );
-      console.log("AccessToken:", res.data);
-      setUser(res.data.User);
-      navigate("/");
-    } catch (error: any) {
-      console.log(error.response.data)
-      alert(error.response.data[0].msg || error.response.data);
-    }
-  };
 
   const handleSignInSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -53,6 +27,8 @@ export default function Authentication() {
         },
       );
       console.log("AccessToken:", res.data);
+      localStorage.set("CurrentUser", JSON.stringify(res.data.User));
+
       navigate("/");
     } catch (error: any) {
       setEmail("");
@@ -62,14 +38,13 @@ export default function Authentication() {
     }
   };
 
-
   return (
     <section className="Auth_Wrapper">
       <h1 id="AppName">Convo</h1>
       <form
         id="SignIn_Form"
         onSubmit={(e) => {
-          type === "signin" ? handleSignInSubmit(e) : handleLogInSubmit(e);
+          handleSignInSubmit(e);
         }}
       >
         <div className="fields">
@@ -83,18 +58,16 @@ export default function Authentication() {
           />
         </div>
 
-        {type !== "login" && (
-          <div className="fields">
-            <label>Username</label>
-            <input
-              type="text"
-              placeholder="Rajesh..."
-              onChange={(e) => setUsername(e.target.value)}
-              value={username}
-              required
-            />
-          </div>
-        )}
+        <div className="fields">
+          <label>Username</label>
+          <input
+            type="text"
+            placeholder="Rajesh..."
+            onChange={(e) => setUsername(e.target.value)}
+            value={username}
+            required
+          />
+        </div>
 
         <div className="fields">
           <label>Password</label>
@@ -108,7 +81,7 @@ export default function Authentication() {
         </div>
 
         <button id="Submit_Button" type="submit">
-          {type?.toUpperCase()}
+          SignIn
         </button>
       </form>
     </section>
