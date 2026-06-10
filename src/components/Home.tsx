@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { useUser } from "../lib/context.js";
 import { io } from "socket.io-client";
 import axios from "../lib/axios.js";
+import Friends from "./Chat/Friends.js";
+import MessageSpace from "./Chat/MessageSpace.js";
+
 type User = {
   _id: string;
   username: string;
@@ -11,11 +14,15 @@ type User = {
 };
 
 export default function Home() {
-  const { setUsers: setUserSocketIds, users: SocketIds } = useUser();
+  const { setUsers: setUserSocketIds } = useUser();
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
-  const [selectedUser, setSelectUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [message, setMessage] = useState<string>("");
+  const [allMessages, setAllMessages] = useState<{
+    sent: string[];
+    received: string[];
+  }>({ sent: [], received: [] });
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("CurrentUser") as string);
@@ -33,15 +40,17 @@ export default function Home() {
         );
         setUsers(data?.data);
       } catch (error: any) {
-        // navigate("/authentication/login");
+        console.log(error.response)
       }
     };
     socket.on("connect", () => {
       socket.emit("chat", "Connected to the server!");
     });
-    console.log("My SocketId : ", socket)
-    socket.on("getUsers", (msg: any) => setUserSocketIds(msg));
-    // socket.on('users', () => console.log(users))
+    console.log("My SocketId : ", socket);
+    socket.on("getUsers", (UsersList: any) => {
+      console.log("UsersList: ", UsersList);
+      setUserSocketIds(UsersList);
+    });
     socket.on("privateMessage", (message) => console.log(message));
 
     fetchUsers();
@@ -58,30 +67,8 @@ export default function Home() {
       );
       navigate("/authentication/login");
       console.log(response);
-      // setUser(null)
     } catch (error) {
       console.log(error);
-    }
-  };
-
-  const sendMessage = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    let selectedUserSocketId;
-    try {
-      console.log(SocketIds);
-
-      for (let id in SocketIds) {
-        if (id === selectedUser?._id) selectedUserSocketId = SocketIds[id];
-        console.log(selectedUserSocketId);
-      }
-
-      const messageRequest = await axios.post(
-        `${import.meta.env.VITE_API}/messages/sendMessage/${selectedUserSocketId}`,
-        { message },
-      );
-      console.log(messageRequest);
-    } catch (error: any) {
-      console.log(error.response.data);
     }
   };
 
@@ -104,26 +91,7 @@ export default function Home() {
           </button>
         </form>
 
-        <div className="Chat_Friends">
-          {users &&
-            users.map((user: any) => (
-              <>
-                <div
-                  key={user.username + 2}
-                  className="User_Wrapper"
-                  onClick={() => setSelectUser(user)}
-                >
-                  <figure>
-                    <i className="fa-solid fa-circle-user"></i>
-                  </figure>
-                  <div className="User_Details">
-                    <h2>{user.username}</h2>
-                    <p>Hi</p>
-                  </div>
-                </div>
-              </>
-            ))}
-        </div>
+        <Friends users={users} setSelectedUser={setSelectedUser} />
         <button
           className="Logout_Btn"
           aria-label="Logout"
@@ -135,39 +103,13 @@ export default function Home() {
 
       <section className="Chat_Space">
         {selectedUser && (
-          <>
-            <div className="Chat_header">
-              <div className="profile">
-                <i className="fa-solid fa-circle-user"></i>
-                <h1>{selectedUser.username}</h1>
-              </div>
-              <div className="chatheader_options">
-                <i className="fa-solid fa-call"></i>
-              </div>
-            </div>
-
-            <div className="Chat_main">
-              <div className="chat_messages">Messages</div>
-              <form className="message_form" onSubmit={(e) => sendMessage(e)}>
-                <label id="message_label" htmlFor="message_input">
-                  message
-                </label>
-                <input
-                  type="text"
-                  id="message_input"
-                  onChange={(e) => setMessage(e.target.value)}
-                  value={message}
-                ></input>
-                <button
-                  type="submit"
-                  id="sendMessage_button"
-                  aria-label="send message"
-                >
-                  <i className="fa-regular fa-paper-plane"></i>
-                </button>
-              </form>
-            </div>
-          </>
+          <MessageSpace
+            selectedUser={selectedUser}
+            allMessages={allMessages}
+            message={message}
+            setAllMessages={setAllMessages}
+            setMessage={setMessage}
+          />
         )}
       </section>
     </div>
