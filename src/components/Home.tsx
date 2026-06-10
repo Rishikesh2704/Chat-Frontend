@@ -13,20 +13,22 @@ type User = {
   profile?: string;
 };
 
+type ReceivedMessageType = {
+  SenderId: string;
+  image?: string;
+  text: string;
+  id: string;
+};
+
 export default function Home() {
   const { setUsers: setUserSocketIds } = useUser();
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [message, setMessage] = useState<string>("");
-  const [allMessages, setAllMessages] = useState<{
-    sent: string[];
-    received: string[];
-  }>({ sent: [], received: [] });
+  const [receivedMessages, setReceivedMessages] = useState<{from:string |undefined,message:string|undefined}[]>([]);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("CurrentUser") as string);
-    console.log(user);
     const socket = io(`${import.meta.env.VITE_API}`, {
       query: { userId: user?.id, username: user?.username },
     });
@@ -40,19 +42,23 @@ export default function Home() {
         );
         setUsers(data?.data);
       } catch (error: any) {
-        console.log(error.response)
+        console.log(error.response);
       }
     };
     socket.on("connect", () => {
       socket.emit("chat", "Connected to the server!");
     });
-    console.log("My SocketId : ", socket);
     socket.on("getUsers", (UsersList: any) => {
-      console.log("UsersList: ", UsersList);
       setUserSocketIds(UsersList);
     });
-    socket.on("privateMessage", (message) => console.log(message));
-
+    socket.on("privateMessage", (message: ReceivedMessageType,ack) =>{
+      setReceivedMessages([
+        ...receivedMessages,
+       {from:message.SenderId, message: message.text}
+      ]),
+      ack(true)
+    });
+    console.log(receivedMessages);
     fetchUsers();
 
     return () => {
@@ -105,10 +111,7 @@ export default function Home() {
         {selectedUser && (
           <MessageSpace
             selectedUser={selectedUser}
-            allMessages={allMessages}
-            message={message}
-            setAllMessages={setAllMessages}
-            setMessage={setMessage}
+            receivedMessages={receivedMessages}
           />
         )}
       </section>

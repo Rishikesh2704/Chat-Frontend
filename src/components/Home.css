@@ -205,6 +205,10 @@
 
 .chat_messages {
   height: 93.5%;
+  width:100%;
+  display: flex;
+  justify-content:center;
+
 }
 
 .message_form {
@@ -261,4 +265,33 @@
   &:hover {
     background-color: var(--primary-hover-color);
   }
+}
+
+/* Message Style */
+.Messages{
+  width:47%;
+  padding:1rem 0.9rem;
+}
+.Sent,.Received{
+  display:flex;
+  flex-direction:column;
+  justify-content:end;
+  gap: 0.3em;
+}
+.Sent{
+  align-items:end
+}
+
+.messageStyle{
+  height:fit-content;
+  min-height: 2.2rem;
+  width: fit-content;
+  min-width: 5rem;
+  max-width: 50%;
+  background-color: var(--primary-color);;
+  border-radius:0.4rem;
+  word-wrap:break-word;
+  line-height: 2.2rem;
+  padding:0rem 0.5rem;
+
 }

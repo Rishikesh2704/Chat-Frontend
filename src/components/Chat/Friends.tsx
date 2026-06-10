@@ -17,7 +17,7 @@ export default function Friends(props: FriendsProps) {
         users.map((user: any) => (
           <>
             <div
-              key={user.username + 2}
+              key={Math.random()}
               className="User_Wrapper"
               onClick={() => setSelectedUser(user)}
             >
