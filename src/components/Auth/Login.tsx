@@ -25,7 +25,7 @@ export default function Login() {
       );
       navigate("/");
       console.log(res.data.User)
-      localStorage.setItem('CurrentUser',JSON.stringify(res.data.User))
+      localStorage.setItem('Current_User',JSON.stringify(res.data.User))
     } catch (error: any) {
       console.log(error.response.data);
       alert(error.response.data[0].msg || error.response.data);
@@ -49,6 +49,7 @@ export default function Login() {
             onChange={(e) => setEmail(e.target.value)}
             value={email}
             required
+            autoFocus
           />
         </div>
 

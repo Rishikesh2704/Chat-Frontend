@@ -11,17 +11,17 @@
 * {
   padding: 0;
   margin: 0;
-  --primary-gradient: linear-gradient(to bottom right, #65e3bb 0%, #0ba360 100%);
-  --primary-color: #3cba92;
-  --primary-hover-color:#0d9167;
-  --secondary-color: #ecfffe;
+  --primary-gradient: linear-gradient(to bottom right, #f79f58 0%, #ff6a0d 50%);
+  --primary-color: #ff7a28;
+  --primary-hover-color:#e05b09;
+  --secondary-color: #f9faf9;
 }
 
 body {
   color: black;
   font-family:Inter;
   overflow: clip;
-  background-color: #f8f4f4;
+  background-color: #e1e0e0;
 }
 
 main {
@@ -30,10 +30,14 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap:0.5rem;
 }
 
 #AppName {
   font-family: Beverage;
-  font-size: 3.1rem;
-  letter-spacing: 0.3rem;
+  font-size: 2.4rem;
+  letter-spacing: 0.2rem;
+  background: var(--primary-gradient);
+  color:transparent;
+  background-clip: text;
 }

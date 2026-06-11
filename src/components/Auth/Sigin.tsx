@@ -27,7 +27,7 @@ export default function SignIn() {
         },
       );
       console.log("AccessToken:", res.data);
-      localStorage.set("CurrentUser", JSON.stringify(res.data.User));
+      localStorage.set("Current_User", JSON.stringify(res.data.User));
 
       navigate("/");
     } catch (error: any) {
@@ -55,6 +55,7 @@ export default function SignIn() {
             onChange={(e) => setEmail(e.target.value)}
             value={email}
             required
+            autoFocus
           />
         </div>
 

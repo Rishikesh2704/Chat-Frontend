@@ -1,8 +1,9 @@
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
-import Home from "./components/Home.tsx";
+import { createBrowserRouter, RouterProvider } from "react-router";
+import Home from "./components/Home/Home.tsx";
 import Account from "./components/Account.tsx";
 import Login from "./components/Auth/Login.tsx";
 import SignIn from "./components/Auth/Sigin.tsx";
+import Navbar from "./components/Navbar/Navbar.tsx";
 
 function App() {
   const  user  = localStorage.getItem('CurrentUser');
@@ -10,7 +11,7 @@ function App() {
   const routes = createBrowserRouter([
     {
       path: "/",
-      element: <Home />,
+      element: <> <Navbar/> <Home /> </>,
     },
     {
       path: "/authentication/signin",
