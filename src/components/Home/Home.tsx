@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import "./Home.css";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useUser } from "../../lib/context.js";
 import { io } from "socket.io-client";
 import axios from "../../lib/axios.js";
@@ -15,20 +15,19 @@ type User = {
 
 type ReceivedMessageType = {
   SenderId: string;
-  ReceiverId:string;
+  ReceiverId: string;
   image?: string;
   text: string;
   id: string;
 };
 
-
 type AllMessageType = {
-  [index: string ]: string;
+  [index: string]: string;
   message: string;
 };
 
 export default function Home() {
-  const { setUsers: setOnlineUsers, users: onlineUsers } = useUser();
+  const { setOnlineUsers, onlineUsers } = useUser();
   const navigate = useNavigate();
 
   const [users, setUsers] = useState<User[]>([]);
@@ -58,12 +57,9 @@ export default function Home() {
     const socket = io(`${import.meta.env.VITE_API}`, {
       query: { userId: user?.id, username: user?.username },
     });
-    
+
     try {
-      socket.on("connect", () => {
-        socket.emit("chat", "Connected to the server!");
-      });
-      socket.on("getUsers", (UsersList: any) => {
+      socket.on("get_Online_Users", (UsersList: any) => {
         setOnlineUsers(UsersList);
       });
       socket.on("privateMessage", (message: ReceivedMessageType, ack) => {
@@ -71,9 +67,9 @@ export default function Home() {
           ...prev,
           { from: message.SenderId, message: message.text },
         ]);
-
         ack(true);
       });
+      socket.on("Users_Online", (onlineUsers) => setOnlineUsers(onlineUsers));
     } catch (error: any) {
       console.log(error.response);
     }
@@ -84,12 +80,9 @@ export default function Home() {
 
   const handleLogOut = async () => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API}/auth/logout`,
-      );
-      localStorage.removeItem('Current_User')
+      await axios.get(`${import.meta.env.VITE_API}/auth/logout`);
+      localStorage.removeItem("Current_User");
       navigate("/authentication/login");
-      console.log(response);
     } catch (error) {
       console.log(error);
     }
@@ -99,7 +92,7 @@ export default function Home() {
     <div className="Home_Wrapper">
       <section className="ContentSection">
         <div className="Header">
-          <h1 id="AppName">Convo</h1>
+          <h1 className="AppName">Convo</h1>
           {/* <a href="/account" className="Account">
             <i className="fa-solid fa-circle-user"></i>
           </a> */}
@@ -115,7 +108,11 @@ export default function Home() {
           </button>
         </form>
 
-         {users&&<Friends users={users} setSelectedUser={setSelectedUser} onlineUsers={onlineUsers} />}
+        <Friends
+          users={users}
+          setSelectedUser={setSelectedUser}
+          onlineUsers={onlineUsers}
+        />
         <button
           className="Logout_Btn"
           aria-label="Logout"

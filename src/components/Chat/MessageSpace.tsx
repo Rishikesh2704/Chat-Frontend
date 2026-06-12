@@ -21,7 +21,7 @@ type MessageSpacePros = {
 
 export default function MessageSpace(props: MessageSpacePros) {
   const { selectedUser, allMessages, setAllMessages } = props;
-  const { users: SocketIds } = useUser();
+  const { onlineUsers: SocketIds } = useUser();
   const [message, setMessage] = useState<string | undefined>(undefined);
   
   function getSelectedUserSocketId() {
@@ -36,6 +36,7 @@ export default function MessageSpace(props: MessageSpacePros) {
     e.preventDefault();
     if (!message) return;
     try {
+      console.log(SocketIds)
       const userSocketId = getSelectedUserSocketId();
       const messageRequest = await axios.post(
         `${import.meta.env.VITE_API}/messages/sendMessage/${selectedUser._id}`,
@@ -56,9 +57,8 @@ export default function MessageSpace(props: MessageSpacePros) {
           <i className="fa-solid fa-circle-user"></i>
           <h1>{selectedUser.username}</h1>
         </div>
-        <div className="chatheader_options">
-          <i className="fa-solid fa-call"></i>
-        </div>
+        
+        <div className="line"></div>
       </div>
 
       <div className="Chat_main">
@@ -74,7 +74,9 @@ export default function MessageSpace(props: MessageSpacePros) {
               } else {
                 return (
                   <div className="SentMessage_Wrapper">
-                    <p className="messageStyle">{messages.message}</p>
+                    <p className="messageStyle">{messages.message} 
+                    </p>
+                    
                   </div>
                 );
               }

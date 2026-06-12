@@ -25,10 +25,13 @@ a{
     transition:0.2s ease-out
 }
 
-
-
  a:hover{
     transition:0.1s ease-in;
+    background-color:white;
+    color:black;
+}
+
+.selectedPage{
     background-color:white;
     color:black;
 }

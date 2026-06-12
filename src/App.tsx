@@ -1,17 +1,25 @@
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
 import Home from "./components/Home/Home.tsx";
 import Account from "./components/Account.tsx";
 import Login from "./components/Auth/Login.tsx";
 import SignIn from "./components/Auth/Sigin.tsx";
 import Navbar from "./components/Navbar/Navbar.tsx";
+import ProtectedRoute from "./lib/protectedRoute.tsx";
+
 
 function App() {
-  const  user  = localStorage.getItem('CurrentUser');
-  console.log(user)
+ 
   const routes = createBrowserRouter([
     {
       path: "/",
-      element: <> <Navbar/> <Home /> </>,
+      element: (
+        <ProtectedRoute>
+          <>
+            <Navbar />
+            <Home  />
+          </>
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/authentication/signin",
@@ -23,7 +31,7 @@ function App() {
     },
     {
       path: "/account",
-      element: <Account />,
+      element: <><Navbar/><Account /></>,
     },
   ]);
 

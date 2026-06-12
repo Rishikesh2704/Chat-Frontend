@@ -211,10 +211,19 @@
 }
 
 .Chat_header {
-  height: 10%;
+  height: 8%;
   width: 100%;
   display: flex;
   align-items: center;
+  position:relative;
+}
+
+.Chat_header > .line{
+  height:1px;
+  width:100%;
+  background-color:rgba(120, 118, 118, 0.616);
+  position:absolute;
+  bottom:0rem;
 }
 
 .profile {
@@ -232,6 +241,8 @@
 .profile i {
   font-size: 1.8vmax;
 }
+
+
 
 .Chat_main {
   height: 94%;
@@ -336,11 +347,24 @@
   height: fit-content;
   min-height: 2.2rem;
   width: fit-content;
-  min-width: 5rem;
+  min-width: 2.2rem;
   max-width: 50%;
   background-color: var(--primary-color);
   border-radius: 0.4rem;
   word-wrap: break-word;
   line-height: 2.2rem;
+  font-size:0.95rem;
   padding: 0rem 0.5rem;
+  position:relative
 }
+
+.time{
+  
+  position:absolute;
+  bottom:0;
+  right:0;
+  font-size:1rem;
+  color:#424141
+}
+
+

@@ -1,14 +1,18 @@
+import { useLocation } from 'react-router'
 import './Navbar.css'
 export default function Navbar(){
+    const page = useLocation();
+    const pagePath = page.pathname
+    console.log(pagePath)
     const icons = [
-        {id:23, name:'messages',icon:"fa-solid fa-message"},
-        {id:13, name:'account',icon:"fa-solid fa-circle-user"},
-        {id:2, name:'calls',icon:"fa-solid fa-phone"},
+        {id:23, name:'/',icon:"fa-solid fa-message", path:'/',},
+        {id:2, name:'calls',icon:"fa-solid fa-phone",  path:'/calls'},
+        {id:13, name:'account',icon:"fa-solid fa-circle-user",  path:'/account'},
     ]
     return(
         <nav >
             {icons.map( (icon) => (
-                    <a  href={`/${icon.name}`} aria-label={icon.name}>
+                    <a className={`${pagePath===icon.path ?"selectedPage":''}`} href={`/${icon.name}`} aria-label={icon.name}>
                         <i className={icon.icon}></i>
                     </a>
             ) )}

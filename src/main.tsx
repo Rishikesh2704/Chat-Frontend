@@ -7,7 +7,10 @@ import { User } from "./lib/context.tsx";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <User>
+      <User>
+
       <App />
+      </User>
     </User>
   </StrictMode>,
 );

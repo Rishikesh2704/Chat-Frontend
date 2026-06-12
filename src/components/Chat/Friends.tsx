@@ -18,7 +18,6 @@ export default function Friends(props: FriendsProps) {
   useEffect(() => {
     if (onlineUsers) {
       setOnlineUsersIds(Object.keys(onlineUsers))
-      
     }
   }, [,onlineUsers]);
 
@@ -44,8 +43,6 @@ export default function Friends(props: FriendsProps) {
     <div className="Chat_Friends">
       {users &&
         users.map((user: any) => {
-              
-
           return(
             <div
             key={user._id}

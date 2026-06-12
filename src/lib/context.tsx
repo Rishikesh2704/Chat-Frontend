@@ -1,27 +1,37 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 
 type User = {
-  [index:string] : string
+  [index: string]: string;
+};
+
+type LoggedInUserType = {
+  id: string;
+  username: string;
+  profile?: string;
 };
 
 type UserContextType = {
-  users: User[] | null;
-  setUsers: React.Dispatch<React.SetStateAction<User[] | null>>;
+  onlineUsers: User[] | null;
+  setOnlineUsers: React.Dispatch<React.SetStateAction<User[] | null>>;
+  // loggedInUser: LoggedInUserType | null;
+  // setLoggedInUser: React.Dispatch<React.SetStateAction<LoggedInUserType | null>>
 };
 
 const userContextState = {
-  users: null,
-  setUsers: () => "",
+  onlineUsers: null,
+  setOnlineUsers: () => "",
+  // loggedInUser:null,
+  // setLoggedInUser: () => "",
 };
 const userContext = createContext<UserContextType>(userContextState);
 
 export const useUser = () => useContext(userContext);
 
 export const User = ({ children }: { children: React.ReactNode }) => {
-  const [users, setUsers] = useState<User[] | null>(null);
-
+  const [onlineUsers, setOnlineUsers] = useState<User[] | null>(null);
+  const [loggedInUser, setLoggedInUser] = useState<LoggedInUserType[] | null>(null);
   return (
-    <userContext.Provider value={{ users, setUsers }}>
+    <userContext.Provider value={{ onlineUsers, setOnlineUsers }}>
       {children}
     </userContext.Provider>
   );

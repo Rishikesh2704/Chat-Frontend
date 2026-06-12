@@ -40,7 +40,7 @@ export default function SignIn() {
 
   return (
     <section className="Auth_Wrapper">
-      <h1 id="AppName">Convo</h1>
+      <h1 className="AppName">Convo</h1>
       <form
         id="SignIn_Form"
         onSubmit={(e) => {

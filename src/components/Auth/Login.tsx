@@ -23,9 +23,9 @@ export default function Login() {
           withCredentials: true,
         },
       );
-      navigate("/");
       console.log(res.data.User)
       localStorage.setItem('Current_User',JSON.stringify(res.data.User))
+      navigate("/");
     } catch (error: any) {
       console.log(error.response.data);
       alert(error.response.data[0].msg || error.response.data);
@@ -34,7 +34,7 @@ export default function Login() {
 
   return (
     <section className="Auth_Wrapper">
-      <h1 id="AppName">Convo</h1>
+      <h1 className="AppName Auth">Convo</h1>
       <form
         id="SignIn_Form"
         onSubmit={(e) => {
