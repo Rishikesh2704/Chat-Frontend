@@ -16,15 +16,26 @@ type User = {
 type ReceivedMessageType = {
   SenderId: string;
   ReceiverId: string;
-  image?: string;
   text: string;
-  id: string;
+  image?: string;
+  _id: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 type AllMessageType = {
-  [index: string]: string;
-  message: string;
+  SenderId: string;
+  ReceiverId: string;
+  text: string;
+  image: string;
+  createdAt: string;
+  updatedAt: string;
 };
+
+function toLocaleTime(time: string) {
+  const date = new Date(time);
+  return date.toLocaleTimeString();
+}
 
 export default function Home() {
   const { setOnlineUsers, onlineUsers } = useUser();
@@ -32,7 +43,7 @@ export default function Home() {
 
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [allMessages, setAllMessages] = useState<AllMessageType[]>([]);
+  const [allMessages, setAllMessages] = useState<any>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -48,6 +59,7 @@ export default function Home() {
         console.log(error.response);
       }
     };
+   
 
     fetchUsers();
   }, []);
@@ -62,13 +74,15 @@ export default function Home() {
       socket.on("get_Online_Users", (UsersList: any) => {
         setOnlineUsers(UsersList);
       });
+
       socket.on("privateMessage", (message: ReceivedMessageType, ack) => {
         setAllMessages((prev: any) => [
           ...prev,
-          { from: message.SenderId, message: message.text },
+          message
         ]);
         ack(true);
       });
+
       socket.on("Users_Online", (onlineUsers) => setOnlineUsers(onlineUsers));
     } catch (error: any) {
       console.log(error.response);
@@ -82,6 +96,10 @@ export default function Home() {
     try {
       await axios.get(`${import.meta.env.VITE_API}/auth/logout`);
       localStorage.removeItem("Current_User");
+      console.log(
+        "Logout Handler: ",
+        JSON.parse(localStorage.getItem("Current_User") as string),
+      );
       navigate("/authentication/login");
     } catch (error) {
       console.log(error);

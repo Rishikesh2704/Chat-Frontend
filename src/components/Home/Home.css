@@ -127,18 +127,6 @@
   font-size: 2rem;
 }
 
-/* .User_Wrapper figure i::after {
-  content: "";
-  height: 30%;
-  width: 25%;
-  position:absolute;
-  bottom: 0;
-  right: 0.3rem;
-  background-color: green;
-  border-radius: 50%;
-  z-index: 2;
-} */
-
 .online{
   height: 30%;
   width:25%;

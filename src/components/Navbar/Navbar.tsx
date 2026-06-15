@@ -3,7 +3,6 @@ import './Navbar.css'
 export default function Navbar(){
     const page = useLocation();
     const pagePath = page.pathname
-    console.log(pagePath)
     const icons = [
         {id:23, name:'/',icon:"fa-solid fa-message", path:'/',},
         {id:2, name:'calls',icon:"fa-solid fa-phone",  path:'/calls'},
