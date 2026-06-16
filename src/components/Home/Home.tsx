@@ -43,7 +43,7 @@ export default function Home() {
 
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [allMessages, setAllMessages] = useState<any>([]);
+  const [allMessages, setAllMessages] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
