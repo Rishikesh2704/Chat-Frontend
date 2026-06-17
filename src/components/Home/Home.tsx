@@ -46,6 +46,7 @@ export default function Home() {
   const [allMessages, setAllMessages] = useState<any[]>([]);
 
   useEffect(() => {
+    console.log(JSON.parse(localStorage.getItem('Current_User') as string))
     const fetchUsers = async () => {
       try {
         const data = await axios.get(

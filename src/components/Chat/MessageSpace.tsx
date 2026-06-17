@@ -59,11 +59,29 @@ const fetchMessages = async (selectedUser: User, skipitems: number) => {
   return reversed;
 };
 
+const getMessagesDay = (
+  time: string,
+  previousMessageTime: React.RefObject<string>,
+) => {
+  const date = new Date(time);
+  if(date.toLocaleDateString() === new Date().toLocaleDateString()) return "Today"
+  if (previousMessageTime.current.length === 0) {
+    previousMessageTime.current = date.toLocaleDateString();
+    const formattedDate = date.getDate() + " " + date.toLocaleString('default', {month: 'long'}) + " " + date.getFullYear()
+    return formattedDate;
+  } else if (previousMessageTime.current !== date.toLocaleDateString()) {
+    previousMessageTime.current = date.toLocaleDateString();
+    const formattedDate = date.getDate() + " " + date.toLocaleString('default', {month: 'long'}) + " " + date.getFullYear()
+    return formattedDate;
+  } else return "";
+};
+
 export default function MessageSpace(props: MessageSpacePros) {
   const { selectedUser, allMessages, setAllMessages } = props;
   const { onlineUsers: SocketIds } = useUser();
   const [message, setMessage] = useState<string | undefined>(undefined);
   let skipitems = useRef(0);
+  let previousMessageTime = useRef<string>("");
 
   useEffect(() => {
     try {
@@ -83,13 +101,12 @@ export default function MessageSpace(props: MessageSpacePros) {
       if (Math.floor(messageSpaceDiv.scrollTop) === 0) {
         try {
           skipitems.current += 15;
-          console.log(skipitems.current)
           const MoreRecentMessages = async () => {
             const messages1 = await fetchMessages(
               selectedUser,
               skipitems.current,
             );
-            console.log("Messages: ", messages1)
+            console.log("Messages: ", messages1);
             setAllMessages((prev) => [...messages1, ...prev]);
           };
           MoreRecentMessages();
@@ -139,16 +156,19 @@ export default function MessageSpace(props: MessageSpacePros) {
     }
   };
 
-  const handleDeleteMessage = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    messageId: string,
-  ) => {
+  const handleDeleteMessage = (messageId: string) => {
     try {
       const deleteMessage = async () => {
         const response = await axios.get(
           `${import.meta.env.VITE_API}/messages/${messageId}`,
         );
         console.log("Delete Request: ", response);
+        if (response.status === 200) {
+          const filteredMessages = allMessages.filter(
+            (messages) => messages._id !== messageId,
+          );
+          setAllMessages([...filteredMessages]);
+        }
       };
       deleteMessage();
     } catch (error) {
@@ -161,10 +181,12 @@ export default function MessageSpace(props: MessageSpacePros) {
     options?.style.setProperty("--displayOptions", "block");
   };
 
-  const handleMouseLeave = (e:  React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    const optiions = e.currentTarget.lastChild as HTMLDivElement 
-    optiions.style.setProperty("--displayOptions", "none")
-  }
+  const handleMouseLeave = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ) => {
+    const optiions = e.currentTarget.lastChild as HTMLDivElement;
+    optiions.style.setProperty("--displayOptions", "none");
+  };
 
   return (
     <>
@@ -183,44 +205,57 @@ export default function MessageSpace(props: MessageSpacePros) {
             {allMessages.map((messages: AllMessageType) => {
               if (messages.ReceiverId !== selectedUser._id) {
                 return (
-                  <div className="ReceivedMessages_Wrapper">
-                    <div className="Options">
-                      <i className="fa-solid fa-ellipsis-vertical"></i>
-                      <div className="option">
-                        <button>Delete</button>
+                  <>
+                    <h6 className="Messages_Day">
+                      {getMessagesDay(messages.createdAt, previousMessageTime)}
+                    </h6>
+                    <div className="ReceivedMessages_Wrapper">
+                      <div className="Options">
+                        <i className="fa-solid fa-ellipsis-vertical"></i>
+                        <div className="option">
+                          <button>Delete</button>
+                        </div>
+                      </div>
+                      <div className="ReceivedText_Wrapper">
+                        <p className="messageStyle">{messages.text}</p>
+                        <p className="receivedTime time">
+                          {toLocaleTime(messages.createdAt)}
+                        </p>
                       </div>
                     </div>
-                    <div className="ReceivedText_Wrapper">
-                      <p className="messageStyle">{messages.text}</p>
-                      <p className="receivedTime time">
-                        {toLocaleTime(messages.createdAt)}
-                      </p>
-                    </div>
-                  </div>
+                  </>
                 );
               } else {
                 return (
-                  <div className="SentMessages_Wrapper">
-                    <div className="SentText_Wrapper">
-                      <p className="messageStyle">{messages.text}</p>
-                      <p className="sentTime time">
-                        {toLocaleTime(messages.createdAt)}
-                      </p>
-                    </div>
-                    <div className="Options" onMouseLeave={(e) => handleMouseLeave(e)}>
-                      <i
-                        className="fa-solid fa-ellipsis-vertical"
-                        onClick={(e) => handleOptions(e)}
-                      ></i>
-                      <div className="option">
-                        <button
-                          onClick={(e) => handleDeleteMessage(e, messages._id)}
-                        >
-                          Delete
-                        </button>
+                  <>
+                    <h6 className="Messages_Day">
+                      {getMessagesDay(messages.createdAt, previousMessageTime)}
+                    </h6>
+                    <div className="SentMessages_Wrapper">
+                      <div className="SentText_Wrapper">
+                        <p className="messageStyle">{messages.text}</p>
+                        <p className="sentTime time">
+                          {toLocaleTime(messages.createdAt)}
+                        </p>
+                      </div>
+                      <div
+                        className="Options"
+                        onMouseLeave={(e) => handleMouseLeave(e)}
+                      >
+                        <i
+                          className="fa-solid fa-ellipsis-vertical"
+                          onClick={(e) => handleOptions(e)}
+                        ></i>
+                        <div className="option">
+                          <button
+                            onClick={() => handleDeleteMessage(messages._id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </>
                 );
               }
             })}
@@ -249,3 +284,104 @@ export default function MessageSpace(props: MessageSpacePros) {
     </>
   );
 }
+
+// if (messages.ReceiverId !== selectedUser._id) {
+//                 return (
+//                   <div className="ReceivedMessages_Wrapper">
+//                     <div className="Options">
+//                       <i className="fa-solid fa-ellipsis-vertical"></i>
+//                       <div className="option">
+//                         <button>Delete</button>
+//                       </div>
+//                     </div>
+//                     <div className="ReceivedText_Wrapper">
+//                       <p className="messageStyle">{messages.text}</p>
+//                       <p className="receivedTime time">
+//                         {toLocaleTime(messages.createdAt)}
+//                       </p>
+//                     </div>
+//                   </div>
+//                 );
+//               } else {
+//                 return (
+//                   <div className="SentMessages_Wrapper">
+//                     <div className="SentText_Wrapper">
+//                       <p className="messageStyle">{messages.text}</p>
+//                       <p className="sentTime time">
+//                         {toLocaleTime(messages.createdAt)}
+//                       </p>
+//                     </div>
+//                     <div
+//                       className="Options"
+//                       onMouseLeave={(e) => handleMouseLeave(e)}
+//                     >
+//                       <i
+//                         className="fa-solid fa-ellipsis-vertical"
+//                         onClick={(e) => handleOptions(e)}
+//                       ></i>
+//                       <div className="option">
+//                         <button
+//                           onClick={() => handleDeleteMessage(messages._id)}
+//                         >
+//                           Delete
+//                         </button>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 );
+//               }
+
+// (
+//               <>
+//                 {messages.ReceiverId !== selectedUser._id ? (
+//                   <>
+//                     <h6 className="Messages_Day">
+//                       {getMessagesDay(messages.createdAt, previousMessageTime)}
+//                     </h6>
+//                     <div className="ReceivedMessages_Wrapper">
+//                       <div className="Options">
+//                         <i className="fa-solid fa-ellipsis-vertical"></i>
+//                         <div className="option">
+//                           <button>Delete</button>
+//                         </div>
+//                       </div>
+//                       <div className="ReceivedText_Wrapper">
+//                         <p className="messageStyle">{messages.text}</p>
+//                         <p className="receivedTime time">
+//                           {toLocaleTime(messages.createdAt)}
+//                         </p>
+//                       </div>
+//                     </div>
+//                   </>
+//                 ) : (
+//                   <>
+//                     <h6 className="Messages_Day">
+//                       {getMessagesDay(messages.createdAt, previousMessageTime)}
+//                     </h6>
+//                     <div className="SentMessages_Wrapper">
+//                       <div className="SentText_Wrapper">
+//                         <p className="messageStyle">{messages.text}</p>
+//                         <p className="sentTime time">
+//                           {toLocaleTime(messages.createdAt)}
+//                         </p>
+//                       </div>
+//                       <div
+//                         className="Options"
+//                         onMouseLeave={(e) => handleMouseLeave(e)}
+//                       >
+//                         <i
+//                           className="fa-solid fa-ellipsis-vertical"
+//                           onClick={(e) => handleOptions(e)}
+//                         ></i>
+//                         <div className="option">
+//                           <button
+//                             onClick={() => handleDeleteMessage(messages._id)}
+//                           >
+//                             Delete
+//                           </button>
+//                         </div>
+//                       </div>
+//                     </div>
+//                   </>
+//                 )}
+//               </>
