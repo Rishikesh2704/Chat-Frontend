@@ -1,17 +1,12 @@
 import { useNavigate } from "react-router";
 import "./Home.css";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "../../lib/context.js";
 import { io } from "socket.io-client";
 import axios from "../../lib/axios.js";
 import Friends from "../Chat/Friends.js";
-import MessageSpace from "../Chat/MessageSpace.js";
+import MessageMain from "../Chat/MessageMain.js";
 
-type User = {
-  _id: string;
-  username: string;
-  profile?: string;
-};
 
 type ReceivedMessageType = {
   SenderId: string;
@@ -23,19 +18,6 @@ type ReceivedMessageType = {
   updatedAt: string;
 };
 
-type AllMessageType = {
-  SenderId: string;
-  ReceiverId: string;
-  text: string;
-  image: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-function toLocaleTime(time: string) {
-  const date = new Date(time);
-  return date.toLocaleTimeString();
-}
 
 export default function Home() {
   const { setOnlineUsers, onlineUsers } = useUser();
@@ -143,11 +125,12 @@ export default function Home() {
 
       <section className="Chat_Space">
         {selectedUser && (
-          <MessageSpace
+          <MessageMain
             selectedUser={selectedUser}
             allMessages={allMessages}
             setAllMessages={setAllMessages}
           />
+
         )}
       </section>
     </div>

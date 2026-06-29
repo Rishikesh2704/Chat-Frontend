@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import './Friends.css'
 
 type User = {
   _id: string;

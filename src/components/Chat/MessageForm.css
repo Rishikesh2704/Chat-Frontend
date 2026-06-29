@@ -1,0 +1,87 @@
+
+.message_form {
+  height: 6%;
+  width: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 0.3rem;
+  /* border-top: 1px solid rgb(116, 114, 114); */
+  overflow: hidden;
+  background-color:rgb(246, 246, 246);
+}
+
+#message_label {
+  height: 1px;
+  width: 1px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: -1;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+#message_input {
+  height: 80%;
+  width: 50%;
+  border:1px solid black;
+  font-size: 1.1vmax;
+  border-radius:1rem;
+  padding: 0rem 1rem;
+  background-color: transparent;
+
+  &:focus {
+    outline: none;
+    background-color: transparent;
+  }
+}
+
+.select_image_wrapper{
+  width: 3%;
+  height: 80%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+}
+
+.select_image_wrapper > input {
+  visibility: hidden;
+}
+
+#ImageInputFor  {
+  position:absolute;
+  z-index: 1;
+}
+#ImageIcon{
+  font-size:1.3rem;
+  transition:0.1s ease-out
+}
+#ImageIcon:hover{
+  color:var(--primary-color);
+  transition:0.1s ease-out;
+  cursor:pointer;
+}
+
+#sendMessage_button {
+  height: 80%;
+  width: 5%;
+  transform: scale(1.1);
+  position: relative;
+  right: 0.1rem;
+  font-size: 2.1vmin;
+  border-radius: 1.2rem;
+  text-align: center;
+  border: none;
+  background-color: var(--primary-color);
+  cursor: pointer;
+  &:hover {
+    background-color: var(--primary-hover-color);
+  }
+}
