@@ -1,16 +1,21 @@
-
-.message_form {
+.SendMessageFrom_Wrapper {
   height: 6%;
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.3rem;
+}
+
+.message_form {
+  height: 100%;
+  width: 70%;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1rem;
   border-radius: 0.3rem;
-  /* border-top: 1px solid rgb(116, 114, 114); */
-  overflow: hidden;
-  background-color:rgb(246, 246, 246);
 }
 
 #message_label {
@@ -29,44 +34,39 @@
 
 #message_input {
   height: 80%;
-  width: 50%;
-  border:1px solid black;
+  width: 100%;
+  border: 1px solid rgb(84, 84, 84);
   font-size: 1.1vmax;
-  border-radius:1rem;
+  border-radius: 0.7rem;
   padding: 0rem 1rem;
-  background-color: transparent;
+  z-index: 1;
 
   &:focus {
     outline: none;
-    background-color: transparent;
   }
 }
 
-.select_image_wrapper{
-  width: 3%;
-  height: 80%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  overflow:hidden;
-}
-
-.select_image_wrapper > input {
+#ImageInputFor > input {
   visibility: hidden;
 }
 
-#ImageInputFor  {
-  position:absolute;
-  z-index: 1;
+#ImageInputFor {
+  width: 3%;
+  height: 80%;
+  display: flex;
+  align-items: center;
+  z-index: 2;
 }
-#ImageIcon{
-  font-size:1.3rem;
-  transition:0.1s ease-out
+#ImageIcon {
+  font-size: 1.3rem;
+  transition: 0.1s ease-out;
+  background-color: transparent;
+  border: none;
 }
-#ImageIcon:hover{
-  color:var(--primary-color);
-  transition:0.1s ease-out;
-  cursor:pointer;
+#ImageIcon:hover {
+  color: var(--primary-color);
+  transition: 0.1s ease-out;
+  cursor: pointer;
 }
 
 #sendMessage_button {
@@ -84,4 +84,65 @@
   &:hover {
     background-color: var(--primary-hover-color);
   }
+}
+
+@keyframes slideInPreview {
+  0% {
+    left: 45%;
+    top: -6rem;
+    opacity: 0;
+    transform: translate(-50%,25%);
+  }
+  
+  
+  100% {
+    left: 45%;
+    top: -6rem;
+    transform: translate(-50%,0%);
+    opacity: 1;
+  }
+}
+
+.Preview_Wrapper {
+  height: 110px;
+  width: 70%;
+  position: absolute;
+  left: 45%;
+  top: -6rem;
+  transform: translate(-50%,0%);
+  background-color: rgb(27, 26, 26);
+  border-top-left-radius: 0.6rem;
+  border-top-right-radius: 0.6rem;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  animation: slideInPreview 0.2s ease-out;
+  padding-top:0.2rem;
+}
+
+.Preview {
+  height: 85%;
+  width:fit-content;
+  position: relative;
+}
+
+.Preview_Img{
+  height:100%;
+  width:100%;
+  object-fit: contain;
+}
+
+.Cancel_Button {
+  background: none;
+  border: none;
+  color: white;
+  position: absolute;
+  top: -0.1rem;
+  right: -1rem;
+  cursor: pointer;
+}
+
+.Cancel_Button:hover {
+  color: rgb(182, 179, 179);
 }

@@ -34,8 +34,13 @@ const getDayOfMessages = (
   previousMessageTime: React.RefObject<string>,
 ) => {
   const date = new Date(time);
-  if (date.toLocaleDateString() === new Date().toLocaleDateString())
+  if (
+    date.toLocaleDateString() === new Date().toLocaleDateString() &&
+    date.toLocaleDateString() !== previousMessageTime.current
+  ) {
+    previousMessageTime.current = date.toLocaleDateString();
     return "Today";
+  }
   if (previousMessageTime.current.length === 0) {
     previousMessageTime.current = date.toLocaleDateString();
     const formattedDate =
@@ -156,82 +161,98 @@ export default function MessageSpace(props: MessageSpacePros) {
         <div className="line"></div>
       </div>
 
-        <div className="chat_messages">
-          <div className="Messages">
-            {allMessages.map((messages: AllMessageType) => {
-              if (messages.ReceiverId !== selectedUser._id) {
-                return (
-                  <>
-                    <h6 className="Messages_Day">
-                      {getDayOfMessages(
-                        messages.createdAt,
-                        previousMessageTime,
-                      )}
-                    </h6>
-                    <div className="ReceivedMessages_Wrapper">
-                      <div className="Options">
-                        <i className="fa-solid fa-ellipsis-vertical"></i>
-                        <div className="option">
-                          <button aria-label="Delete">
-                            <i className="fa-regular fa-trash-can"></i>
-                          </button>
-                        </div>
-                      </div>
-                      <div className="ReceivedText_Wrapper">
-                        <p className="messageStyle">{messages.text}</p>
-                        <p className="receivedTime time">
-                          {toLocaleTime(messages.createdAt)}
-                        </p>
+      <div className="chat_messages">
+        <div className="Messages">
+          {}
+          {allMessages.map((messages: AllMessageType) => {
+            if (messages.ReceiverId !== selectedUser._id) {
+              return (
+                <>
+                  <h6 className="Messages_Day">
+                    {getDayOfMessages(messages.createdAt, previousMessageTime)}
+                  </h6>
+                  <div className="ReceivedMessages_Wrapper">
+                    <div className="Options">
+                      <i className="fa-solid fa-ellipsis-vertical"></i>
+                      <div className="option">
+                        <button aria-label="Delete">
+                          <i className="fa-regular fa-trash-can"></i>
+                        </button>
                       </div>
                     </div>
-                  </>
-                );
-              } else {
-                return (
-                  <>
-                    <h6 className="Messages_Day">
-                      {getDayOfMessages(
-                        messages.createdAt,
-                        previousMessageTime,
-                      )}
-                    </h6>
-                    <div className="SentMessages_Wrapper">
-                      <div className="SentText_Wrapper">
-                        <p className="messageStyle">{messages.text}</p>
-                        <p className="sentTime time">
-                          {toLocaleTime(messages.createdAt)}
-                        </p>
-                      </div>
-                      <div
-                        className="Options"
-                        onMouseLeave={(e) => handleMouseLeave(e)}
-                      >
-                        <i
-                          className="fa-solid fa-ellipsis-vertical"
-                          onClick={(e) => handleOptions(e)}
-                        ></i>
-                        <div className="option">
-                          <button
-                            aria-label="Delete"
-                            onClick={() => handleDeleteMessage(messages._id)}
-                          >
-                            <i className="fa-regular fa-trash-can"></i>
-                          </button>
+                    <div className="ReceivedText_Wrapper">
+                      {messages.image && (
+                        <div className="messageimg_wrapper">
+                          <img
+                            className="message_img"
+                            height={150}
+                            width={250}
+                            src={messages.image}
+                          />
                         </div>
+                      )}
+
+                      <p className="messageStyle">{messages.text}</p>
+                      <p className="receivedTime time">
+                        {toLocaleTime(messages.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+                </>
+              );
+            } else {
+              return (
+                <>
+                  <h6 className="Messages_Day">
+                    {getDayOfMessages(messages.createdAt, previousMessageTime)}
+                  </h6>
+                  <div className="SentMessages_Wrapper">
+                    <div className="SentText_Wrapper">
+                      {messages.image && (
+                        <div className="messageimg_wrapper">
+                          <img
+                            className="message_img"
+                            height={150}
+                            width={250}
+                            src={messages.image}
+                          />
+                        </div>
+                      )}
+                      <p className="messageStyle">{messages.text}</p>
+                      <p className="sentTime time">
+                        {toLocaleTime(messages.createdAt)}
+                      </p>
+                    </div>
+                    <div
+                      className="Options"
+                      onMouseLeave={(e) => handleMouseLeave(e)}
+                    >
+                      <i
+                        className="fa-solid fa-ellipsis-vertical"
+                        onClick={(e) => handleOptions(e)}
+                      ></i>
+                      <div className="option">
+                        <button
+                          aria-label="Delete"
+                          onClick={() => handleDeleteMessage(messages._id)}
+                        >
+                          <i className="fa-regular fa-trash-can"></i>
+                        </button>
                       </div>
                     </div>
-                  </>
-                );
-              }
-            })}
-          </div>
+                  </div>
+                </>
+              );
+            }
+          })}
+        </div>
       </div>
-        <MessageForm
-          selectedUser={selectedUser}
-          message={message}
-          setMessage={setMessage}
-          setAllMessages={setAllMessages}
-        />
+      <MessageForm
+        selectedUser={selectedUser}
+        message={message}
+        setMessage={setMessage}
+        setAllMessages={setAllMessages}
+      />
     </>
   );
 }

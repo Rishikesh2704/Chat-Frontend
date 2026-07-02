@@ -1,8 +1,8 @@
-import { useNavigate } from "react-router";
-import "./Home.css";
 import { useEffect, useState } from "react";
 import { useUser } from "../../lib/context.js";
 import { io } from "socket.io-client";
+
+import "./Home.css";
 import axios from "../../lib/axios.js";
 import Friends from "../Chat/Friends.js";
 import MessageMain from "../Chat/MessageMain.js";
@@ -21,7 +21,6 @@ type ReceivedMessageType = {
 
 export default function Home() {
   const { setOnlineUsers, onlineUsers } = useUser();
-  const navigate = useNavigate();
 
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -75,19 +74,7 @@ export default function Home() {
     };
   }, []);
 
-  const handleLogOut = async () => {
-    try {
-      await axios.get(`${import.meta.env.VITE_API}/auth/logout`);
-      localStorage.removeItem("Current_User");
-      console.log(
-        "Logout Handler: ",
-        JSON.parse(localStorage.getItem("Current_User") as string),
-      );
-      navigate("/authentication/login");
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  
 
   return (
     <div className="Home_Wrapper">
@@ -114,13 +101,7 @@ export default function Home() {
           setSelectedUser={setSelectedUser}
           onlineUsers={onlineUsers}
         />
-        <button
-          className="Logout_Btn"
-          aria-label="Logout"
-          onClick={handleLogOut}
-        >
-          <i className="fa-solid fa-arrow-right-from-bracket"></i>
-        </button>
+        
       </section>
 
       <section className="Chat_Space">

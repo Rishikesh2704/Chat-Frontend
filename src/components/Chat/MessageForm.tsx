@@ -26,6 +26,17 @@ export default function MessageForm(props: propsType) {
   const { message, setMessage, setAllMessages, selectedUser } = props;
   const { onlineUsers: SocketIds } = useUser();
   const [file, setFile] = useState<any>();
+  const [preview, setPreview] = useState("");
+
+  const handleImageUploadChange = (
+    e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+  ) => {
+    if (e.target.files) {
+      const preview = URL.createObjectURL(e.target.files[0]);
+      setPreview(preview);
+      setFile(e.target.files ? e.target.files[0] : null);
+    }
+  };
 
   const sendMessage = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -38,6 +49,7 @@ export default function MessageForm(props: propsType) {
       form.append("image", file);
       form.append("message", message);
       form.append("receiverSocketId", userSocketId);
+
       const messageRequest = await axios.post(
         `${import.meta.env.VITE_API}/messages/sendMessage/${selectedUser._id}`,
         form,
@@ -55,38 +67,51 @@ export default function MessageForm(props: propsType) {
           behavior: "smooth",
         });
       }
+      setFile("");
+      setPreview("");
     } catch (error: any) {
       console.log(error.response.data);
     }
   };
   return (
-    <form className="message_form" onSubmit={(e) => sendMessage(e)}>
-      <label id="message_label" htmlFor="message_input">
-        message
-      </label>
-      <input
-        type="text"
-        id="message_input"
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder="Message..."
-        value={message}
-      ></input>
-      <div className="select_image_wrapper">
+    <div className="SendMessageFrom_Wrapper">
+      <form className="message_form" onSubmit={(e) => sendMessage(e)}>
+        <label id="message_label" htmlFor="message_input">
+          message
+        </label>
+
+        <input
+          type="text"
+          id="message_input"
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Message..."
+          value={message}
+        ></input>
         <label id="ImageInputFor" htmlFor="select_image">
           <i id="ImageIcon" className="fa-regular fa-image"></i>
+          <input
+            type="file"
+            name="image"
+            id="select_image"
+            onChange={(e) => handleImageUploadChange(e)}
+          />
         </label>
-        <input
-          type="file"
-          name="image"
-          id="select_image"
-          onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
-        />
-      </div>
 
-      <button type="submit" id="sendMessage_button" aria-label="send message">
-        <i className="fa-regular fa-paper-plane"></i>
-      </button>
-      <button />
-    </form>
+        <button type="submit" id="sendMessage_button" aria-label="send message">
+          <i className="fa-regular fa-paper-plane"></i>
+        </button>
+        <button />
+        {preview && (
+          <div className="Preview_Wrapper">
+            <div className='Preview'>
+              <img className="Preview_Img" width={175} height="auto" src={preview} alt="" />
+              <button className="Cancel_Button" onClick={() => {setPreview('');setFile('')}}>
+                <i className="fa-solid fa-x"></i>
+              </button>
+            </div>
+          </div>
+        )}
+      </form>
+    </div>
   );
 }
