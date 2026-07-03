@@ -22,6 +22,8 @@ a {
   justify-content: center;
   align-items: center;
   text-decoration: none;
+  border-radius: 0.6rem;
+
   color: rgb(0, 0, 0);
   transition: 0.2s ease-out;
 }
@@ -38,10 +40,11 @@ a:hover {
 }
 
 .Logout_Btn {
-  height: 6%;
+  height:3rem;
   width: 100%;
   font-size: 1.4vmax;
   cursor: pointer;
+  border-radius: 0.6rem;
   transition: 0.1s ease-out;
   background-color: transparent;
   border: none;

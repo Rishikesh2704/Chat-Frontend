@@ -1,14 +1,12 @@
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
 import Home from "./components/Home/Home.tsx";
-import Account from "./components/Account.tsx";
+import Account from "./components/Account/Account.tsx";
 import Login from "./components/Auth/Login.tsx";
 import SignIn from "./components/Auth/Sigin.tsx";
 import Navbar from "./components/Navbar/Navbar.tsx";
 import ProtectedRoute from "./lib/protectedRoute.tsx";
 
-
 function App() {
- 
   const routes = createBrowserRouter([
     {
       path: "/",
@@ -16,7 +14,7 @@ function App() {
         <ProtectedRoute>
           <>
             <Navbar />
-            <Home  />
+            <Home />
           </>
         </ProtectedRoute>
       ),
@@ -31,7 +29,12 @@ function App() {
     },
     {
       path: "/account",
-      element: <><Navbar/><Account /></>,
+      element: (
+          <ProtectedRoute>
+            <Navbar />
+            <Account />
+          </ProtectedRoute>
+      ),
     },
   ]);
 

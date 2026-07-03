@@ -28,7 +28,7 @@ main {
   height: 100vh;
   width: 100vw;
   display: flex;
-  justify-content: center;
+  justify-content: center; 
   align-items: center;
   padding:0rem 0.5rem;
   gap:0.5rem;

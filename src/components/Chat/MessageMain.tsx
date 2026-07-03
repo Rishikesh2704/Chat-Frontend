@@ -82,6 +82,7 @@ export default function MessageSpace(props: MessageSpacePros) {
 
   useEffect(() => {
     const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
+
     const windw = () => {
       if (Math.floor(messageSpaceDiv.scrollTop) === 0) {
         try {
@@ -100,8 +101,14 @@ export default function MessageSpace(props: MessageSpacePros) {
         }
       }
     };
+    if (messageSpaceDiv) {
+      setTimeout(
+        () => (messageSpaceDiv.scrollTop = messageSpaceDiv.scrollHeight),
+        38,
+      );
 
-    if (messageSpaceDiv) messageSpaceDiv.addEventListener("scroll", windw);
+      messageSpaceDiv.addEventListener("scroll", windw);
+    }
 
     return () => {
       if (messageSpaceDiv) messageSpaceDiv.removeEventListener("scroll", windw);

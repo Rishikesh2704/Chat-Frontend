@@ -1,0 +1,67 @@
+.Account {
+  height: 98vh;
+  width: 95vw;
+  background-color: var(--secondary-color);
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.Account_Header {
+  height: 30%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid black;
+}
+
+.Account_User {
+  height: 80%;
+  width: 15%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.Profile_Wrapper {
+  height: 65%;
+  width: 50%;
+  border-radius: 50%;
+  font-size: 2.4vmax;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: skyblue;
+  object-fit: fill;
+  border-radius: 50%;
+}
+.Profile_Wrapper > img {
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+}
+
+.Upload_Button {
+  width: 25%;
+  height: 22%;
+  position: absolute;
+  bottom: -0.3rem;
+  right: 0.5rem;
+  font-size: 1.1vmax;
+  background: none;
+  border: none;
+  overflow: hidden;
+}
+.Upload_Button:hover {
+  color: var(--primary-color);
+  cursor: pointer;
+}
+
+#profileUpload {
+  visibility: hidden;
+}
