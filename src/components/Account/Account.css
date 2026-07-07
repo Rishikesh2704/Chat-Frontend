@@ -1,42 +1,49 @@
 .Account {
   height: 98vh;
   width: 95vw;
-  background-color: var(--secondary-color);
   border-radius: 0.5rem;
   display: flex;
+  position: relative;
   flex-direction: column;
+  justify-content: space-around;
 }
 
-.Account_Header {
-  height: 30%;
+#Heading {
+  width: 97%;
+  height: fit-content;
+  left: 1rem;
+  top: 0.5rem;
+  position:relative;
+  left:1rem;
+}
+
+.Account_Profile{
   width: 100%;
+  height:30%;
+  background:var(--secondary-color);
+  border-radius:0.5rem;
   display: flex;
-  flex-direction: column;
+  justify-content:start;
   align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid black;
+  position:relative;
 }
 
-.Account_User {
-  height: 80%;
-  width: 15%;
-  display: flex;
-  flex-direction: column;
+.Account_Image{
+  margin-left:4rem;
+  display:flex;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
+  gap:3rem;
 }
 
 .Profile_Wrapper {
-  height: 65%;
-  width: 50%;
+  height: 5rem;
+  width: 5rem;
   border-radius: 50%;
   font-size: 2.4vmax;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: skyblue;
   object-fit: fill;
   border-radius: 50%;
 }
@@ -44,6 +51,14 @@
   height: 100%;
   width: 100%;
   border-radius: 50%;
+  border: 2px solid rgb(30, 30, 30);
+  position:relative;
+}
+
+#Profile_Username{
+  font-size:1.2vmax;
+  font-weight: 600;
+
 }
 
 .Upload_Button {
@@ -57,6 +72,7 @@
   border: none;
   overflow: hidden;
 }
+
 .Upload_Button:hover {
   color: var(--primary-color);
   cursor: pointer;
@@ -64,4 +80,39 @@
 
 #profileUpload {
   visibility: hidden;
+}
+
+.Account_Info {
+  height: 40%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items:start;
+  padding: 1rem 0rem;
+  border-radius:0.5rem;
+  gap: 2.5rem;
+  background:var(--secondary-color)
+}
+
+.rows{
+  margin-left:4rem;
+}
+.rows > h4 {
+  color:rgb(88, 87, 87)
+} 
+.rows > h4 > span{
+  color:black;
+}
+
+#UpdateProfile_Btn{
+  position:absolute;
+  right:1rem;
+  bottom:1rem;
+  border:none;
+  background-color:var(--primary-color);
+  padding:0.7rem 0.5rem;
+  border-radius:0.5rem;
+  font-size:0.9rem;
+  font-weight: 500;
 }

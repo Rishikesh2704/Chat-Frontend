@@ -23,7 +23,7 @@ export default function Login() {
           withCredentials: true,
         },
       );
-      console.log(res.data.User)
+      console.log(res.data)
       localStorage.setItem('Current_User',JSON.stringify(res.data.User))
       navigate("/");
     } catch (error: any) {

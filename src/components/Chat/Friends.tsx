@@ -51,7 +51,9 @@ export default function Friends(props: FriendsProps) {
             onClick={(e) => handleClick(e, user)}
           >
             <figure>
-              <i className="fa-solid fa-circle-user "></i>
+              <div className="profile_picture">
+                <img  src={user.profile}/>
+              </div>
               <div
                 className={`${onlineUsersIds.includes(user._id) ? "online" : ""}`}
               ></div>
