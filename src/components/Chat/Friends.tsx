@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import './Friends.css'
+import "./Friends.css";
 
 type User = {
   _id: string;
@@ -11,16 +11,28 @@ type FriendsProps = {
   users: User[];
   setSelectedUser: (user: User) => void;
   onlineUsers: any;
+  lastMessage: AllMessageType;
 };
 
 export default function Friends(props: FriendsProps) {
-  const { users, setSelectedUser, onlineUsers } = props;
-  const [onlineUsersIds, setOnlineUsersIds ] = useState<string[]>([])
+  const { users, setSelectedUser, onlineUsers, lastMessage } = props;
+  const [onlineUsersIds, setOnlineUsersIds] = useState<string[]>([]);
+  const [recentMessage, setRecentMessage] = useState<AllMessageType>();
   useEffect(() => {
     if (onlineUsers) {
-      setOnlineUsersIds(Object.keys(onlineUsers))
+      setOnlineUsersIds(Object.keys(onlineUsers));
     }
-  }, [,onlineUsers]);
+  }, [onlineUsers]);
+
+  useEffect(() => {
+    if (!lastMessage) {
+      const storedMessage = JSON.parse(
+        localStorage.getItem("Last_Message") as string,
+      );
+      setRecentMessage(storedMessage);
+    }
+    else setRecentMessage(lastMessage);
+  }, [lastMessage]);
 
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -44,27 +56,28 @@ export default function Friends(props: FriendsProps) {
     <div className="Chat_Friends">
       {users &&
         users.map((user: any) => {
-          return(
+          return (
             <div
-            key={user._id}
-            className="User_Wrapper"
-            onClick={(e) => handleClick(e, user)}
-          >
-            <figure>
-              <div className="profile_picture">
-                <img  src={user.profile}/>
+              key={user._id}
+              className="User_Wrapper"
+              onClick={(e) => handleClick(e, user)}
+            >
+              <figure>
+                <div className="profile_picture">
+                  <img src={user.profile} />
+                </div>
+                <div
+                  className={`${onlineUsersIds.includes(user._id) ? "online" : ""}`}
+                ></div>
+              </figure>
+              <div className="User_Details">
+                <h2>{user.username}</h2>
+                <p>
+                  {(recentMessage && recentMessage.text)}
+                </p>
               </div>
-              <div
-                className={`${onlineUsersIds.includes(user._id) ? "online" : ""}`}
-              ></div>
-            </figure>
-            <div className="User_Details">
-              <h2>{user.username}</h2>
-              <p>Hi</p>
             </div>
-          </div>
-          )
-          
+          );
         })}
     </div>
   );

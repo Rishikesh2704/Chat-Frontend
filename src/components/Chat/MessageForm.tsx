@@ -8,6 +8,7 @@ type propsType = {
   setMessage: (message: string) => void;
   setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
   selectedUser: User;
+  setIsMessageSent:React.Dispatch<React.SetStateAction<boolean>>
 };
 
 // type OnlineUsers = {
@@ -23,7 +24,7 @@ function getSelectedUserSocketId(SocketIds: any[] | null, selectedUser: User) {
 }
 
 export default function MessageForm(props: propsType) {
-  const { message, setMessage, setAllMessages, selectedUser } = props;
+  const { message, setMessage, setAllMessages, selectedUser, setIsMessageSent } = props;
   const { onlineUsers: SocketIds } = useUser();
   const [file, setFile] = useState<any>();
   const [preview, setPreview] = useState("");
@@ -44,7 +45,6 @@ export default function MessageForm(props: propsType) {
     if (!message) return;
     try {
       const userSocketId = getSelectedUserSocketId(SocketIds, selectedUser);
-      console.log("Image file: ", file);
       const form = new FormData();
       form.append("image", file);
       form.append("message", message);
@@ -59,8 +59,9 @@ export default function MessageForm(props: propsType) {
           },
         },
       );
+      console.log("Sent Message", messageRequest)
       if (messageRequest.status === 201) {
-        setAllMessages((prev) => [...prev, messageRequest.data.data]);
+        setAllMessages((prev) => [...prev, messageRequest.data.newMessage]);
         setMessage("");
         messageSpaceDiv.scrollTo({
           top: messageSpaceDiv.scrollHeight,

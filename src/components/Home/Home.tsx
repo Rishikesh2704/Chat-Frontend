@@ -27,7 +27,6 @@ export default function Home() {
   const [allMessages, setAllMessages] = useState<any[]>([]);
 
   useEffect(() => {
-    console.log(JSON.parse(localStorage.getItem('Current_User') as string))
     const fetchUsers = async () => {
       try {
         const data = await axios.get(
@@ -49,7 +48,7 @@ export default function Home() {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("Current_User") as string);
     const socket = io(`${import.meta.env.VITE_API}`, {
-      query: { userId: user?.id, username: user?.username },
+      query: { userId: user?._id, username: user?.username },
     });
 
     try {
@@ -58,14 +57,14 @@ export default function Home() {
       });
 
       socket.on("privateMessage", (message: ReceivedMessageType, ack) => {
+        
         setAllMessages((prev: any) => [
           ...prev,
           message
         ]);
         ack(true);
       });
-
-      socket.on("Users_Online", (onlineUsers) => setOnlineUsers(onlineUsers));
+      socket.on("Users_Online", (onlineUsers) => {setOnlineUsers(onlineUsers);});
     } catch (error: any) {
       console.log(error.response);
     }
@@ -81,9 +80,7 @@ export default function Home() {
       <section className="ContentSection">
         <div className="Header">
           <h1 className="AppName">Convo</h1>
-          {/* <a href="/account" className="Account">
-            <i className="fa-solid fa-circle-user"></i>
-          </a> */}
+         
         </div>
 
         <form className="Search_Form">
@@ -100,18 +97,24 @@ export default function Home() {
           users={users}
           setSelectedUser={setSelectedUser}
           onlineUsers={onlineUsers}
+          lastMessage={allMessages[allMessages.length - 1]}
         />
         
       </section>
 
       <section className="Chat_Space">
-        {selectedUser && (
+        {selectedUser ? (
           <MessageMain
             selectedUser={selectedUser}
             allMessages={allMessages}
             setAllMessages={setAllMessages}
           />
 
+        ):(
+          <div className="NoChats">
+            <i className="fa-solid fa-message"></i>
+            <span>No Chats Selected</span>
+          </div>
         )}
       </section>
     </div>

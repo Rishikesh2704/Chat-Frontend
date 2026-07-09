@@ -11,9 +11,10 @@ nav {
   padding-top: 3rem;
   border-radius: 0.3rem;
   position: relative;
+  margin-left:0.5rem
 }
 
-a {
+.Anchor {
   height: 3rem;
   width: 100%;
   cursor: pointer;
@@ -23,7 +24,6 @@ a {
   align-items: center;
   text-decoration: none;
   border-radius: 0.6rem;
-
   color: rgb(0, 0, 0);
   transition: 0.2s ease-out;
 }

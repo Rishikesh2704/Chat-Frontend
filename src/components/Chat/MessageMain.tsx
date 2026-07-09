@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import axios from "../../lib/axios";
 import MessageForm from "./MessageForm";
 import "./MessageMain.css";
+import profile from "../../assets/profile.jpg";
 
 type MessageSpacePros = {
   selectedUser: User;
@@ -17,14 +18,15 @@ function toLocaleTime(time: string) {
     ":" +
     hoursAndSecs[1] +
     " " +
-    hoursAndSecs[2].split(" ")[1];
+    hoursAndSecs[2]?.split(" ")[1];
   return formattedTime;
 }
 
-const fetchMessages = async (selectedUser: User, skipitems: number) => {
+const fetchMessages = async (selectedUser: User, skipMessages: number) => {
   const response = await axios(
-    `${import.meta.env.VITE_API}/messages/${selectedUser._id}/${skipitems}`,
+    `${import.meta.env.VITE_API}/messages/${selectedUser._id}/${skipMessages}`,
   );
+  console.log("Response: ", response);
   const reversed = response.data.messages.toReversed();
   return reversed;
 };
@@ -41,16 +43,10 @@ const getDayOfMessages = (
     previousMessageTime.current = date.toLocaleDateString();
     return "Today";
   }
-  if (previousMessageTime.current.length === 0) {
-    previousMessageTime.current = date.toLocaleDateString();
-    const formattedDate =
-      date.getDate() +
-      " " +
-      date.toLocaleString("default", { month: "long" }) +
-      " " +
-      date.getFullYear();
-    return formattedDate;
-  } else if (previousMessageTime.current !== date.toLocaleDateString()) {
+  if (
+    previousMessageTime.current.length === 0 ||
+    previousMessageTime.current !== date.toLocaleDateString()
+  ) {
     previousMessageTime.current = date.toLocaleDateString();
     const formattedDate =
       date.getDate() +
@@ -65,13 +61,20 @@ const getDayOfMessages = (
 export default function MessageSpace(props: MessageSpacePros) {
   const { selectedUser, allMessages, setAllMessages } = props;
   const [message, setMessage] = useState<string | undefined>(undefined);
-  let skipitems = useRef(0);
+  const [isTop, setIsTop] = useState<boolean>(false);
+  const [isMessageSent, setIsMessageSent] = useState<boolean>(true);
+  const MessageSpaceRef = useRef<HTMLDivElement | null>(null);
+  const scrollPosRef = useRef<number | null>(null);
+  let skipMessages = useRef(0);
   let previousMessageTime = useRef<string>("");
 
   useEffect(() => {
     try {
       const setRecentMessages = async () => {
-        const messages = await fetchMessages(selectedUser, skipitems.current);
+        const messages = await fetchMessages(
+          selectedUser,
+          skipMessages.current,
+        );
         setAllMessages([...messages, ...allMessages]);
       };
       setRecentMessages();
@@ -84,15 +87,16 @@ export default function MessageSpace(props: MessageSpacePros) {
     const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
 
     const windw = () => {
-      if (Math.floor(messageSpaceDiv.scrollTop) === 0) {
+      if (Math.floor(messageSpaceDiv.scrollTop) <= 1) {
+        setIsTop(true);
         try {
-          skipitems.current += 15;
+          scrollPosRef.current = messageSpaceDiv.scrollHeight;
+          skipMessages.current += 15;
           const MoreRecentMessages = async () => {
             const messages1 = await fetchMessages(
               selectedUser,
-              skipitems.current,
+              skipMessages.current,
             );
-            console.log("Messages: ", messages1);
             setAllMessages((prev) => [...messages1, ...prev]);
           };
           MoreRecentMessages();
@@ -104,7 +108,7 @@ export default function MessageSpace(props: MessageSpacePros) {
     if (messageSpaceDiv) {
       setTimeout(
         () => (messageSpaceDiv.scrollTop = messageSpaceDiv.scrollHeight),
-        38,
+        39,
       );
 
       messageSpaceDiv.addEventListener("scroll", windw);
@@ -114,6 +118,20 @@ export default function MessageSpace(props: MessageSpacePros) {
       if (messageSpaceDiv) messageSpaceDiv.removeEventListener("scroll", windw);
     };
   }, []);
+
+  useLayoutEffect(() => {
+    const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
+    if (messageSpaceDiv && isTop) {
+      messageSpaceDiv.scrollTo({
+        top: messageSpaceDiv.scrollHeight - (scrollPosRef.current as number),
+      });
+    }
+    localStorage.setItem(
+      "Last_Message",
+      JSON.stringify(allMessages[allMessages.length - 1]),
+    );
+    setIsTop(false);
+  }, [allMessages]);
 
   useEffect(() => {
     const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
@@ -161,16 +179,14 @@ export default function MessageSpace(props: MessageSpacePros) {
     <>
       <div className="Chat_header">
         <div className="profile">
-          <i className="fa-solid fa-circle-user"></i>
+          <img height={30} width={30} src={selectedUser.profile || profile} />
           <h1>{selectedUser.username}</h1>
         </div>
 
         <div className="line"></div>
       </div>
-
       <div className="chat_messages">
-        <div className="Messages">
-          {}
+        <div className="Messages" ref={MessageSpaceRef}>
           {allMessages.map((messages: AllMessageType) => {
             if (messages.ReceiverId !== selectedUser._id) {
               return (
@@ -211,7 +227,8 @@ export default function MessageSpace(props: MessageSpacePros) {
               return (
                 <>
                   <h6 className="Messages_Day">
-                    {getDayOfMessages(messages.createdAt, previousMessageTime)}
+                    {
+                      getDayOfMessages(messages.createdAt, previousMessageTime)}
                   </h6>
                   <div className="SentMessages_Wrapper">
                     <div className="SentText_Wrapper">
@@ -259,6 +276,7 @@ export default function MessageSpace(props: MessageSpacePros) {
         message={message}
         setMessage={setMessage}
         setAllMessages={setAllMessages}
+        setIsMessageSent={setIsMessageSent}
       />
     </>
   );

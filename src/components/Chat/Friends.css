@@ -48,6 +48,7 @@
   border-radius:50%;
   overflow:hidden;
   object-fit: contain;
+  border:2px solid rgb(45, 44, 44)
 }
 
 .profile_picture> img{
@@ -58,14 +59,15 @@
 
 
 .online {
-  height: 30%;
-  width: 25%;
+  height: 0.5rem;
+  width: 0.5rem;
   background-color: green;
   position: absolute;
   bottom: 0;
   right: 0.3rem;
   z-index: 2;
   border-radius: 50%;
+  border:1px solid black;
 }
 
 .User_Details {

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import "./AuthStyle.css";
 import axios from "../../lib/axios.js";
-import { useUser } from "../../lib/context.js";
 
 export default function SignIn() {
   const [email, setEmail] = useState<string>();
@@ -39,52 +38,64 @@ export default function SignIn() {
   };
 
   return (
-    <section className="Auth_Wrapper">
-      <h1 className="AppName">Convo</h1>
-      <form
-        id="SignIn_Form"
-        onSubmit={(e) => {
-          handleSignInSubmit(e);
-        }}
-      >
-        <div className="fields">
-          <label>Email</label>
-          <input
-            type="email"
-            placeholder="fake@email.com..."
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
-            required
-            autoFocus
-          />
-        </div>
+    <section className="Sigin_Wrapper">
+      <div className="Auth_Wrapper">
+        <h1 className="Auth">Sign In </h1>
+        <form
+          id="SignIn_Form"
+          onSubmit={(e) => {
+            handleSignInSubmit(e);
+          }}
+        >
+          <div className="fields">
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="fake@email.com..."
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              required
+              autoFocus
+            />
+          </div>
 
-        <div className="fields">
-          <label>Username</label>
-          <input
-            type="text"
-            placeholder="Rajesh..."
-            onChange={(e) => setUsername(e.target.value)}
-            value={username}
-            required
-          />
-        </div>
+          <div className="fields">
+            <label>Username</label>
+            <input
+              type="text"
+              placeholder="Rajesh..."
+              onChange={(e) => setUsername(e.target.value)}
+              value={username}
+              required
+            />
+          </div>
 
-        <div className="fields">
-          <label>Password</label>
-          <input
-            type="password"
-            placeholder="Rajesh1234..."
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-            required
-          />
-        </div>
-
-        <button id="Submit_Button" type="submit">
-          SignIn
-        </button>
-      </form>
+          <div className="fields">
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="Rajesh1234..."
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              required
+            />
+          </div>
+          <p id="CreateAccount">
+            Already have an Account ?
+            <a id="CreateAccount_Link" href="/Authentication/login">
+            Login
+            </a>
+          </p>
+          <button id="Submit_Button" type="submit">
+            SignIn
+          </button>
+        </form>
+      </div>
+      <div id="Logo_Wrapper">
+        <h1 id="Logo">
+          C<span>onvo</span>
+        </h1>
+      </div>
     </section>
   );
 }

@@ -38,8 +38,11 @@
   font-weight: 800;
 }
 
-.profile i {
-  font-size: 1.8vmax;
+.profile img {
+  height: 2rem;
+  width:2rem;
+  border-radius:50%;
+  border:1px solid rgb(46, 45, 45);
 }
 
 
@@ -57,7 +60,8 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  overflow-y: scroll;
+  overflow-y: auto;
+  overflow-anchor: auto;
 }
 
 .Messages::-webkit-scrollbar {

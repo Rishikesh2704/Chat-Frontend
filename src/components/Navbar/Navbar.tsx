@@ -7,7 +7,6 @@ export default function Navbar() {
   const pagePath = page.pathname;
   const icons = [
     { id: 23, name: "", icon: "fa-solid fa-message", path: "/" },
-    { id: 2, name: "calls", icon: "fa-solid fa-phone", path: "/calls" },
     {
       id: 13,
       name: "account",
@@ -33,14 +32,14 @@ export default function Navbar() {
     <nav>
       {icons.map((icon) => (
         <a
-          className={`${pagePath === icon.path ? "selectedPage" : ""}`}
+          className={`Anchor ${pagePath === icon.path ? "selectedPage" : ""}`}
           href={`/${icon.name}`}
           aria-label={icon.name}
         >
           <i className={icon.icon}></i>
         </a>
       ))}
-      <button className="Logout_Btn" aria-label="Logout" onClick={handleLogOut}>
+      <button className="Logout_Btn Anchor" aria-label="Logout" onClick={handleLogOut}>
         <i className="fa-solid fa-arrow-right-from-bracket"></i>
       </button>
     </nav>

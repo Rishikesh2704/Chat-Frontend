@@ -30,15 +30,6 @@
   position: relative;
 }
 
-/* 
-.Account {
-  position: absolute;
-  right: 1rem;
-  top: 53%;
-  transform: translateY(-50%);
-  color: black;
-} */
-
 .Search_Form {
   width: 95%;
   height: 3.5%;
@@ -84,4 +75,22 @@
   border: none;
 }
 
-/*  Message Box  */
+
+.NoChats{
+  height:100%;
+  width:100%;
+  display:flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items:center;
+  gap:0.5rem;
+  color:gainsboro;
+}
+
+.NoChats > i{
+  font-size:5vmax;
+}
+
+.NoChats > span{
+  font-size:1.1vmax;
+}

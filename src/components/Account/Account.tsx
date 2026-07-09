@@ -1,5 +1,4 @@
 import "./Account.css";
-import profile from "../../assets/profile.jpg";
 import axiosInstance from "../../lib/axios";
 import { useState } from "react";
 
