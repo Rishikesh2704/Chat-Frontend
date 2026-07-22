@@ -10,6 +10,7 @@ type AllMessageType = {
   SenderId: string;
   ReceiverId: string;
   text: string;
+  seen:boolean;
   image: string;
   createdAt: string;
   updatedAt: string;

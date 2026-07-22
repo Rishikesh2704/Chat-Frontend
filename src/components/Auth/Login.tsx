@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import "./AuthStyle.css";
 import axios from "../../lib/axios.js";
+import { io } from "socket.io-client";
 
-export default function Login() {
+export default function Login({setSocket}:{setSocket:React.Dispatch<React.SetStateAction<null>>}) {
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
   const navigate = useNavigate();
@@ -24,6 +25,10 @@ export default function Login() {
       );
       console.log(res.data);
       localStorage.setItem("Current_User", JSON.stringify(res.data.User));
+      const socket = io(`${import.meta.env.VITE_API}`, {
+      query: { userId: res.data.User?._id, username: res.data.User?.username },
+    });
+      setSocket(socket as any)
       navigate("/");
     } catch (error: any) {
       console.log(error.response.data);

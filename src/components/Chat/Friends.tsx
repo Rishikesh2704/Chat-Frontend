@@ -25,13 +25,13 @@ export default function Friends(props: FriendsProps) {
   }, [onlineUsers]);
 
   useEffect(() => {
-    if (!lastMessage) {
-      const storedMessage = JSON.parse(
-        localStorage.getItem("Last_Message") as string,
-      );
-      setRecentMessage(storedMessage);
-    }
-    else setRecentMessage(lastMessage);
+    // if (!lastMessage) {
+    //   const storedMessage = JSON.parse(
+    //     localStorage.getItem("Last_Message") as string,
+    //   );
+    //   setRecentMessage(storedMessage);
+    // }
+    // else setRecentMessage(lastMessage);
   }, [lastMessage]);
 
   const handleClick = (

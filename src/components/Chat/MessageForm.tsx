@@ -1,19 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "../../lib/axios";
 import { useUser } from "../../lib/context";
 import "./MessageForm.css";
+import type { Socket } from "socket.io-client";
 
 type propsType = {
   message: string | undefined;
   setMessage: (message: string) => void;
   setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
   selectedUser: User;
-  setIsMessageSent:React.Dispatch<React.SetStateAction<boolean>>
+  socketRef: React.RefObject<Socket | null>;
 };
-
-// type OnlineUsers = {
-//   [index: string]: string;
-// };
 
 function getSelectedUserSocketId(SocketIds: any[] | null, selectedUser: User) {
   let selectedUserSocketId;
@@ -24,10 +21,18 @@ function getSelectedUserSocketId(SocketIds: any[] | null, selectedUser: User) {
 }
 
 export default function MessageForm(props: propsType) {
-  const { message, setMessage, setAllMessages, selectedUser, setIsMessageSent } = props;
+  const { message, setMessage, setAllMessages, selectedUser, socketRef } = props;
   const { onlineUsers: SocketIds } = useUser();
   const [file, setFile] = useState<any>();
   const [preview, setPreview] = useState("");
+  
+  let selectedUserSocketId: any = Object.entries(SocketIds as any).filter(
+    ([key, value]) => key == selectedUser._id,
+  );
+
+  if (selectedUserSocketId[0]) {
+    selectedUserSocketId = selectedUserSocketId[0][1];
+  }
 
   const handleImageUploadChange = (
     e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
@@ -59,7 +64,6 @@ export default function MessageForm(props: propsType) {
           },
         },
       );
-      console.log("Sent Message", messageRequest)
       if (messageRequest.status === 201) {
         setAllMessages((prev) => [...prev, messageRequest.data.newMessage]);
         setMessage("");
@@ -74,6 +78,31 @@ export default function MessageForm(props: propsType) {
       console.log(error.response.data);
     }
   };
+
+  const handleTextOnChange = (
+    e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+  ) => {
+    setMessage(e.target.value);
+  };
+
+  const handleOnFocus = () => {
+    if (socketRef.current) {
+      socketRef.current.emit("Typing", {
+        id: selectedUserSocketId,
+        isTyping: true,
+      });
+    }
+  };
+
+  const handleOffFocus = () => {
+    if (socketRef.current) {
+      socketRef.current.emit("Typing", {
+        id: selectedUserSocketId,
+        isTyping: false,
+      });
+    }
+  };
+
   return (
     <div className="SendMessageFrom_Wrapper">
       <form className="message_form" onSubmit={(e) => sendMessage(e)}>
@@ -84,7 +113,9 @@ export default function MessageForm(props: propsType) {
         <input
           type="text"
           id="message_input"
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => handleTextOnChange(e)}
+          onFocus={handleOnFocus}
+          onBlur={handleOffFocus}
           placeholder="Message..."
           value={message}
         ></input>
@@ -104,9 +135,21 @@ export default function MessageForm(props: propsType) {
         <button />
         {preview && (
           <div className="Preview_Wrapper">
-            <div className='Preview'>
-              <img className="Preview_Img" width={175} height="auto" src={preview} alt="" />
-              <button className="Cancel_Button" onClick={() => {setPreview('');setFile('')}}>
+            <div className="Preview">
+              <img
+                className="Preview_Img"
+                width={175}
+                height="auto"
+                src={preview}
+                alt=""
+              />
+              <button
+                className="Cancel_Button"
+                onClick={() => {
+                  setPreview("");
+                  setFile("");
+                }}
+              >
                 <i className="fa-solid fa-x"></i>
               </button>
             </div>

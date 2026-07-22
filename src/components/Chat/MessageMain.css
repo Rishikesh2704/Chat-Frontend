@@ -134,14 +134,17 @@
   position: relative;
 }
 
+
+.received{
+  background-color: #e1e0e0;
+}
+
 .Messages_Day {
   text-align: center;
   color: #424141;
 }
 
 .time {
-  position: absolute;
-  bottom: -1rem;
   font-size: 0.7rem;
   color: #424141;
 }
@@ -202,4 +205,9 @@
 .option > button:hover {
   background-color: rgb(26, 25, 25);
   cursor: pointer;
+}
+
+#Seen_Message{
+  font-size:0.7vmax;
+  color:rgb(89, 88, 88);
 }

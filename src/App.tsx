@@ -5,8 +5,10 @@ import Login from "./components/Auth/Login.tsx";
 import SignIn from "./components/Auth/Sigin.tsx";
 import Navbar from "./components/Navbar/Navbar.tsx";
 import ProtectedRoute from "./lib/protectedRoute.tsx";
+import { useState } from "react";
 
 function App() {
+  const [ socket, setSocket ] = useState<any|null>(null)
   const routes = createBrowserRouter([
     {
       path: "/",
@@ -21,11 +23,11 @@ function App() {
     },
     {
       path: "/authentication/signin",
-      element: <SignIn />,
+      element: <SignIn setSocket={setSocket} />,
     },
     {
       path: "/authentication/login",
-      element: <Login />,
+      element: <Login setSocket={setSocket} />,
     },
     {
       path: "/account",

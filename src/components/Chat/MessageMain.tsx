@@ -3,11 +3,13 @@ import axios from "../../lib/axios";
 import MessageForm from "./MessageForm";
 import "./MessageMain.css";
 import profile from "../../assets/profile.jpg";
+import type { Socket } from "socket.io-client";
 
-type MessageSpacePros = {
+type MessageSpaceProps = {
   selectedUser: User;
   allMessages: AllMessageType[];
   setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
+  socketRef: React.RefObject<Socket | null>;
 };
 
 function toLocaleTime(time: string) {
@@ -26,7 +28,6 @@ const fetchMessages = async (selectedUser: User, skipMessages: number) => {
   const response = await axios(
     `${import.meta.env.VITE_API}/messages/${selectedUser._id}/${skipMessages}`,
   );
-  console.log("Response: ", response);
   const reversed = response.data.messages.toReversed();
   return reversed;
 };
@@ -58,16 +59,56 @@ const getDayOfMessages = (
   } else return "";
 };
 
-export default function MessageSpace(props: MessageSpacePros) {
-  const { selectedUser, allMessages, setAllMessages } = props;
+export default function MessageSpace(props: MessageSpaceProps) {
+  const { selectedUser, allMessages, setAllMessages, socketRef } = props;
+
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [isTop, setIsTop] = useState<boolean>(false);
-  const [isMessageSent, setIsMessageSent] = useState<boolean>(true);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [seenMessage, setSeenMessage] = useState<AllMessageType | null>(null)
+
   const MessageSpaceRef = useRef<HTMLDivElement | null>(null);
   const scrollPosRef = useRef<number | null>(null);
   let skipMessages = useRef(0);
   let previousMessageTime = useRef<string>("");
+  const lastMessageRef = useRef(null);
 
+  //isTyping
+  useEffect(() => {
+    const socket = socketRef.current as Socket;
+    socket.on("Typing", (user) => setIsTyping(user.isTyping));
+    socket.on('Seen_Message',(message) => setSeenMessage(message))
+
+  }, [allMessages]);
+
+  //Seen Message
+  useEffect(() => {
+    const messages = document.querySelectorAll(".ReceivedMessages_Wrapper") ;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('id')
+            const message = allMessages.find((message) => message._id == id);
+            socketRef.current?.emit('Seen_Message', message)
+            console.log("Observer: ",entry.target)
+          };
+        });
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 1.0,
+      },
+    );
+
+    if(lastMessageRef.current) {
+      observer.observe(lastMessageRef.current)
+    }
+    messages.forEach((message) => observer.observe(message));
+  }, [allMessages]);
+
+  //Initial Recent Messages
   useEffect(() => {
     try {
       const setRecentMessages = async () => {
@@ -75,14 +116,17 @@ export default function MessageSpace(props: MessageSpacePros) {
           selectedUser,
           skipMessages.current,
         );
+        setSeenMessage(messages[messages?.length - 1])
         setAllMessages([...messages, ...allMessages]);
       };
+      
       setRecentMessages();
     } catch (error: any) {
       console.log(error.response.data);
     }
   }, []);
 
+  //Fetch Recent Messages
   useEffect(() => {
     const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
 
@@ -119,6 +163,7 @@ export default function MessageSpace(props: MessageSpacePros) {
     };
   }, []);
 
+  //Infinite Scroll(up)
   useLayoutEffect(() => {
     const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
     if (messageSpaceDiv && isTop) {
@@ -149,7 +194,6 @@ export default function MessageSpace(props: MessageSpacePros) {
         const response = await axios.get(
           `${import.meta.env.VITE_API}/messages/${messageId}`,
         );
-        console.log("Delete Request: ", response);
         if (response.status === 200) {
           const filteredMessages = allMessages.filter(
             (messages) => messages._id !== messageId,
@@ -203,7 +247,7 @@ export default function MessageSpace(props: MessageSpacePros) {
                         </button>
                       </div>
                     </div>
-                    <div className="ReceivedText_Wrapper">
+                    <div className="ReceivedText_Wrapper" id={messages._id} ref={lastMessageRef}>
                       {messages.image && (
                         <div className="messageimg_wrapper">
                           <img
@@ -215,7 +259,7 @@ export default function MessageSpace(props: MessageSpacePros) {
                         </div>
                       )}
 
-                      <p className="messageStyle">{messages.text}</p>
+                      <p className="messageStyle received">{messages.text}</p>
                       <p className="receivedTime time">
                         {toLocaleTime(messages.createdAt)}
                       </p>
@@ -224,13 +268,13 @@ export default function MessageSpace(props: MessageSpacePros) {
                 </>
               );
             } else {
+              console.log("All Messages: ", allMessages)
               return (
                 <>
                   <h6 className="Messages_Day">
-                    {
-                      getDayOfMessages(messages.createdAt, previousMessageTime)}
+                    {getDayOfMessages(messages.createdAt, previousMessageTime)}
                   </h6>
-                  <div className="SentMessages_Wrapper">
+                  <div className="SentMessages_Wrapper"  >
                     <div className="SentText_Wrapper">
                       {messages.image && (
                         <div className="messageimg_wrapper">
@@ -246,6 +290,8 @@ export default function MessageSpace(props: MessageSpacePros) {
                       <p className="sentTime time">
                         {toLocaleTime(messages.createdAt)}
                       </p>
+                      
+                      { seenMessage?._id==messages._id &&<p id="Seen_Message">Seen</p>}
                     </div>
                     <div
                       className="Options"
@@ -269,6 +315,15 @@ export default function MessageSpace(props: MessageSpacePros) {
               );
             }
           })}
+          {isTyping && (
+            <div className="messageStyle received">
+              <div className="typing ">
+                <div className="dot"></div>
+                <div className="dot"></div>
+                <div className="dot"></div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <MessageForm
@@ -276,7 +331,7 @@ export default function MessageSpace(props: MessageSpacePros) {
         message={message}
         setMessage={setMessage}
         setAllMessages={setAllMessages}
-        setIsMessageSent={setIsMessageSent}
+        socketRef={socketRef}
       />
     </>
   );

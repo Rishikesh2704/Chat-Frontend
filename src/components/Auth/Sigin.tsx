@@ -2,8 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import "./AuthStyle.css";
 import axios from "../../lib/axios.js";
+import { io } from "socket.io-client";
 
-export default function SignIn() {
+export default function SignIn({
+  setSocket,
+}: {
+  setSocket: React.Dispatch<React.SetStateAction<null>>;
+}) {
   const [email, setEmail] = useState<string>();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
@@ -27,7 +32,13 @@ export default function SignIn() {
       );
       console.log("AccessToken:", res.data);
       localStorage.set("Current_User", JSON.stringify(res.data.User));
-
+      const socket = io(`${import.meta.env.VITE_API}`, {
+        query: {
+          userId: res.data.User?._id,
+          username: res.data.User?.username,
+        },
+      });
+      setSocket(socket as any);
       navigate("/");
     } catch (error: any) {
       setEmail("");
@@ -83,7 +94,7 @@ export default function SignIn() {
           <p id="CreateAccount">
             Already have an Account ?
             <a id="CreateAccount_Link" href="/Authentication/login">
-            Login
+              Login
             </a>
           </p>
           <button id="Submit_Button" type="submit">
