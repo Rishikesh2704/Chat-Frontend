@@ -1,52 +1,95 @@
-@keyframes slideInFromTop{
-    from{
-        transform:translateY(-30%);
-        opacity:0;
-    }
-    to{
-        transform:translateY(0%);
-        opacity:1;
-    }
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-30%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0%);
+    opacity: 1;
+  }
 }
-
 
 @font-face {
-    font-family: SF-Bold;
-    src: url(../../assets/SFPRODISPLAYREGULAR.OTF);
+  font-family: SF-Bold;
+  src: url(../../assets/SFPRODISPLAYREGULAR.OTF);
 }
 
-
-.Modal_Background{
-    height:107vh;
-    width:105vw;
-    background-color:rgba(150, 149, 149, 0.556);
-    position:absolute;
-    z-index:2;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+.Modal_Background {
+  height: 107vh;
+  width: 105vw;
+  background-color: rgba(150, 149, 149, 0.556);
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.Modal_Box{
-    height:75%;
-    width:35%;
-    background-color:var(--secondary-color);
-    border-radius:0.56rem;
-    animation:slideInFromTop 0.3s ease-out forwards;
-    display:flex;
+.Modal_Box {
+  height: 70%;
+  width: 55%;
+  background-color: var(--secondary-color);
+  border-radius: 0.56rem;
+  animation: slideInFromTop 0.3s ease-out forwards;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  gap:1rem;
+}
+
+.GroupName {
+  width: 95%;
+  height: 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#GroupName_Label {
+  font-size: 1.05rem;
+  font-weight: 700;
+  width: 100%;
+}
+
+#GroupName_Input {
+  width: 90%;
+  height: 40%;
+  background-color: rgb(251, 249, 249);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.45rem;
+  overflow: clip;
+  border: none;
+  padding: 0rem 0.5rem;
+  background-color: rgba(221, 220, 220, 0.723);
+}
+
+.Members_H1 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  width: 95%;
+  margin-top: 1rem;
+}
+
+.GroupMembers{
+    height: 70%;
+    width:90%;
+    display: flex;
     flex-direction:column;
-    justify-content:space-around;
-    align-items: center;
-
+    gap:1rem
 }
 
-.Search_Users{
-    width:100%;
-    height: 2rem;
-    display:flex;
-    justify-content:center;
+.Search_Users {
+  width: 100%;
+  height: 2rem;
+  display: flex;
+  justify-content: center;
 }
-
 
 .Search_Users > .Search_Form {
   width: 90%;
@@ -61,14 +104,29 @@
   background-color: rgba(234, 234, 234, 0.723);
 }
 
-.Create_Group_Button{
-    font-family: SF-Bold;
-    padding:0.4rem 0.6rem;
-    background:var(--primary-color);
-    border:none;
-    border-radius:0.35rem;
+.Search_Results {
+  height: 60%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: scroll;
 }
 
-.disabled{
-    background-color:gainsboro !important;
+.Search_Results::-webkit-scrollbar {
+  display: none;
+}
+
+.Create_Group_Button {
+  font-family: SF-Bold;
+  padding: 0.4rem 0.6rem;
+  background: var(--primary-color);
+  border: none;
+  border-radius: 0.35rem;
+  cursor:pointer;
+  margin-bottom:1rem;
+}
+
+.disabled {
+  background-color: gainsboro !important;
 }
