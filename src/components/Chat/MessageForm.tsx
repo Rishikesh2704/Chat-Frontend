@@ -1,38 +1,46 @@
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { Socket } from "socket.io-client";
+import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
+import "./MessageForm.css";
+
 import axios from "../../lib/axios";
 import { useUser } from "../../lib/context";
-import "./MessageForm.css";
-import type { Socket } from "socket.io-client";
 
 type propsType = {
   message: string | undefined;
-  setMessage: (message: string) => void;
+  setMessage: (message: any) => void;
   setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
   selectedUser: User;
-  socketRef: React.RefObject<Socket | null>;
+  socketRef:React.RefObject<Socket|null>
+
 };
 
 function getSelectedUserSocketId(SocketIds: any[] | null, selectedUser: User) {
-  let selectedUserSocketId;
-  for (let id in SocketIds) {
-    if (id === selectedUser?._id) selectedUserSocketId = SocketIds[id as any];
+  if (SocketIds) {
+    const selectedUserSocketId = Object.entries(SocketIds).find(
+      ([key, _]) => key == selectedUser._id,
+    );
+    return selectedUserSocketId && selectedUserSocketId[1];
+  }else{
+    return null
   }
-  return selectedUserSocketId;
+  // for (let id in SocketIds) {
+  //   if (id === selectedUser?._id) selectedUserSocketId = SocketIds[id as any];
+  // }
 }
 
 export default function MessageForm(props: propsType) {
-  const { message, setMessage, setAllMessages, selectedUser, socketRef } = props;
-  const { onlineUsers: SocketIds } = useUser();
+  const { message, setMessage, setAllMessages, selectedUser, socketRef } =
+    props;
+  const { onlineUsers: SocketIds,  } = useUser();
   const [file, setFile] = useState<any>();
   const [preview, setPreview] = useState("");
-  
-  let selectedUserSocketId: any = Object.entries(SocketIds as any).filter(
-    ([key, value]) => key == selectedUser._id,
-  );
+  const [emojiVisible, setEmojiVisible] = useState(false);
 
-  if (selectedUserSocketId[0]) {
-    selectedUserSocketId = selectedUserSocketId[0][1];
-  }
+  let selectedUserSocketId: any = getSelectedUserSocketId(
+    SocketIds,
+    selectedUser,
+  );
 
   const handleImageUploadChange = (
     e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
@@ -52,7 +60,7 @@ export default function MessageForm(props: propsType) {
       const userSocketId = getSelectedUserSocketId(SocketIds, selectedUser);
       const form = new FormData();
       form.append("image", file);
-      form.append("message", message);
+      form.append("message", message as string);
       form.append("receiverSocketId", userSocketId);
 
       const messageRequest = await axios.post(
@@ -87,7 +95,8 @@ export default function MessageForm(props: propsType) {
 
   const handleOnFocus = () => {
     if (socketRef.current) {
-      socketRef.current.emit("Typing", {
+      const socket = socketRef.current;
+      socket.emit("Typing", {
         id: selectedUserSocketId,
         isTyping: true,
       });
@@ -96,13 +105,13 @@ export default function MessageForm(props: propsType) {
 
   const handleOffFocus = () => {
     if (socketRef.current) {
-      socketRef.current.emit("Typing", {
+      const socket = socketRef.current;
+      socket.emit("Typing", {
         id: selectedUserSocketId,
         isTyping: false,
       });
     }
   };
-
   return (
     <div className="SendMessageFrom_Wrapper">
       <form className="message_form" onSubmit={(e) => sendMessage(e)}>
@@ -117,7 +126,7 @@ export default function MessageForm(props: propsType) {
           onFocus={handleOnFocus}
           onBlur={handleOffFocus}
           placeholder="Message..."
-          value={message}
+          value={message as string}
         ></input>
         <label id="ImageInputFor" htmlFor="select_image">
           <i id="ImageIcon" className="fa-regular fa-image"></i>
@@ -129,10 +138,21 @@ export default function MessageForm(props: propsType) {
           />
         </label>
 
+        <button
+          aria-label="Emojis"
+          type="button"
+          id="Emojis"
+          onClick={() =>
+            setEmojiVisible((prev) => (prev == true ? false : true))
+          }
+        >
+          <i className="fa-regular fa-face-grin"></i>
+        </button>
+
         <button type="submit" id="sendMessage_button" aria-label="send message">
           <i className="fa-regular fa-paper-plane"></i>
         </button>
-        <button />
+
         {preview && (
           <div className="Preview_Wrapper">
             <div className="Preview">
@@ -145,6 +165,7 @@ export default function MessageForm(props: propsType) {
               />
               <button
                 className="Cancel_Button"
+                type="button"
                 onClick={() => {
                   setPreview("");
                   setFile("");
@@ -153,6 +174,25 @@ export default function MessageForm(props: propsType) {
                 <i className="fa-solid fa-x"></i>
               </button>
             </div>
+          </div>
+        )}
+
+        {emojiVisible && (
+          <div className="Emoji_Wrapper">
+            <EmojiPicker
+              open={emojiVisible}
+              className="Emojis_Main"
+              emojiStyle={"native" as EmojiStyle}
+              height={"100%"}
+              onEmojiClick={(emojiObject) => {
+                setMessage((prev: any) =>
+                  prev !== undefined
+                    ? prev + emojiObject.emoji
+                    : emojiObject.emoji,
+                );
+                console.log(emojiObject);
+              }}
+            />
           </div>
         )}
       </form>

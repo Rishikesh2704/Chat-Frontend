@@ -1,5 +1,6 @@
 .SendMessageFrom_Wrapper {
-  height: 6%;
+  /* height: 6%; */
+  height:8%;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -35,10 +36,12 @@
 #message_input {
   height: 80%;
   width: 100%;
-  border: 1px solid rgb(84, 84, 84);
+  /* border: 1px solid rgb(84, 84, 84); */
+  background-color:rgb(231, 228, 228);
   font-size: 1.1vmax;
   border-radius: 0.7rem;
   padding: 0rem 1rem;
+  border:none;
   z-index: 1;
 
   &:focus {
@@ -147,6 +150,31 @@
   color: rgb(182, 179, 179);
 }
 
+.Emoji_Wrapper{
+  height:27.5rem;
+  width:90%;
+  position:absolute;
+  bottom:95%;
+  left:0;
+  display:flex;
+  flex-direction:row-reverse
+}
+
+
+
+#Emojis{
+  background:transparent;
+  border:none;
+  font-size:1.3vmax;
+  cursor:pointer;
+  &:hover{
+    color:var(--primary-hover-color)
+  }
+  &:active{
+    color:#fe6506;
+  }
+}
+
 
 /**** Typing Animation ****/
 
@@ -190,3 +218,5 @@
     transform: translateY(0px);
   }
 }
+
+

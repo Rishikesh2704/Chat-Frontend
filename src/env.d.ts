@@ -1,7 +1,11 @@
 type User = {
-  _id: string;
-  username: string;
-  profile?: string;
+ _id: string,
+  email: string,
+  username: string,
+  password: null,
+  profile: string,
+  createdAt: string,
+  updatedAt: string,
 };
 
 
@@ -14,5 +18,6 @@ type AllMessageType = {
   image: string;
   createdAt: string;
   updatedAt: string;
+  reactions:string;
 };
 

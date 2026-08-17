@@ -1,9 +1,13 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { Socket } from "socket.io-client";
+import "./MessageMain.css";
+
 import axios from "../../lib/axios";
 import MessageForm from "./MessageForm";
-import "./MessageMain.css";
-import profile from "../../assets/profile.jpg";
-import type { Socket } from "socket.io-client";
+import EmojiPicker, {
+  EmojiStyle,
+  type EmojiClickData,
+} from "emoji-picker-react";
 
 type MessageSpaceProps = {
   selectedUser: User;
@@ -61,38 +65,54 @@ const getDayOfMessages = (
 
 export default function MessageSpace(props: MessageSpaceProps) {
   const { selectedUser, allMessages, setAllMessages, socketRef } = props;
+  // const { socketRef } = useUser();
 
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [isTop, setIsTop] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const [seenMessage, setSeenMessage] = useState<AllMessageType | null>(null)
+  const [seenMessage, setSeenMessage] = useState<AllMessageType | null>(null);
+  
 
   const MessageSpaceRef = useRef<HTMLDivElement | null>(null);
   const scrollPosRef = useRef<number | null>(null);
   let skipMessages = useRef(0);
   let previousMessageTime = useRef<string>("");
   const lastMessageRef = useRef(null);
+  const socket = socketRef.current;
 
   //isTyping
   useEffect(() => {
-    const socket = socketRef.current as Socket;
-    socket.on("Typing", (user) => setIsTyping(user.isTyping));
-    socket.on('Seen_Message',(message) => setSeenMessage(message))
+    if (socket) {
+      socket.on("Typing", (user) => {
+        setIsTyping(user.isTyping);
+      });
+      socket.on("Seen_Message", (message) => setSeenMessage(message));
+      socket.on("Reaction_Update", (res: AllMessageType) => {
+        const updatedMessages = allMessages.map((message) => {
+          if (message._id == res._id) {
+            console.log("Found Message: ", message);
+            message.reactions = res.reactions;
+            return message;
+          } else return message;
+        });
 
+        setAllMessages([...updatedMessages]);
+      });
+    }
   }, [allMessages]);
 
   //Seen Message
   useEffect(() => {
-    const messages = document.querySelectorAll(".ReceivedMessages_Wrapper") ;
+    const messages = document.querySelectorAll(".ReceivedMessages_Wrapper");
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const id = entry.target.getAttribute('id')
+            const id = entry.target.getAttribute("id");
             const message = allMessages.find((message) => message._id == id);
-            socketRef.current?.emit('Seen_Message', message)
-            console.log("Observer: ",entry.target)
-          };
+            socketRef.current &&
+              socketRef.current.emit("Seen_Message", message);
+          }
         });
       },
       {
@@ -102,24 +122,29 @@ export default function MessageSpace(props: MessageSpaceProps) {
       },
     );
 
-    if(lastMessageRef.current) {
-      observer.observe(lastMessageRef.current)
+    if (lastMessageRef.current) {
+      observer.observe(lastMessageRef.current);
     }
     messages.forEach((message) => observer.observe(message));
   }, [allMessages]);
 
   //Initial Recent Messages
   useEffect(() => {
+    console.log("Selected User id: ", selectedUser)
     try {
+      const user = JSON.parse(localStorage.getItem("Current_User") as string);
       const setRecentMessages = async () => {
         const messages = await fetchMessages(
           selectedUser,
           skipMessages.current,
         );
-        setSeenMessage(messages[messages?.length - 1])
+        const lastSeenMessage = messages.filter(
+          (message: AllMessageType) => message.SenderId == user._id,
+        );
+        setSeenMessage(lastSeenMessage[lastSeenMessage?.length - 1]);
         setAllMessages([...messages, ...allMessages]);
       };
-      
+
       setRecentMessages();
     } catch (error: any) {
       console.log(error.response.data);
@@ -129,7 +154,6 @@ export default function MessageSpace(props: MessageSpaceProps) {
   //Fetch Recent Messages
   useEffect(() => {
     const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
-
     const windw = () => {
       if (Math.floor(messageSpaceDiv.scrollTop) <= 1) {
         setIsTop(true);
@@ -154,7 +178,6 @@ export default function MessageSpace(props: MessageSpaceProps) {
         () => (messageSpaceDiv.scrollTop = messageSpaceDiv.scrollHeight),
         39,
       );
-
       messageSpaceDiv.addEventListener("scroll", windw);
     }
 
@@ -186,7 +209,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
         behavior: "smooth",
       });
     }
-  }, [message]);
+  }, [message, isTyping]);
 
   const handleDeleteMessage = (messageId: string) => {
     try {
@@ -219,16 +242,62 @@ export default function MessageSpace(props: MessageSpaceProps) {
     optiions.style.setProperty("--displayOptions", "none");
   };
 
+  const handleReactionEmojis = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ) => {
+    const reactionPicker = e.currentTarget.nextElementSibling as HTMLDivElement;
+    const isVisible = reactionPicker.classList.contains("reactionVisible");
+    console.log(reactionPicker);
+    if (isVisible) {
+      reactionPicker.classList.remove("reactionVisible");
+    } else {
+      reactionPicker.classList.add("reactionVisible");
+    }
+  };
+
+  const reactToMessage = (messageId: string, emojiObject: EmojiClickData) => {
+    if (socket) {
+      socket.emit("Reacted_To_Message", {
+        messageId,
+        reaction: emojiObject.emoji,
+      });
+    }
+  };
+
+  const handleHoverOut = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    // console.log(e.currentTarget.children[0].children[0])
+  };
+
+  const handleDeleteReaction = (
+    e: React.MouseEvent<HTMLParagraphElement, MouseEvent>,
+    messageId: string,
+  ) => {
+    e.preventDefault()
+    if (socket) {
+      socket.emit("Delete_Reaction", { messageId, reaction: "" });
+      socket.on("Deleted_Reaction", (message) => {
+        const updatedMessages = allMessages.map((m) => {
+          if (m._id == message._id) {
+            m.reactions = message.reactions;
+            return m;
+          } else return m;
+        });
+
+        setAllMessages([...updatedMessages]);
+      });
+    }
+  };
+
   return (
     <>
-      <div className="Chat_header">
+      {/* <div className="Chat_header">
         <div className="profile">
           <img height={30} width={30} src={selectedUser.profile || profile} />
           <h1>{selectedUser.username}</h1>
         </div>
 
         <div className="line"></div>
-      </div>
+      </div> */}
       <div className="chat_messages">
         <div className="Messages" ref={MessageSpaceRef}>
           {allMessages.map((messages: AllMessageType) => {
@@ -238,16 +307,36 @@ export default function MessageSpace(props: MessageSpaceProps) {
                   <h6 className="Messages_Day">
                     {getDayOfMessages(messages.createdAt, previousMessageTime)}
                   </h6>
-                  <div className="ReceivedMessages_Wrapper">
-                    <div className="Options">
-                      <i className="fa-solid fa-ellipsis-vertical"></i>
-                      <div className="option">
-                        <button aria-label="Delete">
-                          <i className="fa-regular fa-trash-can"></i>
-                        </button>
+                  <div
+                    className="ReceivedMessages_Wrapper"
+                    onMouseOut={(e) => handleHoverOut(e)}
+                  >
+                    <div className="Reactions">
+                      <div
+                        id="ReactionEmoji_Button"
+                        aria-label="reaction emojis"
+                        role="button"
+                        onClick={(e) => handleReactionEmojis(e)}
+                      >
+                        <i className="fa-regular fa-face-grin"></i>
+                      </div>
+                      <div className="Reaction_Wrapper">
+                        <EmojiPicker
+                          className="Emojis_Main"
+                          open={true}
+                          emojiStyle={"native" as EmojiStyle}
+                          reactionsDefaultOpen={true}
+                          onEmojiClick={(emojiObject) =>
+                            reactToMessage(messages._id, emojiObject)
+                          }
+                        />
                       </div>
                     </div>
-                    <div className="ReceivedText_Wrapper" id={messages._id} ref={lastMessageRef}>
+                    <div
+                      className="ReceivedText_Wrapper"
+                      id={messages._id}
+                      ref={lastMessageRef}
+                    >
                       {messages.image && (
                         <div className="messageimg_wrapper">
                           <img
@@ -259,7 +348,19 @@ export default function MessageSpace(props: MessageSpaceProps) {
                         </div>
                       )}
 
-                      <p className="messageStyle received">{messages.text}</p>
+                      <div className="messageStyle received">
+                        {messages.text}
+                        {messages.reactions && (
+                          <p
+                            className="reaction"
+                            onContextMenu={(e) =>
+                              handleDeleteReaction(e, messages._id)
+                            }
+                          >
+                            {messages.reactions}
+                          </p>
+                        )}
+                      </div>
                       <p className="receivedTime time">
                         {toLocaleTime(messages.createdAt)}
                       </p>
@@ -268,13 +369,12 @@ export default function MessageSpace(props: MessageSpaceProps) {
                 </>
               );
             } else {
-              console.log("All Messages: ", allMessages)
               return (
                 <>
                   <h6 className="Messages_Day">
                     {getDayOfMessages(messages.createdAt, previousMessageTime)}
                   </h6>
-                  <div className="SentMessages_Wrapper"  >
+                  <div className="SentMessages_Wrapper">
                     <div className="SentText_Wrapper">
                       {messages.image && (
                         <div className="messageimg_wrapper">
@@ -286,12 +386,21 @@ export default function MessageSpace(props: MessageSpaceProps) {
                           />
                         </div>
                       )}
-                      <p className="messageStyle">{messages.text}</p>
+                      <div className="messageStyle ">
+                        {messages.text}
+                        {messages.reactions && (
+                          <p className="reaction sentMessage_reaction">
+                            {messages.reactions}
+                          </p>
+                        )}
+                      </div>
                       <p className="sentTime time">
                         {toLocaleTime(messages.createdAt)}
                       </p>
-                      
-                      { seenMessage?._id==messages._id &&<p id="Seen_Message">Seen</p>}
+
+                      {seenMessage?._id == messages._id && (
+                        <p id="Seen_Message">Seen</p>
+                      )}
                     </div>
                     <div
                       className="Options"

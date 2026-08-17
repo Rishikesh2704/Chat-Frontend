@@ -1,42 +1,53 @@
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
+import { createBrowserRouter, RouterProvider } from "react-router";
+
 import Home from "./components/Home/Home.tsx";
 import Account from "./components/Account/Account.tsx";
 import Login from "./components/Auth/Login.tsx";
 import SignIn from "./components/Auth/Sigin.tsx";
-import Navbar from "./components/Navbar/Navbar.tsx";
 import ProtectedRoute from "./lib/protectedRoute.tsx";
-import { useState } from "react";
+import { useEffect, useRef } from "react";
+import { io, type Socket } from "socket.io-client";
 
 function App() {
-  const [ socket, setSocket ] = useState<any|null>(null)
+   let socketRef = useRef<Socket | null>(null);
+    const user = JSON.parse(localStorage.getItem("Current_User") as string);
+    useEffect(() => {
+      if (user) {
+      socketRef.current = io(import.meta.env.VITE_API, {
+        query: { userId: user?._id, username: user?.username },
+      });
+    }
+     
+    // return () => {
+    //   socketRef.current?.disconnect();
+    //   socketRef.current = null;
+    // }
+    },[])
+    
+    
+ 
   const routes = createBrowserRouter([
     {
       path: "/",
-      element: (
-        <ProtectedRoute>
-          <>
-            <Navbar />
-            <Home />
-          </>
-        </ProtectedRoute>
-      ),
+      element: <ProtectedRoute socketRef={socketRef} />,
+      children: [
+        {
+          path: "/",
+          element: <Home socketRef={socketRef} />,
+        },
+        {
+          path: "/account",
+          element: <Account />,
+        },
+      ],
     },
     {
       path: "/authentication/signin",
-      element: <SignIn setSocket={setSocket} />,
+      element: <SignIn socketRef={socketRef} />,
     },
     {
       path: "/authentication/login",
-      element: <Login setSocket={setSocket} />,
-    },
-    {
-      path: "/account",
-      element: (
-          <ProtectedRoute>
-            <Navbar />
-            <Account />
-          </ProtectedRoute>
-      ),
+      element: <Login  socketRef={socketRef} />,
     },
   ]);
 

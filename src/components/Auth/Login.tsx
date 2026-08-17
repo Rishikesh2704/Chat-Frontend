@@ -2,9 +2,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import "./AuthStyle.css";
 import axios from "../../lib/axios.js";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
+import { useUser } from "../../lib/context.js";
 
-export default function Login({setSocket}:{setSocket:React.Dispatch<React.SetStateAction<null>>}) {
+type props = {
+  socketRef:React.RefObject<Socket | null>;
+}
+
+export default function Login(props:props) {
+  // const { socketRef } = useUser();
+  const { socketRef } = props;
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
   const navigate = useNavigate();
@@ -25,21 +32,21 @@ export default function Login({setSocket}:{setSocket:React.Dispatch<React.SetSta
       );
       console.log(res.data);
       localStorage.setItem("Current_User", JSON.stringify(res.data.User));
-      const socket = io(`${import.meta.env.VITE_API}`, {
-      query: { userId: res.data.User?._id, username: res.data.User?.username },
-    });
-      setSocket(socket as any)
+      const user = res.data.User;
+      socketRef.current = io(import.meta.env.VITE_API, {
+          query: { userId: user?._id, username: user?.username },
+        })
       navigate("/");
     } catch (error: any) {
+      alert(error.response.data.message || error.response.data);
       console.log(error.response.data);
-      alert(error.response.data[0].msg || error.response.data);
     }
   };
 
   return (
     <section className="Sigin_Wrapper">
       <div className="Auth_Wrapper">
-        <h1 className="AppName Auth">Login</h1> 
+        <h1 className="AppName Auth">Login</h1>
         <form
           id="SignIn_Form"
           onSubmit={(e) => {
@@ -69,7 +76,12 @@ export default function Login({setSocket}:{setSocket:React.Dispatch<React.SetSta
             />
           </div>
 
-        <p id="CreateAccount">Create an Account. <a id="CreateAccount_Link" href="/Authentication/signin">Sign In </a></p>
+          <p id="CreateAccount">
+            Create an Account.{" "}
+            <a id="CreateAccount_Link" href="/Authentication/signin">
+              Sign In{" "}
+            </a>
+          </p>
           <button id="Submit_Button" type="submit">
             Login
           </button>

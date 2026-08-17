@@ -1,8 +1,11 @@
 .Home_Wrapper {
-  height: 95vh;
-  width: 100vw;
+  height: 90vh;
+  width: 99vw;
+  /* height: 95vh;
+  width: 100vw; */
   display: flex;
   /* justify-content: center; */
+  justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
 }
@@ -15,66 +18,28 @@
   flex-direction: column;
   align-items: center;
   gap: 1.6rem;
-  padding-top: 1.5rem;
-  border-radius: 0.5rem;
+  border-radius: 0.7rem;
   background: var(--secondary-color);
+  position:relative;
 }
 
 .Header {
-  height: fit-content;
+  height: 8%;
   width: 100%;
   font-size: 1.6rem;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
+  border-bottom: 1px solid gainsboro;
 }
 
-.Search_Form {
-  width: 95%;
-  height: 3.5%;
-  background-color: rgb(251, 249, 249);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.25rem;
-  overflow: clip;
-  border: 1px solid black;
+.Heading{
+  font-size:1.1rem;
+  position:relative;
+  /* top:85%; */
+  right:28%;
 }
-
-#search_label {
-  height: 1px;
-  width: 1px;
-  position: absolute;
-  left: 0;
-  top: 0;
-  margin: -1;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
-#search_input {
-  width: 80%;
-  font-size: 1rem;
-  padding: 0.2rem 0.5rem;
-  border: none;
-
-  &:focus {
-    outline: none;
-  }
-}
-
-#search_btn {
-  height: 100%;
-  font-size: 1rem;
-  padding: 0rem 0.6rem;
-  background-color: transparent;
-  border: none;
-}
-
 
 .NoChats{
   height:100%;
@@ -93,4 +58,49 @@
 
 .NoChats > span{
   font-size:1.1vmax;
+}
+
+.Create_Group_Btn{
+  height:2.5rem;
+  width:2.5rem;
+  border-radius:50%;
+  text-align:center;
+  line-height:1rem;
+  border:none;
+  background:none;
+  font-size:1.4rem;
+  position:absolute;
+  right:1rem;
+  bottom:1rem;
+  background-color:var(--primary-color);
+  transition:all 0.5s ease-in 5s;
+  cursor:pointer;
+}
+
+.Create_Group_Btn:hover{
+  &::before{
+    content:"Create Group";
+    height: 1.3rem;
+    width:5rem;
+    position:absolute;
+    top:-1.4rem;
+    left:-1rem;
+    z-index: 1;
+    font-size:0.7rem;
+    font-weight:500;
+    border-radius:0.3rem;
+    color:white;
+    line-height:1.3rem;
+    font-style:italic;
+    background-color:rgb(45, 44, 44);
+    opacity:0;
+    animation:visible 0s forwards;
+    animation-delay: 0.5s;
+  }
+}
+
+@keyframes visible{
+  to{
+    opacity:1;
+  }
 }

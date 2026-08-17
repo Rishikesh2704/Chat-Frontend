@@ -2,13 +2,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import "./AuthStyle.css";
 import axios from "../../lib/axios.js";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
+import { useUser } from "../../lib/context.js";
+type props = {
+  socketRef:React.RefObject<Socket | null>;
+}
 
-export default function SignIn({
-  setSocket,
-}: {
-  setSocket: React.Dispatch<React.SetStateAction<null>>;
-}) {
+export default function SignIn(props:props) {
+  // const { socketRef } = useUser();
+  const { socketRef } = props;
   const [email, setEmail] = useState<string>();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
@@ -30,21 +32,18 @@ export default function SignIn({
           withCredentials: true,
         },
       );
-      console.log("AccessToken:", res.data);
-      localStorage.set("Current_User", JSON.stringify(res.data.User));
-      const socket = io(`${import.meta.env.VITE_API}`, {
-        query: {
-          userId: res.data.User?._id,
-          username: res.data.User?.username,
-        },
-      });
-      setSocket(socket as any);
+      localStorage.setItem("Current_User", JSON.stringify(res.data.User));
+      const user = res.data.User;
+      socketRef.current = io(import.meta.env.VITE_API, {
+        query: { userId: user?._id, username: user?.username },
+      })
+      console.log('User',user)
       navigate("/");
     } catch (error: any) {
       setEmail("");
       setPassword("");
-      alert(error.response.data.message);
-      console.log(error.response.data.message);
+      alert(error.response.data[0].msg);
+      console.log(error);
     }
   };
 

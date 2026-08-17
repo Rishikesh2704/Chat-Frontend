@@ -1,6 +1,32 @@
+.App_Symbol {
+  font-family: Beverage;
+  font-size: 2.1rem;
+  letter-spacing: 0.2rem;
+  background: var(--primary-gradient);
+  color:transparent;
+  background-clip: text;
+  width: 10rem;
+  text-align: center;
+}
+
+
 nav {
-  height: 91.2%;
-  width: 2.8%;
+  width: 99%;
+  height: 6.5%;
+  background: var(--secondary-color);
+  display: flex;
+  /* flex-direction: column; */
+  align-items: center;
+  justify-content: space-around;
+  gap: 3rem;
+  font-size: 1.35vmax;
+  border-radius: 0.6rem;
+  position: relative;
+}
+
+/* nav {
+  width: 91.2%;
+  height: 2.8%;
   background: var(--secondary-color);
   display: flex;
   flex-direction: column;
@@ -12,11 +38,78 @@ nav {
   border-radius: 0.3rem;
   position: relative;
   margin-left:0.5rem
+} */
+
+.Nav_Options {
+  width: 90%;
+  height: 100%;
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  /* flex-direction:row-reverse; */
+  gap:0.8rem; 
+}
+
+.Search_Form {
+  width: 30%;
+  height: 60%;
+  background-color: rgb(251, 249, 249);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.45rem;
+  overflow: clip;
+  /* border: 1px solid black; */
+  background-color: rgba(234, 234, 234, 0.723);
+}
+
+#search_label {
+  height: 1px;
+  width: 1px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: -1;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+#search_input {
+  width: 90%;
+  font-size: 1rem;
+  padding: 0.2rem 0.5rem;
+  border: none;
+  background: transparent;
+  &:focus {
+    outline: none;
+  }
+}
+
+#search_btn {
+  height: 100%;
+  font-size: 1rem;
+  padding: 0rem 0.6rem;
+  background-color: transparent;
+  border: none;
+}
+
+.Icons_Wrapper {
+  width: 8%;
+  height: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  gap: 0.5rem;
+  --icons-width: 50%;
+  --icons-height: 100%;
 }
 
 .Anchor {
-  height: 3rem;
-  width: 100%;
+  height: var(--icons-height);
+  width: var(--icons-width);
   cursor: pointer;
   text-align: center;
   display: flex;
@@ -40,8 +133,8 @@ a:hover {
 }
 
 .Logout_Btn {
-  height:3rem;
-  width: 100%;
+  height: var(--icons-height);
+  width: var(--icons-width);
   font-size: 1.4vmax;
   cursor: pointer;
   border-radius: 0.6rem;

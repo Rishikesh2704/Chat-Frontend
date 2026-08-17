@@ -1,31 +1,24 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useUser } from "../../lib/context.js";
-import { io, Socket } from "socket.io-client";
 
 import "./Home.css";
 import axios from "../../lib/axios.js";
 import Friends from "../Chat/Friends.js";
 import MessageMain from "../Chat/MessageMain.js";
+import { Socket } from "socket.io-client";
+import Modal from "../Modal/Modal.js";
 
-// type ReceivedMessageType = {
-//   SenderId: string;
-//   ReceiverId: string;
-//   text: string;
-//   image?: string;
-//   _id: string;
-//   createdAt: string;
-//   updatedAt: string;
-//   isSent?:boolean;
-// };
-
-export default function Home() {
+type props = {
+  socketRef: React.RefObject<Socket | null>;
+};
+export default function Home(props: props) {
   const { setOnlineUsers, onlineUsers } = useUser();
+  const { socketRef } = props;
 
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [allMessages, setAllMessages] = useState<any[]>([]);
-
-  const socketRef = useRef<Socket|null>(null)
+  const [viewModal, setViewModal] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -46,56 +39,60 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("Current_User") as string);
-    socketRef.current = io(`${import.meta.env.VITE_API}`, {
-      query: { userId: user?._id, username: user?.username },
-    });
+    // const user = JSON.parse(localStorage.getItem("Current_User") as string);
+    //  socketRef.current = io(`${import.meta.env.VITE_API}`, {
+    //   query: { userId: user?._id, username: user?.username },
+    // });
 
-    const socket = socketRef.current;
+    if (socketRef.current) {
+      const socket = socketRef.current;
+      socket.on("get_Online_Users", (UsersList: any) => {
+        console.log(UsersList);
 
-    socket.on("get_Online_Users", (UsersList: any) => {
-      setOnlineUsers(UsersList);
-    });
+        setOnlineUsers(UsersList);
+      });
 
-    socket.on("privateMessage", (message: AllMessageType, ack: any) => {
-      console.log(message);
-      setAllMessages((prev: any) => [...prev, message]);
-      ack(true);
-    });
-    
-    socket.on("Users_Online", (onlineUsers: any) => {
-      setOnlineUsers(onlineUsers);
-    });
+      socket.on("privateMessage", (message: AllMessageType, ack: any) => {
+        setAllMessages((prev: any) => [...prev, message]);
+        ack(true);
+      });
 
-    
-    
-  }, []);
+      socket.on("Users_Online", (onlineUsers: any) => {
+        setOnlineUsers(onlineUsers);
+      });
+    }
+  }, [socketRef.current]);
+
+  const handleCreateGroup = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    setViewModal(true);
+    document.getElementsByTagName("main")[0].style.alignItems = "initial";
+  };
 
   return (
     <div className="Home_Wrapper">
       <section className="ContentSection">
         <div className="Header">
-          <h1 className="AppName">Convo</h1>
+          <h1 className="Heading">Messages</h1>
         </div>
-
-        <form className="Search_Form">
-          <label id="search_label" htmlFor="search_input">
-            Search
-          </label>
-          <input type="text" id="search_input" />
-          <button id="search_btn" aria-label="Search" type="submit">
-            <i className="fa-solid fa-magnifying-glass"></i>
-          </button>
-        </form>
 
         <Friends
           users={users}
           setSelectedUser={setSelectedUser}
+          setAllMessages={setAllMessages}
           onlineUsers={onlineUsers}
           lastMessage={allMessages[allMessages.length - 1]}
         />
+        <button
+          className="Create_Group_Btn"
+          aria-label="Create Group"
+          onClick={handleCreateGroup}
+        >
+          +
+        </button>
       </section>
-
+      {viewModal && <Modal setViewModal={setViewModal} Users={users} />}
       <section className="Chat_Space">
         {selectedUser ? (
           <MessageMain

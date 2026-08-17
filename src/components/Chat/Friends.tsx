@@ -1,21 +1,29 @@
 import { useEffect, useState } from "react";
 import "./Friends.css";
 
-type User = {
-  _id: string;
-  username: string;
-  profile?: string;
-};
-
 type FriendsProps = {
   users: User[];
-  setSelectedUser: (user: User) => void;
+  setSelectedUser: React.Dispatch<React.SetStateAction<User | null>>;
   onlineUsers: any;
   lastMessage: AllMessageType;
+  setAllMessages: React.Dispatch<React.SetStateAction<any[]>>;
 };
 
+function toLocaleTime(time: string) {
+  const date = new Date(time);
+  const hoursAndSecs = date.toLocaleTimeString().split(":");
+  const formattedTime =
+    hoursAndSecs[0] +
+    ":" +
+    hoursAndSecs[1] +
+    " " +
+    hoursAndSecs[2]?.split(" ")[1];
+  return formattedTime;
+}
+
 export default function Friends(props: FriendsProps) {
-  const { users, setSelectedUser, onlineUsers, lastMessage } = props;
+  const { users, setSelectedUser, onlineUsers, lastMessage, setAllMessages } =
+    props;
   const [onlineUsersIds, setOnlineUsersIds] = useState<string[]>([]);
   const [recentMessage, setRecentMessage] = useState<AllMessageType>();
   useEffect(() => {
@@ -25,13 +33,17 @@ export default function Friends(props: FriendsProps) {
   }, [onlineUsers]);
 
   useEffect(() => {
-    // if (!lastMessage) {
-    //   const storedMessage = JSON.parse(
-    //     localStorage.getItem("Last_Message") as string,
-    //   );
-    //   setRecentMessage(storedMessage);
-    // }
-    // else setRecentMessage(lastMessage);
+    if (!lastMessage) {
+      try {
+        const storedMessage = JSON.parse(
+          localStorage.getItem("Last_Message") as string,
+        );
+
+        setRecentMessage(storedMessage);
+      } catch (error) {
+        console.log(error);
+      }
+    } else setRecentMessage(lastMessage);
   }, [lastMessage]);
 
   const handleClick = (
@@ -50,6 +62,8 @@ export default function Friends(props: FriendsProps) {
     }
     e.currentTarget.classList.add("selectedUser");
     setSelectedUser(user);
+    setAllMessages([]);
+    console.log(user);
   };
 
   return (
@@ -72,9 +86,16 @@ export default function Friends(props: FriendsProps) {
               </figure>
               <div className="User_Details">
                 <h2>{user.username}</h2>
-                <p>
-                  {(recentMessage && recentMessage.text)}
-                </p>
+                <div id="Last_message">
+                  <p
+                    className={`${recentMessage && !recentMessage.seen && recentMessage?.ReceiverId !== user._id ? "Unseen" : ""}`}
+                  >
+                    {recentMessage && recentMessage.text}
+                  </p>
+                  <p>
+                    {recentMessage && toLocaleTime(recentMessage.createdAt)}
+                  </p>
+                </div>
               </div>
             </div>
           );
