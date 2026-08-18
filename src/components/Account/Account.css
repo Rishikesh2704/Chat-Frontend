@@ -1,11 +1,13 @@
 .Account {
-  height: 98vh;
-  width: 95vw;
+  height: 100%;
+  width:100%;
   border-radius: 0.5rem;
   display: flex;
   position: relative;
   flex-direction: column;
   justify-content: space-around;
+  background:var(--secondary-color);
+
 }
 
 #Heading {
@@ -20,24 +22,24 @@
 .Account_Profile{
   width: 100%;
   height:30%;
-  background:var(--secondary-color);
   border-radius:0.5rem;
   display: flex;
-  justify-content:start;
+  justify-content:center;
   align-items: center;
   position:relative;
 }
 
 .Account_Image{
-  margin-left:4rem;
   display:flex;
   align-items: center;
+  height: 100%;
+  justify-content:start;
   gap:3rem;
 }
 
 .Profile_Wrapper {
-  height: 5rem;
-  width: 5rem;
+  height: 4rem;
+  width: 4rem;
   border-radius: 50%;
   font-size: 2.4vmax;
   position: relative;
@@ -62,11 +64,11 @@
 }
 
 .Upload_Button {
-  width: 25%;
-  height: 22%;
+  width: 35%;
+  height: 30%;
   position: absolute;
   bottom: -0.3rem;
-  right: 0.5rem;
+  right: 0rem;
   font-size: 1.1vmax;
   background: none;
   border: none;
@@ -83,20 +85,18 @@
 }
 
 .Account_Info {
-  height: 40%;
-  width: 100%;
+  height: 80%;
+  width: 95%;
   display: flex;
   flex-direction: column;
   justify-content: start;
   align-items:start;
-  padding: 1rem 0rem;
   border-radius:0.5rem;
-  gap: 2.5rem;
-  background:var(--secondary-color)
+  gap: 2rem;
 }
 
 .rows{
-  margin-left:4rem;
+  font-size:0.9rem;
 }
 .rows > h4 {
   color:rgb(88, 87, 87)

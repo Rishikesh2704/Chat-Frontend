@@ -2,6 +2,7 @@ type User = {
  _id: string,
   email: string,
   username: string,
+  GroupName?:string,
   password: null,
   profile: string,
   createdAt: string,

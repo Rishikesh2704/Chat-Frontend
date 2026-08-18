@@ -1,5 +1,6 @@
 
 .Chat_Friends {
+  flex-shrink: 1;
   height: 78%;
   width: 100%;
   display: flex;

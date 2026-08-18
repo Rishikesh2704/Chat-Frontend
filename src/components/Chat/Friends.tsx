@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./Friends.css";
+import profile from '../../assets/profile.jpg'
 
 type FriendsProps = {
   users: User[];
@@ -78,14 +79,14 @@ export default function Friends(props: FriendsProps) {
             >
               <figure>
                 <div className="profile_picture">
-                  <img src={user.profile} />
+                  <img src={user.profile||profile} />
                 </div>
                 <div
                   className={`${onlineUsersIds.includes(user._id) ? "online" : ""}`}
                 ></div>
               </figure>
               <div className="User_Details">
-                <h2>{user.username}</h2>
+                <h2>{user.username||user.GroupName}</h2>
                 <div id="Last_message">
                   <p
                     className={`${recentMessage && !recentMessage.seen && recentMessage?.ReceiverId !== user._id ? "Unseen" : ""}`}

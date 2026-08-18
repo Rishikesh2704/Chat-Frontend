@@ -7,6 +7,7 @@ import Friends from "../Chat/Friends.js";
 import MessageMain from "../Chat/MessageMain.js";
 import { Socket } from "socket.io-client";
 import Modal from "../Modal/Modal.js";
+import Account from "../Account/Account.js";
 
 type props = {
   socketRef: React.RefObject<Socket | null>;
@@ -19,6 +20,7 @@ export default function Home(props: props) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [allMessages, setAllMessages] = useState<any[]>([]);
   const [viewModal, setViewModal] = useState<boolean>(false);
+  const [showDetails, setShowDetails] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -29,7 +31,8 @@ export default function Home(props: props) {
             withCredentials: true,
           },
         );
-        setUsers(data?.data);
+        setUsers([...data?.data.Friends, ...data.data.Groups]);
+        console.log(data.data);
       } catch (error: any) {
         console.log(error.response);
       }
@@ -46,9 +49,7 @@ export default function Home(props: props) {
 
     if (socketRef.current) {
       const socket = socketRef.current;
-      socket.on("get_Online_Users", (UsersList: any) => {
-        console.log(UsersList);
-
+      socket.on("Online_Users", (UsersList: any) => {
         setOnlineUsers(UsersList);
       });
 
@@ -57,7 +58,7 @@ export default function Home(props: props) {
         ack(true);
       });
 
-      socket.on("Users_Online", (onlineUsers: any) => {
+      socket.on("AfterDisconnection_Online_Users", (onlineUsers: any) => {
         setOnlineUsers(onlineUsers);
       });
     }
@@ -100,6 +101,7 @@ export default function Home(props: props) {
             allMessages={allMessages}
             setAllMessages={setAllMessages}
             socketRef={socketRef}
+            setShowDetails={setShowDetails}
           />
         ) : (
           <div className="NoChats">
@@ -108,6 +110,9 @@ export default function Home(props: props) {
           </div>
         )}
       </section>
+      {showDetails&&<aside className="Account_Details">
+        <Account />
+      </aside>}
     </div>
   );
 }
