@@ -14,11 +14,11 @@
 
 /* Message Style */
 .Messages {
-  width: 85%;
+  width: 91%;
   padding: 0.1rem 0.9rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.8rem;
   overflow-y: auto;
   overflow-anchor: auto;
 }
@@ -71,8 +71,13 @@
   flex-direction: column;
   justify-content: start;
   align-items: start;
-  gap: 1rem;
+  gap: 0.5rem;
   cursor: pointer;
+}
+.ReceivedMessage_Profile{
+  border-radius:50%;
+  position:relative;
+  bottom:0.6rem
 }
 
 .Reactions {
@@ -112,7 +117,7 @@
   max-width: 50%;
   justify-content: end;
   align-items: end;
-  gap: 0.7rem;
+  gap: 0.3rem;
   cursor: pointer;
   position: relative;
 }
@@ -233,4 +238,14 @@
 #Seen_Message {
   font-size: 0.7vmax;
   color: rgb(89, 88, 88);
+}
+
+.GroupMessage_Username{
+  position:absolute;
+  top:-1.7rem;
+  left:0rem;
+  font-weight: 700;
+  font-size:0.7rem;
+  color:rgb(99, 97, 97);
+
 }

@@ -9,10 +9,23 @@ type User = {
   updatedAt: string,
 };
 
+type Group = {
+  _id:string,
+  groupName:string,
+  admins:string[],
+  members:string[],
+  roomId:string,
+  profile:string;
+}
+
 
 type AllMessageType = {
   _id:string
-  SenderId: string;
+  SenderId: string | {
+    _id:string,
+    username:string, 
+    profile:string,
+  };
   ReceiverId: string;
   text: string;
   seen:boolean;
@@ -20,5 +33,7 @@ type AllMessageType = {
   createdAt: string;
   updatedAt: string;
   reactions:string;
+ 
 };
+
 

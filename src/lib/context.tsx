@@ -2,19 +2,15 @@ import React, {
   createContext,
   useContext,
   useEffect,
-  useMemo,
-  useRef,
   useState,
 } from "react";
 import { io, type Socket } from "socket.io-client";
 
-type User = {
-  [index: string]: string;
-};
 
 type UserContextType = {
   onlineUsers: User[] | null;
   setOnlineUsers: React.Dispatch<React.SetStateAction<User[] | null>>;
+  currentUser:User | null;
   // socketRef: React.RefObject<Socket | null>;
   // setSocket:React.Dispatch<React.SetStateAction<Socket| null>>
 };
@@ -22,6 +18,7 @@ type UserContextType = {
 const userContextState = {
   onlineUsers: null,
   setOnlineUsers: () => "",
+  currentUser:null
   // socketRef: { current: null },
   // setSocket:() => ""
 };
@@ -31,7 +28,18 @@ export const useUser = () => useContext(userContext);
 
 export const User = ({ children }: { children: React.ReactNode }) => {
   const [onlineUsers, setOnlineUsers] = useState<User[] | null>(null);
-
+  const [currentUser, setCurrentUser] = useState(null)
+  useEffect(() => {
+    try { 
+      const string = localStorage.getItem("Current_User")
+      if(string){
+        const user =JSON.parse(string as string);
+        setCurrentUser(user);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, [])
   // let socketRef = useRef<Socket | null>(null);
   // useEffect(() => {
   //   const user = JSON.parse(localStorage.getItem("Current_User") as string);
@@ -47,6 +55,7 @@ export const User = ({ children }: { children: React.ReactNode }) => {
   const value = {
     onlineUsers,
     setOnlineUsers,
+    currentUser,
     // socketRef,
   };
   return <userContext.Provider value={value}>{children}</userContext.Provider>;

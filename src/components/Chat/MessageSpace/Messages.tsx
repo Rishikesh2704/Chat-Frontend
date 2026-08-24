@@ -1,14 +1,15 @@
 import type { EmojiClickData, EmojiStyle } from "emoji-picker-react";
 import axios from "../../../lib/axios";
 import EmojiPicker from "emoji-picker-react";
-import { useRef } from "react";
+import { memo, useRef } from "react";
 import type { Socket } from "socket.io-client";
+import { useUser } from "../../../lib/context";
 
 type propsType = {
   allMessages: AllMessageType[];
   socketRef: React.RefObject<Socket | null>;
   setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
-  selectedUser: User;
+  selectedUser: User | Group;
   seenMessage: AllMessageType | null;
   lastMessageRef: React.RefObject<null>;
 };
@@ -52,7 +53,7 @@ const getDayOfMessages = (
   } else return "";
 };
 
-export default function Messages(props: propsType) {
+export default memo(function Messages(props: propsType) {
   const {
     allMessages,
     setAllMessages,
@@ -61,8 +62,11 @@ export default function Messages(props: propsType) {
     seenMessage,
     lastMessageRef,
   } = props;
+
+  const { currentUser } = useUser();
   const previousMessageTime = useRef<string>("");
   const socket = socketRef.current;
+
   const handleDeleteMessage = (messageId: string) => {
     const deleteMessage = async () => {
       try {
@@ -137,10 +141,13 @@ export default function Messages(props: propsType) {
     //   setAllMessages([...updatedMessages]);
     // });
   };
+  const isReceiver = (userInfo:any) => {
+    return !(typeof userInfo.SenderId === 'object'? userInfo.SenderId._id === currentUser?._id :userInfo.SenderId !== currentUser?._id)
+  } 
   return (
     <>
       {allMessages.map((messages: AllMessageType) => {
-        if (messages.ReceiverId !== selectedUser._id) {
+        if (currentUser && isReceiver(messages)) {
           return (
             <div key={messages._id}>
               <h6 className="Messages_Day">
@@ -186,8 +193,12 @@ export default function Messages(props: propsType) {
                       />
                     </div>
                   )}
-
                   <div className="messageStyle received">
+                    {typeof messages.SenderId === "object" && (
+                      <p className="GroupMessage_Username">
+                        {messages.SenderId.username as string}
+                      </p>
+                    )}
                     {messages.text}
                     {messages.reactions && (
                       <p
@@ -204,6 +215,8 @@ export default function Messages(props: propsType) {
                     {toLocaleTime(messages.createdAt)}
                   </p>
                 </div>
+                {typeof messages.SenderId === 'object' &&<img className="ReceivedMessage_Profile" src={messages?.SenderId?.profile} width={25} height={25} />}
+
               </div>
             </div>
           );
@@ -265,4 +278,4 @@ export default function Messages(props: propsType) {
       })}
     </>
   );
-}
+});

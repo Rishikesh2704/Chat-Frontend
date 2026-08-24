@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useUser } from "../../lib/context.js";
 
 import "./Home.css";
-import axios from "../../lib/axios.js";
-import Friends from "../Chat/Friends.js";
+import Friends from "../Chat/Friends/Friends.js";
 import MessageMain from "../Chat/MessageMain.js";
 import { Socket } from "socket.io-client";
 import Modal from "../Modal/Modal.js";
 import Account from "../Account/Account.js";
+import axios from "../../lib/axios.js";
 
 type props = {
   socketRef: React.RefObject<Socket | null>;
@@ -17,10 +17,11 @@ export default function Home(props: props) {
   const { socketRef } = props;
 
   const [users, setUsers] = useState<User[]>([]);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [allMessages, setAllMessages] = useState<any[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | Group | null>(null);
+  const [allMessages, setAllMessages] = useState<any>([]);
   const [viewModal, setViewModal] = useState<boolean>(false);
   const [showDetails, setShowDetails] = useState<boolean>(false);
+  const [groupRoomIds, setGroupRoomIds] = useState<Pick<Group, "roomId">[]>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -31,10 +32,14 @@ export default function Home(props: props) {
             withCredentials: true,
           },
         );
-        setUsers([...data?.data.Friends, ...data.data.Groups]);
-        console.log(data.data);
+        setUsers([...data?.data?.Friends, ...data.data.Groups]);
+        const groups = data.data.Groups || [];
+        const roomIds = groups.map((group: Group) => {
+          return group.roomId;
+        });
+        setGroupRoomIds(roomIds);
       } catch (error: any) {
-        console.log(error.response);
+        console.log(error);
       }
     };
 
@@ -47,22 +52,47 @@ export default function Home(props: props) {
     //   query: { userId: user?._id, username: user?.username },
     // });
 
-    if (socketRef.current) {
-      const socket = socketRef.current;
-      socket.on("Online_Users", (UsersList: any) => {
-        setOnlineUsers(UsersList);
-      });
+    if (!socketRef.current) return;
 
-      socket.on("privateMessage", (message: AllMessageType, ack: any) => {
-        setAllMessages((prev: any) => [...prev, message]);
-        ack(true);
-      });
+    const socket = socketRef.current;
+    const groupMessageHandler = (message: AllMessageType, ack: any) => {
+      console.log("Group Messages: ", message);
+      setAllMessages((prev:any) => [...prev,message]);
+      ack(true);
+    };
 
-      socket.on("AfterDisconnection_Online_Users", (onlineUsers: any) => {
-        setOnlineUsers(onlineUsers);
+    const onlineUsersHandler = (UsersList: any) => {
+      setOnlineUsers(UsersList);
+    };
+
+    const privateMessageHandler = (message: AllMessageType, ack: any) => {
+      setAllMessages((prev: any) => [...prev, message]);
+      ack(true);
+    };
+
+    const afterDisconnectedUsers = (onlineUsers: any) => {
+      setOnlineUsers(onlineUsers);
+    };
+
+    if (groupRoomIds.length > 0) {
+      console.log("Group Room Id : ", groupRoomIds);
+      groupRoomIds.forEach((room) => {
+        socket.emit("join_group", room);
       });
     }
-  }, [socketRef.current]);
+
+    socket.on("groupMessage", groupMessageHandler);
+    socket.on("Online_Users", onlineUsersHandler);
+    socket.on("privateMessage", privateMessageHandler);
+    socket.on("AfterDisconnection_Online_Users", afterDisconnectedUsers);
+
+    return () => {
+      socket.off("groupMessage", groupMessageHandler);
+      socket.off("Online_Users", onlineUsersHandler);
+      socket.off("privateMessage", privateMessageHandler);
+      socket.off("AfterDisconnection_Online_Users", afterDisconnectedUsers);
+    };
+  }, [socketRef.current, groupRoomIds]);
 
   const handleCreateGroup = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -110,9 +140,11 @@ export default function Home(props: props) {
           </div>
         )}
       </section>
-      {showDetails&&<aside className="Account_Details">
-        <Account />
-      </aside>}
+      {showDetails && (
+        <aside className="Account_Details">
+          <Account />
+        </aside>
+      )}
     </div>
   );
 }

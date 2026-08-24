@@ -1,6 +1,5 @@
-
 .Chat_header {
-  height: 8%;
+  height: 9%;
   width: 100%;
   display: flex;
   align-items: center;
@@ -53,37 +52,49 @@
 
 .options_button {
   height: 2rem;
-  width:2rem;
-  border-radius:50%;
+  width: 2rem;
+  border-radius: 50%;
   background: none;
   border: none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 1.3rem;
-  transition:0.1s ease-out;
+  transition: 0.1s ease-out;
   cursor: pointer;
-  &:hover{
-    background:var(--primary-hover-color);
-  transition:0.1s ease-out;
-
+  &:hover {
+    background: var(--primary-hover-color);
+    transition: 0.1s ease-out;
   }
 }
 
-
-.options{
-    height: 150%;
-    z-index:1;
-    position:absolute;
-    bottom:-130%;
-    right:2%;
-    background-color:black;
-    color:white;
-    padding:0.4rem 0.4rem;
-    border-radius:0.45rem;
+.options {
+  height: 150%;
+  z-index: 1;
+  position: absolute;
+  bottom: -130%;
+  right: 2%;
+  background-color: black;
+  color: white;
+  border-radius: 0.45rem;
 }
 
-.options > p{
-    border-bottom:1px solid gainsboro;
-
+.options > button {
+  background: none;
+  border: none;
+  color: white;
+  padding: 0.3rem 0.4rem;
+  border-bottom: 1px solid gainsboro;
+  transition:0.1s ease-out;
+  border-top-right-radius:0.45rem;
+  border-top-left-radius:0.45rem;
+  cursor:pointer;
+  &:hover {
+    background-color: var(--primary-hover-color);
+    transition:0.1s ease-out;
+  }
+  &:active {
+    background-color: #f17d24;
+    transition:0.1s ease-out;
+  }
 }

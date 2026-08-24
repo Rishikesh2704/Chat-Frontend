@@ -3,43 +3,84 @@ import { Socket } from "socket.io-client";
 import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
 import "./MessageForm.css";
 
-import axios from "../../lib/axios";
-import { useUser } from "../../lib/context";
+import axios from "../../../lib/axios"; 
+import { useUser } from "../../../lib/context";
 
 type propsType = {
   message: string | undefined;
   setMessage: (message: any) => void;
   setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
-  selectedUser: User;
-  socketRef:React.RefObject<Socket|null>
-
+  selectedUser: User | Group ;
+  socketRef: React.RefObject<Socket | null>;
 };
 
-function getSelectedUserSocketId(SocketIds: any[] | null, selectedUser: User) {
+function getSelectedUserSocketId(SocketIds: any[] | null, selectedUser:any) {
+ const isGroup = Object.hasOwn(selectedUser,'RoomId');
+  if(isGroup) return selectedUser.RoomId as Group ;
   if (SocketIds) {
     const selectedUserSocketId = Object.entries(SocketIds).find(
       ([key, _]) => key == selectedUser._id,
     );
     return selectedUserSocketId && selectedUserSocketId[1];
-  }else{
-    return null
+  } else {
+    return null;
   }
-  // for (let id in SocketIds) {
-  //   if (id === selectedUser?._id) selectedUserSocketId = SocketIds[id as any];
-  // }
+  // if (SocketIds) return SocketIds[selectedUser._id as any];
+}
+
+async function messageFriendRequest(
+  SocketIds: any[] | null,
+  selectedUser: User,
+  file: any,
+  message: string,
+) {
+  // const userSocketId = getSelectedUserSocketId(SocketIds, selectedUser);
+  const userSocketId = SocketIds ? SocketIds[selectedUser._id as any] : "";
+  const form = new FormData();
+  form.append("image", file);
+  form.append("message", message);
+  form.append("receiverSocketId", userSocketId );
+  return await axios.post(
+    `${import.meta.env.VITE_API}/messages/sendMessage/${selectedUser._id}`,
+    form,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
+  );
+}
+
+async function  groupMessageRequest(
+  group: Group,
+  message: string,
+  file: string,
+) {
+  const form = new FormData();
+  form.append("message", message);
+  form.append("image", file);
+  form.append("room", group.roomId);
+  return await axios.post(
+    `${import.meta.env.VITE_API}/group/${group._id}/message`,
+    form,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
+  );
 }
 
 export default function MessageForm(props: propsType) {
   const { message, setMessage, setAllMessages, selectedUser, socketRef } =
     props;
-  const { onlineUsers: SocketIds,  } = useUser();
+  const { onlineUsers: SocketIds } = useUser();
   const [file, setFile] = useState<any>();
   const [preview, setPreview] = useState("");
   const [emojiVisible, setEmojiVisible] = useState(false);
-
   let selectedUserSocketId: any = getSelectedUserSocketId(
     SocketIds,
-    selectedUser,
+    selectedUser ,
   );
 
   const handleImageUploadChange = (
@@ -56,24 +97,15 @@ export default function MessageForm(props: propsType) {
     e.preventDefault();
     const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
     if (!message) return;
-    try {
-      const userSocketId = getSelectedUserSocketId(SocketIds, selectedUser);
-      const form = new FormData();
-      form.append("image", file);
-      form.append("message", message as string);
-      form.append("receiverSocketId", userSocketId);
+    try { 
+      const isGroup = Object.hasOwn(selectedUser, "roomId");
+      const messageRequest = !isGroup
+        ? await messageFriendRequest(SocketIds, selectedUser as User, file, message)
+        : await groupMessageRequest(selectedUser as Group, message, file);
 
-      const messageRequest = await axios.post(
-        `${import.meta.env.VITE_API}/messages/sendMessage/${selectedUser._id}`,
-        form,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
-      );
       if (messageRequest.status === 201) {
-        setAllMessages((prev) => [...prev, messageRequest.data.newMessage]);
+        console.log("Message request: ", messageRequest)
+        // setAllMessages((prev) => [...prev, messageRequest.data.newMessage]);
         setMessage("");
         messageSpaceDiv.scrollTo({
           top: messageSpaceDiv.scrollHeight,

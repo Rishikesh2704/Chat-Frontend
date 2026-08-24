@@ -119,12 +119,12 @@ export default function Account() {
         </div>
         <div className="rows">
           <h4>
-            Created At: <span> {(user&&toLocaleTime(user.createdAt))||current_user.createdAt}</span>
+            Created At: <span> {(user&&toLocaleTime(user.createdAt))||toLocaleTime(current_user.createdAt)}</span>
           </h4>
         </div>
         <div className="rows">
           <h4>
-            Updated At: <span>{(user&&toLocaleTime(user.updatedAt)||current_user.updatedAt)}</span>
+            Updated At: <span>{(user&&toLocaleTime(user.updatedAt))||toLocaleTime(current_user.updatedAt)}</span>
           </h4>
         </div>
       </div>

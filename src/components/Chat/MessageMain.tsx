@@ -3,89 +3,54 @@ import type { Socket } from "socket.io-client";
 import "./MessageMain.css";
 
 import axios from "../../lib/axios";
-import MessageForm from "./MessageForm";
-import EmojiPicker, {
-  EmojiStyle,
-  type EmojiClickData,
-} from "emoji-picker-react";
-import MessageHeader from "./MessageHeader";
+import MessageForm from "./MessageForm/MessageForm";
+
+import MessageHeader from "./Header/MessageHeader";
 import Messages from "./MessageSpace/Messages";
+import { useUser } from "../../lib/context";
 
 type MessageSpaceProps = {
-  selectedUser: User;
+  selectedUser: User | Group;
   allMessages: AllMessageType[];
   setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
   socketRef: React.RefObject<Socket | null>;
-  setShowDetails:React.Dispatch<React.SetStateAction<boolean>>
+  setShowDetails: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-// function toLocaleTime(time: string) {
-//   const date = new Date(time);
-//   const hoursAndSecs = date.toLocaleTimeString().split(":");
-//   const formattedTime =
-//     hoursAndSecs[0] +
-//     ":" +
-//     hoursAndSecs[1] +
-//     " " +
-//     hoursAndSecs[2]?.split(" ")[1];
-//   return formattedTime;
-// }
-function toLocaleTime(time: string) {
-  return new Date(time).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-const fetchMessages = async (selectedUser: User, skipMessages: number) => {
-  const response = await axios(
-    `${import.meta.env.VITE_API}/messages/${selectedUser._id}/${skipMessages}`,
-  );
-  const reversed = response.data.messages.toReversed();
+const fetchMessages = async (
+  selectedUser: User | Group,
+  skipMessages: number,
+  currentUser: User | null,
+) => {
+  if (!currentUser || !selectedUser) {
+    console.log(
+      "Current User:",
+      currentUser,
+      "\n Selected User:",
+      selectedUser,
+    );
+    return;
+  }
+  const isGroup = Object.hasOwn(selectedUser, "roomId");
+  const UserMessageAPI = `${import.meta.env.VITE_API}/messages/${selectedUser._id}/${skipMessages}`;
+  // const GroupMessageAPI = `${import.meta.env.VITE_API}/group/message/${selectedUser._id}/${currentUser._id}/${skipMessages}`
+  // const isGroup = Object.hasOwn(selectedUser,"RoomId")
+  const response = await axios.get(UserMessageAPI);
+  const reversed = isGroup
+    ? response.data.groupMessages.toReversed()
+    : response.data.messages.toReversed();
   return reversed;
 };
 
-const getDayOfMessages = (
-  time: string,
-  previousMessageTime: React.RefObject<string>,
-) => {
-  const date = new Date(time);
-  const isSameDay = (a: Date, b: Date) =>
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate();
-  // if (
-  //   date.toLocaleDateString() === new Date().toLocaleDateString() &&
-  //   date.toLocaleDateString() !== previousMessageTime.current
-  // ) {
-  //   previousMessageTime.current = date.toLocaleDateString();
-  //   return "Today";
-  // }
-  if (
-    isSameDay(date, new Date()) &&
-    date.toLocaleDateString() !== previousMessageTime.current
-  ) {
-    previousMessageTime.current = date.toLocaleDateString();
-    return "Today";
-  }
-  if (
-    previousMessageTime.current.length === 0 ||
-    previousMessageTime.current !== date.toLocaleDateString()
-  ) {
-    previousMessageTime.current = date.toLocaleDateString();
-    const formattedDate =
-      date.getDate() +
-      " " +
-      date.toLocaleString("default", { month: "long" }) +
-      " " +
-      date.getFullYear();
-    return formattedDate;
-  } else return "";
-};
-
 export default function MessageSpace(props: MessageSpaceProps) {
-  const { selectedUser, allMessages, setAllMessages, socketRef, setShowDetails } = props;
-  // const { socketRef } = useUser();
+  const {
+    selectedUser,
+    allMessages,
+    setAllMessages,
+    socketRef,
+    setShowDetails,
+  } = props;
+  const { currentUser } = useUser();
 
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [isTop, setIsTop] = useState<boolean>(false);
@@ -97,7 +62,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
   const scrollPosRef = useRef<number | null>(null);
   const skipMessages = useRef(0);
   const lastMessageRef = useRef(null);
-  const socket = socketRef.current;
+  // const socket = socketRef.current;
 
   //isTyping
   useEffect(() => {
@@ -167,26 +132,31 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   //Initial Recent Messages
   useEffect(() => {
-    console.log("Selected User id: ", selectedUser);
-    try {
-      const user = JSON.parse(localStorage.getItem("Current_User") as string);
-      const setRecentMessages = async () => {
+    console.log("Initial Messages: ", allMessages);
+    console.log("Selected User: ", selectedUser);
+    const setRecentMessages = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("Current_User") as string);
         const messages = await fetchMessages(
           selectedUser,
           skipMessages.current,
+          currentUser,
         );
         const lastSeenMessage = messages.filter(
           (message: AllMessageType) => message.SenderId === user._id,
         );
 
         setSeenMessage(lastSeenMessage[lastSeenMessage?.length - 1]);
-        setAllMessages([...messages, ...allMessages]);
-      };
+        setAllMessages([...messages]);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-      setRecentMessages();
-    } catch (error: any) {
-      console.log(error.response.data);
-    }
+    setRecentMessages();
+    return () => {
+      setAllMessages([]);
+    };
   }, [selectedUser]);
 
   //Fetch Recent Messages
@@ -208,6 +178,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
             const messages1 = await fetchMessages(
               selectedUser,
               skipMessages.current,
+              currentUser,
             );
             setAllMessages((prev) => [...messages1, ...prev]);
           } catch (error) {
@@ -259,7 +230,10 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   return (
     <>
-      <MessageHeader selectedUser={selectedUser} setShowDetails={setShowDetails} />
+      <MessageHeader
+        selectedUser={selectedUser}
+        setShowDetails={setShowDetails}
+      />
       <div className="chat_messages">
         <div className="Messages" ref={MessageSpaceRef}>
           <Messages

@@ -1,8 +1,8 @@
 import { useState } from "react";
-import profile from "../../assets/profile.jpg";
+import profile from "../../../assets/profile.jpg"
 import './MessageHeader.css'
 type propsType = {
-  selectedUser:User;
+  selectedUser:User | Group;
   setShowDetails:React.Dispatch<React.SetStateAction<boolean>>
 }
 
@@ -13,7 +13,7 @@ export default function MessageHeader(props:propsType){
     <div className="Chat_header">
         <div className="profile">
           <img height={30} width={30} src={selectedUser.profile || profile} />
-          <h1>{selectedUser.username || selectedUser.GroupName}</h1>
+          <h1>{selectedUser.username || selectedUser.groupName}</h1>
         </div>
 
         <div className="Private_Options">

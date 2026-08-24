@@ -123,7 +123,7 @@ export default function Modal(props: props) {
           </div>
         </div>
         <button
-          className={`Create_Group_Button ${groupMembers && groupMembers.length > 1 ? "" : "disabled"}`}
+          className={`Create_Group_Button ${groupMembers && groupMembers.length > 0 ? "" : "disabled"}`}
           onClick={handleCreateGroup}
         >
           Create Group
