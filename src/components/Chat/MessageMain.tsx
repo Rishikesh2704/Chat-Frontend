@@ -33,8 +33,6 @@ const fetchMessages = async (
   }
   const isGroup = Object.hasOwn(selectedUser, "roomId");
   const UserMessageAPI = `${import.meta.env.VITE_API}/messages/${selectedUser._id}/${skipMessages}`;
-  // const GroupMessageAPI = `${import.meta.env.VITE_API}/group/message/${selectedUser._id}/${currentUser._id}/${skipMessages}`
-  // const isGroup = Object.hasOwn(selectedUser,"RoomId")
   const response = await axios.get(UserMessageAPI);
   const reversed = isGroup
     ? response.data.groupMessages.toReversed()
@@ -50,7 +48,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
     socketRef,
     setShowDetails,
   } = props;
-  const { currentUser } = useUser();
+  const { getUser } = useUser();
 
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [isTop, setIsTop] = useState<boolean>(false);
@@ -70,7 +68,29 @@ export default function MessageSpace(props: MessageSpaceProps) {
     if (!socket) return;
 
     const handleIsTyping = (user: any) => setIsTyping(user.isTyping);
-    const handleSeenMessage = (message: any) => setSeenMessage(message);
+
+    const handleSeenMessage = (mss: AllMessageType) => {
+      const updatedMessage = allMessages.map((messages) => {
+        if (mss._id === messages._id) {
+          console.log("Message: ", message);
+          return { ...messages, seen: mss.seen };
+        } else return messages;
+      });
+      console.log("Updated Messages: ", updatedMessage);
+      setAllMessages(updatedMessage);
+    };
+
+    const handleGroupSeenMessages = (mess:AllMessageType) => {
+      const updatedMessage = allMessages.map((messages) => {
+        if (mess._id === messages._id) {
+          console.log("Message: ", message);
+          return { ...messages, seen: mess.seen };
+        } else return messages;
+      });
+      // console.log("Updated Group Messages: ", updatedMessage);
+      // setAllMessages(updatedMessage);
+    }
+
     const handleReaction = (res: AllMessageType) => {
       const updatedMessages = allMessages.map((message) => {
         if (message._id === res._id) {
@@ -79,6 +99,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
       });
       setAllMessages([...updatedMessages]);
     };
+
     const handleDeleteReaction = (message: any) => {
       const updatedMessages = allMessages.map((m) => {
         if (m._id === message._id) {
@@ -92,6 +113,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
     socket.on("Typing", handleIsTyping);
     socket.on("Seen_Message", handleSeenMessage);
+    socket.on("SeenBy_GroupMembers", handleGroupSeenMessages);
     socket.on("Reaction_Update", handleReaction);
     socket.on("Deleted_Reaction", handleDeleteReaction);
 
@@ -105,47 +127,59 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   //Seen Message
   useEffect(() => {
-    const messages = document.querySelectorAll(".ReceivedMessages_Wrapper");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const id = entry.target.getAttribute("id");
-            const message = allMessages.find((message) => message._id == id);
-            socketRef.current &&
-              socketRef.current.emit("Seen_Message", message);
-          }
-        });
-      },
-      {
-        root: null,
-        rootMargin: "0px",
-        threshold: 1.0,
-      },
-    );
+    const messages = document.querySelectorAll(".ReceivedText_Wrapper");
+    const groupMessageSeenHandler = (message:AllMessageType | undefined) => {
+      const currentUser = getUser();
+      if (socketRef.current) socketRef.current.emit("groupMessage_Seen", message,currentUser,selectedUser.roomId);
+
+    };
+
+    const privateMessageSeenHandler = (message:AllMessageType | undefined) => {
+      if (allMessages[allMessages.length - 1].seen) return;
+      if (socketRef.current) socketRef.current.emit("Seen_Message", message);
+    };
+
+    const observerFunction = (entries: any) => {
+      entries.forEach((entry: any) => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute("id");
+          const isGroup = Object.hasOwn(selectedUser, "roomId");
+          const message = allMessages.find((message) => message._id == id);
+
+          if (isGroup) groupMessageSeenHandler(message);
+          else privateMessageSeenHandler(message);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerFunction, {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0,
+    });
 
     if (lastMessageRef.current) {
       observer.observe(lastMessageRef.current);
     }
     messages.forEach((message) => observer.observe(message));
+    return () => {
+      observer.disconnect();
+    };
   }, [allMessages]);
 
   //Initial Recent Messages
   useEffect(() => {
-    console.log("Initial Messages: ", allMessages);
-    console.log("Selected User: ", selectedUser);
     const setRecentMessages = async () => {
       try {
         const user = JSON.parse(localStorage.getItem("Current_User") as string);
         const messages = await fetchMessages(
           selectedUser,
           skipMessages.current,
-          currentUser,
+          getUser(),
         );
         const lastSeenMessage = messages.filter(
           (message: AllMessageType) => message.SenderId === user._id,
         );
-
         setSeenMessage(lastSeenMessage[lastSeenMessage?.length - 1]);
         setAllMessages([...messages]);
       } catch (error) {
@@ -156,6 +190,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
     setRecentMessages();
     return () => {
       setAllMessages([]);
+      skipMessages.current = 0;
     };
   }, [selectedUser]);
 
@@ -178,7 +213,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
             const messages1 = await fetchMessages(
               selectedUser,
               skipMessages.current,
-              currentUser,
+              getUser(),
             );
             setAllMessages((prev) => [...messages1, ...prev]);
           } catch (error) {
@@ -200,8 +235,10 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
     return () => {
       if (messageSpaceDiv) messageSpaceDiv.removeEventListener("scroll", windw);
+      setAllMessages([]);
+      skipMessages.current = 0;
     };
-  }, []);
+  }, [selectedUser]);
 
   //Infinite Scroll(up)
   useLayoutEffect(() => {

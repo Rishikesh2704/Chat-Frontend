@@ -9,7 +9,7 @@ type props = {
 };
 
 export default function Navbar(props: props) {
-  // const { socketRef } = useUser();
+  const { logoutUser } = useUser();
   const { socketRef } = props;
   const navigate = useNavigate();
   const page = useLocation();
@@ -27,7 +27,7 @@ export default function Navbar(props: props) {
   const handleLogOut = async () => {
     try {
       await axios.get(`${import.meta.env.VITE_API}/auth/logout`);
-      localStorage.removeItem("Current_User");
+      logoutUser();
       console.log(
         "Logout Handler: ",
         JSON.parse(localStorage.getItem("Current_User") as string),

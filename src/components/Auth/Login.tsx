@@ -10,7 +10,7 @@ type props = {
 }
 
 export default function Login(props:props) {
-  // const { socketRef } = useUser();
+  const { loginUser } = useUser();
   const { socketRef } = props;
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
@@ -31,8 +31,8 @@ export default function Login(props:props) {
         },
       );
       console.log(res.data);
-      localStorage.setItem("Current_User", JSON.stringify(res.data.User));
       const user = res.data.User;
+      loginUser(user);
       socketRef.current = io(import.meta.env.VITE_API, {
           query: { userId: user?._id, username: user?.username },
         })

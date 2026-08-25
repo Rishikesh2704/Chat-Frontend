@@ -63,10 +63,9 @@ export default memo(function Messages(props: propsType) {
     lastMessageRef,
   } = props;
 
-  const { currentUser } = useUser();
+  const { getUser } = useUser();
   const previousMessageTime = useRef<string>("");
   const socket = socketRef.current;
-
   const handleDeleteMessage = (messageId: string) => {
     const deleteMessage = async () => {
       try {
@@ -131,23 +130,30 @@ export default memo(function Messages(props: propsType) {
   ) => {
     e.preventDefault();
     socket?.emit("Delete_Reaction", { messageId, reaction: "" });
-    // socket.on("Deleted_Reaction", (message) => {
-    //   const updatedMessages = allMessages.map((m) => {
-    //     if (m._id == message._id) {
-    //       m.reactions = message.reactions;
-    //       return m;
-    //     } else return m;
-    //   });
-    //   setAllMessages([...updatedMessages]);
-    // });
   };
-  const isReceiver = (userInfo:any) => {
-    return !(typeof userInfo.SenderId === 'object'? userInfo.SenderId._id === currentUser?._id :userInfo.SenderId !== currentUser?._id)
-  } 
+
+  const isReceiver = (message: any) => {
+    return typeof message.SenderId === "object"
+      ? message.SenderId._id !== getUser()?._id
+      : message.SenderId !== getUser()?._id;
+  };
+
+  const isSeen = (messages: AllMessageType): boolean => {
+    const isGroup = Object.hasOwn(selectedUser, "roomId");
+    if (isGroup) {
+      return false;
+    }
+  
+      const seenMessages = allMessages.filter(
+        (message) => message.seen === true,
+      );
+      return seenMessages[seenMessages.length - 1]?._id === messages?._id;
+    
+  };
   return (
     <>
       {allMessages.map((messages: AllMessageType) => {
-        if (currentUser && isReceiver(messages)) {
+        if (getUser() && isReceiver(messages)) {
           return (
             <div key={messages._id}>
               <h6 className="Messages_Day">
@@ -193,12 +199,13 @@ export default memo(function Messages(props: propsType) {
                       />
                     </div>
                   )}
+                  {
+                    <p className="GroupMessage_Username">
+                      {(messages.SenderId.username as string) ||
+                        selectedUser.username}
+                    </p>
+                  }
                   <div className="messageStyle received">
-                    {typeof messages.SenderId === "object" && (
-                      <p className="GroupMessage_Username">
-                        {messages.SenderId.username as string}
-                      </p>
-                    )}
                     {messages.text}
                     {messages.reactions && (
                       <p
@@ -215,8 +222,14 @@ export default memo(function Messages(props: propsType) {
                     {toLocaleTime(messages.createdAt)}
                   </p>
                 </div>
-                {typeof messages.SenderId === 'object' &&<img className="ReceivedMessage_Profile" src={messages?.SenderId?.profile} width={25} height={25} />}
-
+                {typeof messages.SenderId === "object" && (
+                  <img
+                    className="ReceivedMessage_Profile"
+                    src={messages?.SenderId?.profile}
+                    width={25}
+                    height={25}
+                  />
+                )}
               </div>
             </div>
           );
@@ -246,13 +259,13 @@ export default memo(function Messages(props: propsType) {
                       </p>
                     )}
                   </div>
-                  <p className="sentTime time">
-                    {toLocaleTime(messages.createdAt)}
-                  </p>
+                  <div className="Message_details">
+                    <p className="sentTime time">
+                      {toLocaleTime(messages.createdAt)}
+                    </p>
 
-                  {seenMessage?._id === messages._id && (
-                    <p id="Seen_Message">Seen</p>
-                  )}
+                    {isSeen(messages) && <p id="Seen_Message">Seen</p>}
+                  </div>
                 </div>
                 <div
                   className="Options"

@@ -13,7 +13,7 @@ type props = {
   socketRef: React.RefObject<Socket | null>;
 };
 export default function Home(props: props) {
-  const { setOnlineUsers, onlineUsers } = useUser();
+  const { setOnlineUsers, onlineUsers, getUser } = useUser();
   const { socketRef } = props;
 
   const [users, setUsers] = useState<User[]>([]);
@@ -56,9 +56,13 @@ export default function Home(props: props) {
 
     const socket = socketRef.current;
     const groupMessageHandler = (message: AllMessageType, ack: any) => {
-      console.log("Group Messages: ", message);
-      setAllMessages((prev:any) => [...prev,message]);
       ack(true);
+      console.log("Group Messages: ", message);
+      if (message.SenderId._id !== getUser()?._id){
+
+        setAllMessages((prev: any) => [...prev, message]);
+      }
+        
     };
 
     const onlineUsersHandler = (UsersList: any) => {
@@ -66,6 +70,7 @@ export default function Home(props: props) {
     };
 
     const privateMessageHandler = (message: AllMessageType, ack: any) => {
+      console.log("Private Message: ", message);
       setAllMessages((prev: any) => [...prev, message]);
       ack(true);
     };

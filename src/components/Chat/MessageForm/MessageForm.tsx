@@ -36,6 +36,7 @@ async function messageFriendRequest(
 ) {
   // const userSocketId = getSelectedUserSocketId(SocketIds, selectedUser);
   const userSocketId = SocketIds ? SocketIds[selectedUser._id as any] : "";
+  console.log("Socket Ids : ", SocketIds, "\n Receiver socket id: ", userSocketId);
   const form = new FormData();
   form.append("image", file);
   form.append("message", message);
@@ -105,7 +106,7 @@ export default function MessageForm(props: propsType) {
 
       if (messageRequest.status === 201) {
         console.log("Message request: ", messageRequest)
-        // setAllMessages((prev) => [...prev, messageRequest.data.newMessage]);
+        setAllMessages((prev) => [...prev, messageRequest.data.newMessage]);
         setMessage("");
         messageSpaceDiv.scrollTo({
           top: messageSpaceDiv.scrollHeight,
