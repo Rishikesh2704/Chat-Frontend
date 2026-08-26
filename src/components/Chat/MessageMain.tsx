@@ -1,13 +1,13 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Socket } from "socket.io-client";
 import "./MessageMain.css";
 
-import axios from "../../lib/axios";
 import MessageForm from "./MessageForm/MessageForm";
 
 import MessageHeader from "./Header/MessageHeader";
 import Messages from "./MessageSpace/Messages";
 import { useUser } from "../../lib/context";
+import axios from "../../lib/axios";
 
 type MessageSpaceProps = {
   selectedUser: User | Group;
@@ -54,7 +54,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
   const [isTop, setIsTop] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [seenMessage, setSeenMessage] = useState<AllMessageType | null>(null);
-
+  const [groupMembers, setGroupMembers] = useState();
   const MessageSpaceRef = useRef<HTMLDivElement | null>(null);
   const loadingRef = useRef(false);
   const scrollPosRef = useRef<number | null>(null);
@@ -62,13 +62,12 @@ export default function MessageSpace(props: MessageSpaceProps) {
   const lastMessageRef = useRef(null);
   // const socket = socketRef.current;
 
+
   //isTyping
   useEffect(() => {
     const socket = socketRef.current;
     if (!socket) return;
-
     const handleIsTyping = (user: any) => setIsTyping(user.isTyping);
-
     const handleSeenMessage = (mss: AllMessageType) => {
       const updatedMessage = allMessages.map((messages) => {
         if (mss._id === messages._id) {
@@ -77,19 +76,20 @@ export default function MessageSpace(props: MessageSpaceProps) {
         } else return messages;
       });
       console.log("Updated Messages: ", updatedMessage);
-      setAllMessages(updatedMessage);
+      setAllMessages([...updatedMessage]);
     };
 
-    const handleGroupSeenMessages = (mess:AllMessageType) => {
+    const handleGroupSeenMessages = (mess: AllMessageType) => {
+      console.log("Message: ", allMessages);
       const updatedMessage = allMessages.map((messages) => {
+        console.log("Message Id: ", mess._id === messages._id);
         if (mess._id === messages._id) {
-          console.log("Message: ", message);
           return { ...messages, seen: mess.seen };
         } else return messages;
       });
-      // console.log("Updated Group Messages: ", updatedMessage);
-      // setAllMessages(updatedMessage);
-    }
+      console.log("Updated Group Messages: ", updatedMessage);
+      setAllMessages([...updatedMessage]);
+    };
 
     const handleReaction = (res: AllMessageType) => {
       const updatedMessages = allMessages.map((message) => {
@@ -103,11 +103,9 @@ export default function MessageSpace(props: MessageSpaceProps) {
     const handleDeleteReaction = (message: any) => {
       const updatedMessages = allMessages.map((m) => {
         if (m._id === message._id) {
-          m.reactions = message.reactions;
-          return m;
+          return { ...m, reactions: message.reactions };
         } else return m;
       });
-
       setAllMessages([...updatedMessages]);
     };
 
@@ -120,21 +118,45 @@ export default function MessageSpace(props: MessageSpaceProps) {
     return () => {
       socket.off("Typing", handleIsTyping);
       socket.off("Seen_Message", handleSeenMessage);
+      socket.off("SeenBy_GroupMembers", handleGroupSeenMessages);
       socket.off("Reaction_Update", handleReaction);
       socket.off("Deleted_Reaction", handleDeleteReaction);
     };
   }, [allMessages]);
 
+  
+  useEffect( () => {
+    if(!Object.hasOwn(selectedUser, 'roomId')) return 
+    const fetchMemberDetails = async() => {
+      try {
+        console.log(selectedUser._id);
+        const request= await axios.get(`${import.meta.env.VITE_API}/group/${selectedUser._id}/details`)
+        const updatedMap =  new Map( request.data.members.map((member:any) => [member._id, {username:member.username, profile:member.profile}]) );
+        setGroupMembers(updatedMap)
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchMemberDetails();
+  },[selectedUser])
+
   //Seen Message
   useEffect(() => {
     const messages = document.querySelectorAll(".ReceivedText_Wrapper");
-    const groupMessageSeenHandler = (message:AllMessageType | undefined) => {
+    const groupMessageSeenHandler = (message: AllMessageType | undefined) => {
       const currentUser = getUser();
-      if (socketRef.current) socketRef.current.emit("groupMessage_Seen", message,currentUser,selectedUser.roomId);
-
+      const seen = message?.seen as string[];
+      if (seen.includes(currentUser._id)) return;
+      if (socketRef.current)
+        socketRef.current.emit(
+          "groupMessage_Seen",
+          message,
+          currentUser,
+          selectedUser.roomId,
+        );
     };
 
-    const privateMessageSeenHandler = (message:AllMessageType | undefined) => {
+    const privateMessageSeenHandler = (message: AllMessageType | undefined) => {
       if (allMessages[allMessages.length - 1].seen) return;
       if (socketRef.current) socketRef.current.emit("Seen_Message", message);
     };
@@ -145,7 +167,6 @@ export default function MessageSpace(props: MessageSpaceProps) {
           const id = entry.target.getAttribute("id");
           const isGroup = Object.hasOwn(selectedUser, "roomId");
           const message = allMessages.find((message) => message._id == id);
-
           if (isGroup) groupMessageSeenHandler(message);
           else privateMessageSeenHandler(message);
         }
@@ -280,6 +301,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
             selectedUser={selectedUser}
             lastMessageRef={lastMessageRef}
             seenMessage={seenMessage}
+            groupMembers={groupMembers}
           />
           {isTyping && (
             <div className="messageStyle received">

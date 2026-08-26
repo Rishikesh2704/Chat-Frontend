@@ -28,7 +28,7 @@ type AllMessageType = {
   };
   ReceiverId: string;
   text: string;
-  seen:boolean;
+  seen:boolean|string[];
   image: string;
   createdAt: string;
   updatedAt: string;

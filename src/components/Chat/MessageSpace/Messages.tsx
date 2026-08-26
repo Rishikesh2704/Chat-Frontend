@@ -12,6 +12,7 @@ type propsType = {
   selectedUser: User | Group;
   seenMessage: AllMessageType | null;
   lastMessageRef: React.RefObject<null>;
+  groupMembers:Map<any, any>;
 };
 
 function toLocaleTime(time: string) {
@@ -61,6 +62,7 @@ export default memo(function Messages(props: propsType) {
     selectedUser,
     seenMessage,
     lastMessageRef,
+    groupMembers
   } = props;
 
   const { getUser } = useUser();
@@ -141,9 +143,12 @@ export default memo(function Messages(props: propsType) {
   const isSeen = (messages: AllMessageType): boolean => {
     const isGroup = Object.hasOwn(selectedUser, "roomId");
     if (isGroup) {
-      return false;
+      // if(messages.seen.length>0){
+      //   const lastestSeenMessage = allMessages.filter(mess => mess.seen.length>0)
+      // }
+     return  messages.seen.length>0?true:false;
+
     }
-  
       const seenMessages = allMessages.filter(
         (message) => message.seen === true,
       );
@@ -218,9 +223,7 @@ export default memo(function Messages(props: propsType) {
                       </p>
                     )}
                   </div>
-                  <p className="receivedTime time">
-                    {toLocaleTime(messages.createdAt)}
-                  </p>
+                
                 </div>
                 {typeof messages.SenderId === "object" && (
                   <img
@@ -230,6 +233,9 @@ export default memo(function Messages(props: propsType) {
                     height={25}
                   />
                 )}
+                  <p className="receivedTime time">
+                    {toLocaleTime(messages.createdAt)}
+                  </p>
               </div>
             </div>
           );
@@ -240,6 +246,9 @@ export default memo(function Messages(props: propsType) {
                 {getDayOfMessages(messages.createdAt, previousMessageTime)}
               </h6>
               <div className="SentMessages_Wrapper">
+                 <p className="sentTime time">
+                      {toLocaleTime(messages.createdAt)}
+                    </p>
                 <div className="SentText_Wrapper">
                   {messages.image && (
                     <div className="messageimg_wrapper">
@@ -260,11 +269,10 @@ export default memo(function Messages(props: propsType) {
                     )}
                   </div>
                   <div className="Message_details">
-                    <p className="sentTime time">
-                      {toLocaleTime(messages.createdAt)}
-                    </p>
+                   
 
-                    {isSeen(messages) && <p id="Seen_Message">Seen</p>}
+                    {!Array.isArray(messages.seen)&&isSeen(messages) && <p id="Seen_Message">Seen</p>}
+                    {Array.isArray(messages.seen) && isSeen(messages) && <div className="Seen_GroupMembers"> {messages.seen.map(id =>  <img className="ReceivedMessage_Profile" src={groupMembers.get(id).profile} width={18} height={18}></img>)}</div>}
                   </div>
                 </div>
                 <div
