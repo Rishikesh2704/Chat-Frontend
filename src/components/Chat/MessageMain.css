@@ -18,7 +18,7 @@
   padding: 0.1rem 0.9rem;
   display: flex;
   flex-direction: column;
-  gap: 1.8rem;
+  gap: 1.9rem;
   overflow-y: auto;
   overflow-anchor: auto;
 }
@@ -143,6 +143,22 @@
   position: relative;
 }
 
+.Typing_Wrapper{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  gap: 0.6rem;
+  position: relative;
+  padding-left:3.3rem;
+}
+
+.Typing_Wrapper > img{
+  border-radius:50%;
+
+}
+
 .reaction {
   height: 1.4rem;
   width: 1.6rem;
@@ -252,7 +268,7 @@
   font-size:0.7rem;
   color:rgb(99, 97, 97);
   position:absolute;
-  top:-50%;
+  top:-40%;
 }
 
 .Seen_GroupMembers{
@@ -260,5 +276,8 @@
   width:100%;
   display: flex;
   align-items:center;
-  justify-content:center;
+  justify-content:end;
+  position:absolute;
+  right:0;
+  bottom:-50%;
 }

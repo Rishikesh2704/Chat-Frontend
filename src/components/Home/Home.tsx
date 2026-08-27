@@ -58,7 +58,7 @@ export default function Home(props: props) {
     const groupMessageHandler = (message: AllMessageType, ack: any) => {
       ack(true);
       console.log("Group Messages: ", message);
-      if (message.SenderId._id !== getUser()?._id){
+      if (message.SenderId !== getUser()?._id){
 
         setAllMessages((prev: any) => [...prev, message]);
       }

@@ -14,6 +14,10 @@ type propsType = {
   socketRef: React.RefObject<Socket | null>;
 };
 
+const isGroup = (user:User|Group):user is Group =>{
+  return "members" in user
+}
+
 function getSelectedUserSocketId(SocketIds: any[] | null, selectedUser:any) {
  const isGroup = Object.hasOwn(selectedUser,'RoomId');
   if(isGroup) return selectedUser.RoomId as Group ;
@@ -75,7 +79,7 @@ async function  groupMessageRequest(
 export default function MessageForm(props: propsType) {
   const { message, setMessage, setAllMessages, selectedUser, socketRef } =
     props;
-  const { onlineUsers: SocketIds } = useUser();
+  const { onlineUsers: SocketIds, getUser } = useUser();
   const [file, setFile] = useState<any>();
   const [preview, setPreview] = useState("");
   const [emojiVisible, setEmojiVisible] = useState(false);
@@ -129,8 +133,10 @@ export default function MessageForm(props: propsType) {
   const handleOnFocus = () => {
     if (socketRef.current) {
       const socket = socketRef.current;
+      let roomId = isGroup(selectedUser) ? selectedUser.roomId : selectedUserSocketId
       socket.emit("Typing", {
-        id: selectedUserSocketId,
+        roomId: roomId,
+        typerId:getUser()._id,
         isTyping: true,
       });
     }
@@ -139,8 +145,10 @@ export default function MessageForm(props: propsType) {
   const handleOffFocus = () => {
     if (socketRef.current) {
       const socket = socketRef.current;
+     let roomId = isGroup(selectedUser) ? selectedUser.roomId : selectedUserSocketId
       socket.emit("Typing", {
-        id: selectedUserSocketId,
+        roomId: roomId,
+        typerId:getUser()._id,
         isTyping: false,
       });
     }

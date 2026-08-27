@@ -12,8 +12,12 @@ type propsType = {
   selectedUser: User | Group;
   seenMessage: AllMessageType | null;
   lastMessageRef: React.RefObject<null>;
-  groupMembers:Map<any, any>;
+  groupMembers: Map<any, any> | undefined;
 };
+
+const isGroup = (user:User|Group):user is Group =>{
+  return "members" in user
+}
 
 function toLocaleTime(time: string) {
   return new Date(time).toLocaleTimeString([], {
@@ -62,7 +66,7 @@ export default memo(function Messages(props: propsType) {
     selectedUser,
     seenMessage,
     lastMessageRef,
-    groupMembers
+    groupMembers,
   } = props;
 
   const { getUser } = useUser();
@@ -135,25 +139,54 @@ export default memo(function Messages(props: propsType) {
   };
 
   const isReceiver = (message: any) => {
-    return typeof message.SenderId === "object"
-      ? message.SenderId._id !== getUser()?._id
-      : message.SenderId !== getUser()?._id;
+    return message.SenderId !== getUser()?._id;
   };
 
-  const isSeen = (messages: AllMessageType): boolean => {
-    const isGroup = Object.hasOwn(selectedUser, "roomId");
-    if (isGroup) {
-      // if(messages.seen.length>0){
-      //   const lastestSeenMessage = allMessages.filter(mess => mess.seen.length>0)
-      // }
-     return  messages.seen.length>0?true:false;
+  const isSeen = (messages: AllMessageType) => {
+    const seenMessages = allMessages.filter((message) => message.seen === true);
+    return seenMessages[seenMessages.length - 1]?._id === messages?._id;
+  };
 
+  const groupSeenMembers = (messages: AllMessageType) => {
+    let seenProfile: string[] = [];
+    const mess = messages.seen as string[];
+    const seenMessage = mess.filter((m) => m !== getUser()._id);
+    if (
+      messages.SenderId !== getUser()._id &&
+      !mess.includes(messages.SenderId)
+    ) {
+      mess.push(messages.SenderId);
     }
-      const seenMessages = allMessages.filter(
-        (message) => message.seen === true,
+    if (seenMessage.length < 1) return [];
+
+    const latestMessage = allMessages[allMessages.length - 1];
+    const latestMessageSeenArray = latestMessage.seen as string[];
+    if (latestMessage._id == messages._id) {
+      let seenProfile = seenMessage.map(
+        (mem) => groupMembers?.get(mem).profile,
       );
-      return seenMessages[seenMessages.length - 1]?._id === messages?._id;
-    
+      return seenProfile;
+    }
+    seenMessage.forEach((mem) => {
+      !latestMessageSeenArray.includes(mem) ? seenProfile.push(mem) : null;
+    });
+
+    let messageIndex = allMessages.findIndex(
+      (mess) => mess._id === messages._id,
+    );
+    if (messageIndex + 1 === allMessages.length) return seenProfile;
+
+    let nextMesssage = allMessages[messageIndex + 1];
+    const nextMessageSeenArray = nextMesssage.seen as string[];
+    const updatedSeenProfile: string[] = [];
+
+    seenProfile.forEach((mem) => {
+      !nextMessageSeenArray.includes(mem)
+        ? updatedSeenProfile.push(groupMembers?.get(mem).profile)
+        : null;
+    });
+
+    return updatedSeenProfile;
   };
   return (
     <>
@@ -206,8 +239,8 @@ export default memo(function Messages(props: propsType) {
                   )}
                   {
                     <p className="GroupMessage_Username">
-                      {(messages.SenderId.username as string) ||
-                        selectedUser.username}
+                      {groupMembers?.get(messages.SenderId).username ||
+                        (!isGroup(selectedUser) && selectedUser.username)}
                     </p>
                   }
                   <div className="messageStyle received">
@@ -223,19 +256,32 @@ export default memo(function Messages(props: propsType) {
                       </p>
                     )}
                   </div>
-                
                 </div>
-                {typeof messages.SenderId === "object" && (
-                  <img
-                    className="ReceivedMessage_Profile"
-                    src={messages?.SenderId?.profile}
-                    width={25}
-                    height={25}
-                  />
-                )}
-                  <p className="receivedTime time">
-                    {toLocaleTime(messages.createdAt)}
-                  </p>
+                <div className="Message_details">
+                  {Array.isArray(messages.seen) && (
+                    <div className="Seen_GroupMembers">
+                      {groupSeenMembers(messages)?.map((id) => (
+                        <img
+                          className="ReceivedMessage_Profile"
+                          src={id}
+                          width={18}
+                          height={18}
+                        ></img>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <img
+                  className="ReceivedMessage_Profile"
+                  src={groupMembers?.get(messages.SenderId)?.profile}
+                  width={25}
+                  height={25}
+                />
+
+                <p className="receivedTime time">
+                  {toLocaleTime(messages.createdAt)}
+                </p>
               </div>
             </div>
           );
@@ -246,9 +292,9 @@ export default memo(function Messages(props: propsType) {
                 {getDayOfMessages(messages.createdAt, previousMessageTime)}
               </h6>
               <div className="SentMessages_Wrapper">
-                 <p className="sentTime time">
-                      {toLocaleTime(messages.createdAt)}
-                    </p>
+                <p className="sentTime time">
+                  {toLocaleTime(messages.createdAt)}
+                </p>
                 <div className="SentText_Wrapper">
                   {messages.image && (
                     <div className="messageimg_wrapper">
@@ -269,10 +315,21 @@ export default memo(function Messages(props: propsType) {
                     )}
                   </div>
                   <div className="Message_details">
-                   
-
-                    {!Array.isArray(messages.seen)&&isSeen(messages) && <p id="Seen_Message">Seen</p>}
-                    {Array.isArray(messages.seen) && isSeen(messages) && <div className="Seen_GroupMembers"> {messages.seen.map(id =>  <img className="ReceivedMessage_Profile" src={groupMembers.get(id).profile} width={18} height={18}></img>)}</div>}
+                    {!Array.isArray(messages.seen) && isSeen(messages) && (
+                      <p id="Seen_Message">Seen</p>
+                    )}
+                    {Array.isArray(messages.seen) && (
+                      <div className="Seen_GroupMembers">
+                        {groupSeenMembers(messages)?.map((id) => (
+                          <img
+                            className="ReceivedMessage_Profile"
+                            src={id}
+                            width={18}
+                            height={18}
+                          ></img>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div

@@ -21,11 +21,7 @@ type Group = {
 
 type AllMessageType = {
   _id:string
-  SenderId: string | {
-    _id:string,
-    username:string, 
-    profile:string,
-  };
+  SenderId: string ;
   ReceiverId: string;
   text: string;
   seen:boolean|string[];

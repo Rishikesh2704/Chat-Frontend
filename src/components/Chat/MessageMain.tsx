@@ -17,6 +17,10 @@ type MessageSpaceProps = {
   setShowDetails: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
+const isGroup = (user: User | Group): user is Group => {
+  return "members" in user;
+};
+
 const fetchMessages = async (
   selectedUser: User | Group,
   skipMessages: number,
@@ -52,9 +56,9 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [isTop, setIsTop] = useState<boolean>(false);
-  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [isTyping, setIsTyping] = useState<any>({ id: "", isTyping: false });
   const [seenMessage, setSeenMessage] = useState<AllMessageType | null>(null);
-  const [groupMembers, setGroupMembers] = useState();
+  const [groupMembers, setGroupMembers] = useState<Map<any, any>>();
   const MessageSpaceRef = useRef<HTMLDivElement | null>(null);
   const loadingRef = useRef(false);
   const scrollPosRef = useRef<number | null>(null);
@@ -62,12 +66,12 @@ export default function MessageSpace(props: MessageSpaceProps) {
   const lastMessageRef = useRef(null);
   // const socket = socketRef.current;
 
-
   //isTyping
   useEffect(() => {
     const socket = socketRef.current;
     if (!socket) return;
-    const handleIsTyping = (user: any) => setIsTyping(user.isTyping);
+    const handleIsTyping = (user: any) =>
+      setIsTyping({ id: user.typerId, isTyping: user.isTyping });
     const handleSeenMessage = (mss: AllMessageType) => {
       const updatedMessage = allMessages.map((messages) => {
         if (mss._id === messages._id) {
@@ -124,21 +128,27 @@ export default function MessageSpace(props: MessageSpaceProps) {
     };
   }, [allMessages]);
 
-  
-  useEffect( () => {
-    if(!Object.hasOwn(selectedUser, 'roomId')) return 
-    const fetchMemberDetails = async() => {
+  useEffect(() => {
+    if (!Object.hasOwn(selectedUser, "roomId")) return;
+    const fetchMemberDetails = async () => {
       try {
         console.log(selectedUser._id);
-        const request= await axios.get(`${import.meta.env.VITE_API}/group/${selectedUser._id}/details`)
-        const updatedMap =  new Map( request.data.members.map((member:any) => [member._id, {username:member.username, profile:member.profile}]) );
-        setGroupMembers(updatedMap)
+        const request = await axios.get(
+          `${import.meta.env.VITE_API}/group/${selectedUser._id}/details`,
+        );
+        const updatedMap = new Map(
+          request.data.members.map((member: any) => [
+            member._id,
+            { username: member.username, profile: member.profile },
+          ]),
+        );
+        setGroupMembers(updatedMap);
       } catch (error) {
         console.log(error);
       }
-    }
+    };
     fetchMemberDetails();
-  },[selectedUser])
+  }, [selectedUser]);
 
   //Seen Message
   useEffect(() => {
@@ -152,7 +162,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
           "groupMessage_Seen",
           message,
           currentUser,
-          selectedUser.roomId,
+          isGroup(selectedUser) ? selectedUser.roomId : "",
         );
     };
 
@@ -246,13 +256,13 @@ export default function MessageSpace(props: MessageSpaceProps) {
         MoreRecentMessages();
       }
     };
-    if (messageSpaceDiv) {
-      setTimeout(
-        () => (messageSpaceDiv.scrollTop = messageSpaceDiv.scrollHeight),
-        39,
-      );
-      messageSpaceDiv.addEventListener("scroll", windw);
-    }
+    // if (messageSpaceDiv) {
+    //   setTimeout(
+    //     () => (messageSpaceDiv.scrollTop = messageSpaceDiv.scrollHeight),
+    //     39,
+    //   );
+    // }
+    messageSpaceDiv.addEventListener("scroll", windw);
 
     return () => {
       if (messageSpaceDiv) messageSpaceDiv.removeEventListener("scroll", windw);
@@ -284,7 +294,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
         behavior: "smooth",
       });
     }
-  }, [message, isTyping]);
+  }, [message]);
 
   return (
     <>
@@ -303,12 +313,19 @@ export default function MessageSpace(props: MessageSpaceProps) {
             seenMessage={seenMessage}
             groupMembers={groupMembers}
           />
-          {isTyping && (
-            <div className="messageStyle received">
-              <div className="typing ">
-                <div className="dot"></div>
-                <div className="dot"></div>
-                <div className="dot"></div>
+          {isTyping.isTyping && (
+            <div className="Typing_Wrapper">
+              <img
+                src={groupMembers?.get(isTyping.id).profile}
+                width={25}
+                height={25}
+              />
+              <div className="messageStyle received">
+                <div className="typing ">
+                  <div className="dot"></div>
+                  <div className="dot"></div>
+                  <div className="dot"></div>
+                </div>
               </div>
             </div>
           )}
