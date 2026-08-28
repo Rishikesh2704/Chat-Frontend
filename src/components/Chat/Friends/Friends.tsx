@@ -63,7 +63,7 @@ export default function Friends(props: FriendsProps) {
     }
     e.currentTarget.classList.add("selectedUser");
     setSelectedUser(user);
-    // setAllMessages([]);
+    setAllMessages([]);
   };
 
   return (

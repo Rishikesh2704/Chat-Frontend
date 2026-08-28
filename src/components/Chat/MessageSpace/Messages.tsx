@@ -15,9 +15,9 @@ type propsType = {
   groupMembers: Map<any, any> | undefined;
 };
 
-const isGroup = (user:User|Group):user is Group =>{
-  return "members" in user
-}
+const isGroup = (user: User | Group): user is Group => {
+  return "members" in user;
+};
 
 function toLocaleTime(time: string) {
   return new Date(time).toLocaleTimeString([], {
@@ -58,6 +58,14 @@ const getDayOfMessages = (
   } else return "";
 };
 
+const deleteMessageRequest = async (message: AllMessageType) => {
+  const groupOrPrivate = Object.hasOwn(message, "groupId")
+    ? "group"
+    : "messages";
+  const API = `${import.meta.env.VITE_API}/${groupOrPrivate}/deleteMessage/${message._id}`;
+  return await axios.delete(API);
+};
+
 export default memo(function Messages(props: propsType) {
   const {
     allMessages,
@@ -72,16 +80,13 @@ export default memo(function Messages(props: propsType) {
   const { getUser } = useUser();
   const previousMessageTime = useRef<string>("");
   const socket = socketRef.current;
-  const handleDeleteMessage = (messageId: string) => {
+  const handleDeleteMessage = (message: AllMessageType) => {
     const deleteMessage = async () => {
       try {
-        const response = await axios.delete(
-          `${import.meta.env.VITE_API}/messages/${messageId}`,
-        );
-
+        const response = await deleteMessageRequest(message);
         if (response.status === 200) {
           const filteredMessages = allMessages.filter(
-            (messages) => messages._id !== messageId,
+            (messages) => messages._id !== message._id,
           );
           setAllMessages([...filteredMessages]);
         }
@@ -109,7 +114,6 @@ export default memo(function Messages(props: propsType) {
   ) => {
     const reactionPicker = e.currentTarget.nextElementSibling as HTMLDivElement;
     const isVisible = reactionPicker.classList.contains("reactionVisible");
-    console.log(reactionPicker);
     if (isVisible) {
       reactionPicker.classList.remove("reactionVisible");
     } else {
@@ -119,6 +123,16 @@ export default memo(function Messages(props: propsType) {
 
   const reactToMessage = (messageId: string, emojiObject: EmojiClickData) => {
     if (socket) {
+      if (isGroup(selectedUser)) {
+        socket.emit("Reacted_To_GroupMessage", {
+          messageId,
+          reaction: emojiObject.emoji,
+          roomId: selectedUser.roomId,
+          userId: getUser()._id,
+        });
+        return;
+      }
+
       socket.emit("Reacted_To_Message", {
         messageId,
         reaction: emojiObject.emoji,
@@ -135,6 +149,13 @@ export default memo(function Messages(props: propsType) {
     messageId: string,
   ) => {
     e.preventDefault();
+    if (isGroup(selectedUser)) {
+      socket?.emit("Delete_GroupMessage_Reaction", {
+        messageId,
+        userId: getUser()._id,
+        roomId: selectedUser.roomId,
+      });
+    }
     socket?.emit("Delete_Reaction", { messageId, reaction: "" });
   };
 
@@ -163,7 +184,7 @@ export default memo(function Messages(props: propsType) {
     const latestMessageSeenArray = latestMessage.seen as string[];
     if (latestMessage._id == messages._id) {
       let seenProfile = seenMessage.map(
-        (mem) => groupMembers?.get(mem).profile,
+        (mem) => groupMembers?.get(mem)?.profile,
       );
       return seenProfile;
     }
@@ -239,22 +260,39 @@ export default memo(function Messages(props: propsType) {
                   )}
                   {
                     <p className="GroupMessage_Username">
-                      {groupMembers?.get(messages.SenderId).username ||
-                        (!isGroup(selectedUser) && selectedUser.username)}
+                      {groupMembers?.get(messages.SenderId)?.username ||
+                        (!isGroup(selectedUser) && selectedUser?.username)}
                     </p>
                   }
                   <div className="messageStyle received">
                     {messages.text}
-                    {messages.reactions && (
-                      <p
-                        className="reaction"
-                        onContextMenu={(e) =>
-                          handleDeleteReaction(e, messages._id)
-                        }
-                      >
-                        {messages.reactions}
-                      </p>
-                    )}
+                    {!Array.isArray(messages.reactions) &&
+                      messages.reactions && (
+                        <p
+                          className="PrivateMessage_reaction"
+                          onContextMenu={(e) =>
+                            handleDeleteReaction(e, messages._id)
+                          }
+                        >
+                          {messages.reactions}
+                        </p>
+                      )}
+                    {Array.isArray(messages.reactions) &&
+                      messages.reactions.length > 0 && (
+                        <div className="Group_Reactions">
+                          {messages.reactions.map((react) => (
+                            <p
+                              className="reaction"
+                              onContextMenu={(e) =>
+                                handleDeleteReaction(e, messages._id)
+                              }
+                            >
+                              {react.reaction}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                    
                   </div>
                 </div>
                 <div className="Message_details">
@@ -308,11 +346,33 @@ export default memo(function Messages(props: propsType) {
                   )}
                   <div className="messageStyle ">
                     {messages.text}
-                    {messages.reactions && (
-                      <p className="reaction sentMessage_reaction">
-                        {messages.reactions}
-                      </p>
-                    )}
+                    {!Array.isArray(messages.reactions) &&
+                      messages.reactions && (
+                        <p
+                          className="PrivateMessage_reaction"
+                          onContextMenu={(e) =>
+                            handleDeleteReaction(e, messages._id)
+                          }
+                        >
+                          {messages.reactions}
+                        </p>
+                      )}
+
+                    {Array.isArray(messages.reactions) &&
+                      messages.reactions.length > 0 && (
+                        <div className="Group_Reactions">
+                          {messages.reactions.map((react) => (
+                            <p
+                              className="reaction"
+                              onContextMenu={(e) =>
+                                handleDeleteReaction(e, messages._id)
+                              }
+                            >
+                              {react.reaction}
+                            </p>
+                          ))}
+                        </div>
+                      )}
                   </div>
                   <div className="Message_details">
                     {!Array.isArray(messages.seen) && isSeen(messages) && (
@@ -343,7 +403,7 @@ export default memo(function Messages(props: propsType) {
                   <div className="option">
                     <button
                       aria-label="Delete"
-                      onClick={() => handleDeleteMessage(messages._id)}
+                      onClick={() => handleDeleteMessage(messages)}
                     >
                       <i className="fa-regular fa-trash-can"></i>
                     </button>

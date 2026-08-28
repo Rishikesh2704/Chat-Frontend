@@ -70,8 +70,11 @@ export default function MessageSpace(props: MessageSpaceProps) {
   useEffect(() => {
     const socket = socketRef.current;
     if (!socket) return;
-    const handleIsTyping = (user: any) =>
+    const handleIsTyping = (user: any) => {
+      if (user.typerId === getUser()._id) return;
       setIsTyping({ id: user.typerId, isTyping: user.isTyping });
+    };
+
     const handleSeenMessage = (mss: AllMessageType) => {
       const updatedMessage = allMessages.map((messages) => {
         if (mss._id === messages._id) {
@@ -104,6 +107,16 @@ export default function MessageSpace(props: MessageSpaceProps) {
       setAllMessages([...updatedMessages]);
     };
 
+    const handleGroupMessageReaction = (res: AllMessageType) => {
+      console.log("Response:", res);
+      const updatedMessages = allMessages.map((message) => {
+        if (message._id === res._id) {
+          return { ...message, reactions: res.reactions };
+        } else return message;
+      });
+      setAllMessages([...updatedMessages]);
+    };
+
     const handleDeleteReaction = (message: any) => {
       const updatedMessages = allMessages.map((m) => {
         if (m._id === message._id) {
@@ -113,18 +126,32 @@ export default function MessageSpace(props: MessageSpaceProps) {
       setAllMessages([...updatedMessages]);
     };
 
+    const handleDeleteGroupReaction = (res: AllMessageType) => {
+      console.log("Deleted Reaction: ", res);
+      const updatedMessages = allMessages.map((m) => {
+        if (m._id === res._id) {
+          return { ...m, reactions: res.reactions };
+        } else return m;
+      });
+      setAllMessages([...updatedMessages]);
+    };
+
     socket.on("Typing", handleIsTyping);
     socket.on("Seen_Message", handleSeenMessage);
     socket.on("SeenBy_GroupMembers", handleGroupSeenMessages);
     socket.on("Reaction_Update", handleReaction);
+    socket.on("Reaction_For_GroupMessage", handleGroupMessageReaction);
     socket.on("Deleted_Reaction", handleDeleteReaction);
+    socket.on("Deleted_GroupMessage_Reaction", handleDeleteGroupReaction);
 
     return () => {
       socket.off("Typing", handleIsTyping);
       socket.off("Seen_Message", handleSeenMessage);
       socket.off("SeenBy_GroupMembers", handleGroupSeenMessages);
       socket.off("Reaction_Update", handleReaction);
+      socket.off("Reaction_For_GroupMessage", handleGroupMessageReaction);
       socket.off("Deleted_Reaction", handleDeleteReaction);
+      socket.off("Deleted_GroupMessage_Reaction", handleDeleteGroupReaction);
     };
   }, [allMessages]);
 
@@ -132,7 +159,6 @@ export default function MessageSpace(props: MessageSpaceProps) {
     if (!Object.hasOwn(selectedUser, "roomId")) return;
     const fetchMemberDetails = async () => {
       try {
-        console.log(selectedUser._id);
         const request = await axios.get(
           `${import.meta.env.VITE_API}/group/${selectedUser._id}/details`,
         );
@@ -227,32 +253,40 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   //Fetch Recent Messages
   useEffect(() => {
-    // const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
     const messageSpaceDiv = MessageSpaceRef.current;
+
     if (!messageSpaceDiv) return;
+    messageSpaceDiv.scrollTop = messageSpaceDiv.scrollHeight;
+
+    const MoreRecentMessages = async () => {
+      loadingRef.current = true;
+      try {
+        const messages1 = await fetchMessages(
+          selectedUser,
+          skipMessages.current,
+          getUser(),
+        );
+        setAllMessages((prev) => [...messages1, ...prev]);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        loadingRef.current = false;
+      }
+    };
 
     const windw = () => {
-      if (Math.floor(messageSpaceDiv.scrollTop) <= 1 && !loadingRef.current) {
+      if (
+        Math.floor(messageSpaceDiv.scrollTop) >= 1 &&
+        Math.floor(messageSpaceDiv.scrollTop) <= 5 &&
+        !loadingRef.current
+      ) {
         setIsTop(true);
+        console.log("Messages Length", allMessages);
+        console.log("Fetch More Recent Messages");
 
         scrollPosRef.current = messageSpaceDiv.scrollHeight;
         skipMessages.current += 15;
 
-        const MoreRecentMessages = async () => {
-          loadingRef.current = true;
-          try {
-            const messages1 = await fetchMessages(
-              selectedUser,
-              skipMessages.current,
-              getUser(),
-            );
-            setAllMessages((prev) => [...messages1, ...prev]);
-          } catch (error) {
-            console.log(error);
-          } finally {
-            loadingRef.current = false;
-          }
-        };
         MoreRecentMessages();
       }
     };
@@ -265,7 +299,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
     messageSpaceDiv.addEventListener("scroll", windw);
 
     return () => {
-      if (messageSpaceDiv) messageSpaceDiv.removeEventListener("scroll", windw);
+      messageSpaceDiv.removeEventListener("scroll", windw);
       setAllMessages([]);
       skipMessages.current = 0;
     };
@@ -273,12 +307,17 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   //Infinite Scroll(up)
   useLayoutEffect(() => {
-    const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
+    const messageSpaceDiv = MessageSpaceRef.current;
+    if (messageSpaceDiv && allMessages.length === 15) {
+      messageSpaceDiv.scrollTop = messageSpaceDiv.scrollHeight;
+    }
+
     if (messageSpaceDiv && isTop) {
       messageSpaceDiv.scrollTo({
         top: messageSpaceDiv.scrollHeight - (scrollPosRef.current as number),
       });
     }
+
     localStorage.setItem(
       "Last_Message",
       JSON.stringify(allMessages[allMessages.length - 1]),
@@ -286,15 +325,15 @@ export default function MessageSpace(props: MessageSpaceProps) {
     setIsTop(false);
   }, [allMessages]);
 
-  useEffect(() => {
-    const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
-    if (messageSpaceDiv) {
-      messageSpaceDiv.scrollTo({
-        top: messageSpaceDiv.scrollHeight,
-        behavior: "smooth",
-      });
-    }
-  }, [message]);
+  // useEffect(() => {
+  //   const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
+  //   if (messageSpaceDiv) {
+  //     messageSpaceDiv.scrollTo({
+  //       top: messageSpaceDiv.scrollHeight,
+  //       behavior: "smooth",
+  //     });
+  //   }
+  // }, [message]);
 
   return (
     <>

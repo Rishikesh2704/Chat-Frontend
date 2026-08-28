@@ -80,7 +80,6 @@ export default function Home(props: props) {
     };
 
     if (groupRoomIds.length > 0) {
-      console.log("Group Room Id : ", groupRoomIds);
       groupRoomIds.forEach((room) => {
         socket.emit("join_group", room);
       });
