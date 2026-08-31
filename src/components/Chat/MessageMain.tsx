@@ -15,6 +15,7 @@ type MessageSpaceProps = {
   setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
   socketRef: React.RefObject<Socket | null>;
   setShowDetails: React.Dispatch<React.SetStateAction<boolean>>;
+  setViewModal: React.Dispatch<React.SetStateAction<boolean>>
 };
 
 const isGroup = (user: User | Group): user is Group => {
@@ -51,6 +52,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
     setAllMessages,
     socketRef,
     setShowDetails,
+    setViewModal
   } = props;
   const { getUser } = useUser();
 
@@ -340,6 +342,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
       <MessageHeader
         selectedUser={selectedUser}
         setShowDetails={setShowDetails}
+        setViewModal={setViewModal}
       />
       <div className="chat_messages">
         <div className="Messages" ref={MessageSpaceRef}>

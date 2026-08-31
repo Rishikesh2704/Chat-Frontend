@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Modal.css";
 import { useUser } from "../../lib/context";
+import { useDebounce } from "../../hooks/useDebounce";
 import axios from "../../lib/axios";
+import Search from "./Search";
 
 type props = {
   setViewModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -12,9 +14,11 @@ export default function Modal(props: props) {
   const { onlineUsers } = useUser();
   const { setViewModal, Users } = props;
   const [groupName, setGroupName] = useState<string>("");
+  const [searchResults, setSearchResults] = useState<User[] | null>(null);
   const [groupMembers, setGroupMembers] = useState<Pick<User, "_id">[] | null>(
     [],
   );
+
 
   const handleCloseModal = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -67,7 +71,6 @@ export default function Modal(props: props) {
       console.log(error);
     }
   };
-
   return (
     <div className="Modal_Background" onClick={handleCloseModal}>
       <div className="Modal_Box">
@@ -86,20 +89,12 @@ export default function Modal(props: props) {
         <h1 className="Members_H1">Group Members</h1>
         <div className="GroupMembers">
           <div className="Search_Users">
-            <form className="Search_Form">
-              <label id="search_label" htmlFor="search_input">
-                Search
-              </label>
-              <input type="text" id="search_input" placeholder="Search..." />
-              <button id="search_btn" aria-label="Search" type="submit">
-                <i className="fa-solid fa-magnifying-glass"></i>
-              </button>
-            </form>
+            <Search setResults={setSearchResults}/>
           </div>
           <div className="Search_Results">
-            {Users &&
-              Users.map((user: any) => {
-                console.log("Group Members", groupMembers);
+            {searchResults &&
+              searchResults.map((user: any) => {
+                if (Object.hasOwn(user, "roomId")) return;
                 return (
                   <div
                     key={user._id}

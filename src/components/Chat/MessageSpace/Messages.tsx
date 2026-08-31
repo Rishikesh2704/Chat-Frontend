@@ -310,12 +310,12 @@ export default memo(function Messages(props: propsType) {
                   )}
                 </div>
 
-                <img
+               {isGroup(selectedUser) && <img
                   className="ReceivedMessage_Profile"
                   src={groupMembers?.get(messages.SenderId)?.profile}
                   width={25}
                   height={25}
-                />
+                />}
 
                 <p className="receivedTime time">
                   {toLocaleTime(messages.createdAt)}

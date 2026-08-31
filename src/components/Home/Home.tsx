@@ -127,7 +127,9 @@ export default function Home(props: props) {
           +
         </button>
       </section>
+
       {viewModal && <Modal setViewModal={setViewModal} Users={users} />}
+      
       <section className="Chat_Space">
         {selectedUser ? (
           <MessageMain
@@ -136,6 +138,7 @@ export default function Home(props: props) {
             setAllMessages={setAllMessages}
             socketRef={socketRef}
             setShowDetails={setShowDetails}
+            setViewModal={setViewModal}
           />
         ) : (
           <div className="NoChats">

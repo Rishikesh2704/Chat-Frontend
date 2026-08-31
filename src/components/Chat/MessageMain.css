@@ -112,7 +112,7 @@
   width: 1.6rem;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: end;
   position: absolute;
   bottom: -0.8rem;
   right: 0.4rem;
@@ -195,6 +195,10 @@
   flex-direction: column;
   justify-content: end;
   align-items: end;
+}
+
+.reaction{
+  margin-left: -15px;
 }
 
 .received {
