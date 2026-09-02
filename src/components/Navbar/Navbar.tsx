@@ -1,21 +1,17 @@
 import { useLocation, useNavigate } from "react-router";
 import "./Navbar.css";
 import axios from "../../lib/axios";
-import type { Socket } from "socket.io-client";
 import { useUser } from "../../lib/context";
+import { removeCurrentUser } from "../../redux/Slicers/AuthSlice";
+import { useAppDispatch } from "../../redux/hooks";
 
-type props = {
-  socketRef: React.RefObject<Socket | null>;
-};
-
-export default function Navbar(props: props) {
-  const { logoutUser } = useUser();
-  const { socketRef } = props;
+export default function Navbar() {
+  const { logoutUser, socket } = useUser();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const page = useLocation();
   const pagePath = page.pathname;
   const icons = [
-    // { id: 23, name: "", icon: "fa-solid fa-message", path: "/" },
     {
       id: 13,
       name: "account",
@@ -27,12 +23,9 @@ export default function Navbar(props: props) {
   const handleLogOut = async () => {
     try {
       await axios.get(`${import.meta.env.VITE_API}/auth/logout`);
-      logoutUser();
-      console.log(
-        "Logout Handler: ",
-        JSON.parse(localStorage.getItem("Current_User") as string),
-      );
-      socketRef.current && socketRef.current.disconnect();
+      // logoutUser();
+      dispatch(removeCurrentUser())
+      socket && socket.disconnect();
       navigate("/authentication/login");
     } catch (error) {
       console.log(error);

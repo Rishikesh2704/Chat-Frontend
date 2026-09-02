@@ -8,14 +8,15 @@ import MessageHeader from "./Header/MessageHeader";
 import Messages from "./MessageSpace/Messages";
 import { useUser } from "../../lib/context";
 import axios from "../../lib/axios";
+import { useAppSelector } from "../../redux/hooks";
 
 type MessageSpaceProps = {
-  selectedUser: User | Group;
+  // selectedUser: User | Group;
   allMessages: AllMessageType[];
   setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
-  socketRef: React.RefObject<Socket | null>;
   setShowDetails: React.Dispatch<React.SetStateAction<boolean>>;
   setViewModal: React.Dispatch<React.SetStateAction<boolean>>
+  setViewSearchModal: React.Dispatch<React.SetStateAction<boolean>>
 };
 
 const isGroup = (user: User | Group): user is Group => {
@@ -47,15 +48,15 @@ const fetchMessages = async (
 
 export default function MessageSpace(props: MessageSpaceProps) {
   const {
-    selectedUser,
     allMessages,
     setAllMessages,
-    socketRef,
     setShowDetails,
-    setViewModal
+    setViewModal,
+    setViewSearchModal
   } = props;
-  const { getUser } = useUser();
 
+  const { getUser, socket } = useUser();
+  const { selectedUser } = useAppSelector(state => state.chat)
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [isTop, setIsTop] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<any>({ id: "", isTyping: false });
@@ -67,10 +68,11 @@ export default function MessageSpace(props: MessageSpaceProps) {
   const skipMessages = useRef(0);
   const lastMessageRef = useRef(null);
   // const socket = socketRef.current;
+  // if(!selectedUser) return ;
 
   //isTyping
   useEffect(() => {
-    const socket = socketRef.current;
+    // const socket = socketRef.current;
     if (!socket) return;
     const handleIsTyping = (user: any) => {
       if (user.typerId === getUser()._id) return;
@@ -158,6 +160,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
   }, [allMessages]);
 
   useEffect(() => {
+    if(!selectedUser) return
     if (!Object.hasOwn(selectedUser, "roomId")) return;
     const fetchMemberDetails = async () => {
       try {
@@ -180,13 +183,17 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   //Seen Message
   useEffect(() => {
+    // const socket = socketRef.current;
+    if(!socket) return;
+    if(!selectedUser) return
+
+
     const messages = document.querySelectorAll(".ReceivedText_Wrapper");
     const groupMessageSeenHandler = (message: AllMessageType | undefined) => {
       const currentUser = getUser();
       const seen = message?.seen as string[];
       if (seen.includes(currentUser._id)) return;
-      if (socketRef.current)
-        socketRef.current.emit(
+        socket.emit(
           "groupMessage_Seen",
           message,
           currentUser,
@@ -196,7 +203,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
     const privateMessageSeenHandler = (message: AllMessageType | undefined) => {
       if (allMessages[allMessages.length - 1].seen) return;
-      if (socketRef.current) socketRef.current.emit("Seen_Message", message);
+      socket.emit("Seen_Message", message);
     };
 
     const observerFunction = (entries: any) => {
@@ -228,6 +235,8 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   //Initial Recent Messages
   useEffect(() => {
+    if(!selectedUser) return
+
     const setRecentMessages = async () => {
       try {
         const user = JSON.parse(localStorage.getItem("Current_User") as string);
@@ -255,6 +264,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   //Fetch Recent Messages
   useEffect(() => {
+    if(!selectedUser) return
     const messageSpaceDiv = MessageSpaceRef.current;
 
     if (!messageSpaceDiv) return;
@@ -309,6 +319,8 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   //Infinite Scroll(up)
   useLayoutEffect(() => {
+    if(!selectedUser) return
+
     const messageSpaceDiv = MessageSpaceRef.current;
     if (messageSpaceDiv && allMessages.length === 15) {
       messageSpaceDiv.scrollTop = messageSpaceDiv.scrollHeight;
@@ -319,11 +331,22 @@ export default function MessageSpace(props: MessageSpaceProps) {
         top: messageSpaceDiv.scrollHeight - (scrollPosRef.current as number),
       });
     }
+    try {
+      const string = localStorage.getItem("Recent_Messages")
+      if(string === null){
+          let recent:any = {};
+         recent[selectedUser._id] = allMessages[allMessages.length - 1];
+         console.log("Setting Recent: ", recent)
+        localStorage.setItem('Recent_Messages', JSON.stringify(recent))
 
-    localStorage.setItem(
-      "Last_Message",
-      JSON.stringify(allMessages[allMessages.length - 1]),
-    );
+      }
+      const recentMessagesArray = JSON.parse(string as string);
+      recentMessagesArray[selectedUser._id] = allMessages[allMessages.length - 1]
+      localStorage.setItem("Recent_Messages", JSON.stringify(recentMessagesArray))
+    } catch (error) {
+      console.log("Failed to Set Recent Message In Local Storage: ", error);
+    }
+   
     setIsTop(false);
   }, [allMessages]);
 
@@ -340,17 +363,16 @@ export default function MessageSpace(props: MessageSpaceProps) {
   return (
     <>
       <MessageHeader
-        selectedUser={selectedUser}
+        // selectedUser={selectedUser}
         setShowDetails={setShowDetails}
-        setViewModal={setViewModal}
+        setViewSearchModal={setViewSearchModal}
       />
       <div className="chat_messages">
         <div className="Messages" ref={MessageSpaceRef}>
           <Messages
-            socketRef={socketRef}
             allMessages={allMessages}
             setAllMessages={setAllMessages}
-            selectedUser={selectedUser}
+            // selectedUser={selectedUser}
             lastMessageRef={lastMessageRef}
             seenMessage={seenMessage}
             groupMembers={groupMembers}
@@ -374,11 +396,10 @@ export default function MessageSpace(props: MessageSpaceProps) {
         </div>
       </div>
       <MessageForm
-        selectedUser={selectedUser}
+        // selectedUser={selectedUser}
         message={message}
         setMessage={setMessage}
         setAllMessages={setAllMessages}
-        socketRef={socketRef}
       />
     </>
   );

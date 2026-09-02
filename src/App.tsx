@@ -5,35 +5,31 @@ import Account from "./components/Account/Account.tsx";
 import Login from "./components/Auth/Login.tsx";
 import SignIn from "./components/Auth/Sigin.tsx";
 import ProtectedRoute from "./lib/protectedRoute.tsx";
-import { useEffect, useRef } from "react";
-import { io, type Socket } from "socket.io-client";
 
 function App() {
-   let socketRef = useRef<Socket | null>(null);
-    const user = JSON.parse(localStorage.getItem("Current_User") as string);
-    useEffect(() => {
-      if (user) {
-      socketRef.current = io(import.meta.env.VITE_API, {
-        query: { userId: user?._id, username: user?.username },
-      });
-    }
-     
-    // return () => {
-    //   socketRef.current?.disconnect();
-    //   socketRef.current = null;
+    // const user = JSON.parse(localStorage.getItem("Current_User") as string);
+    // useEffect(() => {
+    //   if (user) {
+    //   socketRef.current = io(import.meta.env.VITE_API, {
+    //     query: { userId: user?._id, username: user?.username },
+    //   });
     // }
-    },[])
-    
+     
+    // // return () => {
+    // //   socketRef.current?.disconnect();
+    // //   socketRef.current = null;
+    // // }
+    // },[])
     
  
   const routes = createBrowserRouter([
     {
       path: "/",
-      element: <ProtectedRoute socketRef={socketRef} />,
+      element: <ProtectedRoute  />,
       children: [
         {
           path: "/",
-          element: <Home socketRef={socketRef} />,
+          element: <Home  />,
         },
         {
           path: "/account",
@@ -43,11 +39,11 @@ function App() {
     },
     {
       path: "/authentication/signin",
-      element: <SignIn socketRef={socketRef} />,
+      element: <SignIn />,
     },
     {
       path: "/authentication/login",
-      element: <Login  socketRef={socketRef} />,
+      element: <Login  />,
     },
   ]);
 

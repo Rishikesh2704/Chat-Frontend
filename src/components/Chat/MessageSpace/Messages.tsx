@@ -4,12 +4,12 @@ import EmojiPicker from "emoji-picker-react";
 import { memo, useRef } from "react";
 import type { Socket } from "socket.io-client";
 import { useUser } from "../../../lib/context";
+import { useAppSelector } from "../../../redux/hooks";
 
 type propsType = {
   allMessages: AllMessageType[];
-  socketRef: React.RefObject<Socket | null>;
   setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
-  selectedUser: User | Group;
+  // selectedUser: User | Group;
   seenMessage: AllMessageType | null;
   lastMessageRef: React.RefObject<null>;
   groupMembers: Map<any, any> | undefined;
@@ -70,16 +70,22 @@ export default memo(function Messages(props: propsType) {
   const {
     allMessages,
     setAllMessages,
-    socketRef,
-    selectedUser,
+    // selectedUser,
     seenMessage,
     lastMessageRef,
     groupMembers,
   } = props;
 
-  const { getUser } = useUser();
+  const { selectedUser } = useAppSelector(state => state.chat)
+
+  const { getUser, socket } = useUser();
   const previousMessageTime = useRef<string>("");
-  const socket = socketRef.current;
+  
+  if (!selectedUser) {
+    console.log("No selected User");
+    return;
+  }
+  // const socket = socketRef.current;
   const handleDeleteMessage = (message: AllMessageType) => {
     const deleteMessage = async () => {
       try {
@@ -402,10 +408,11 @@ export default memo(function Messages(props: propsType) {
                   ></i>
                   <div className="option">
                     <button
+                    className="option_buttton"
                       aria-label="Delete"
                       onClick={() => handleDeleteMessage(messages)}
                     >
-                      <i className="fa-regular fa-trash-can"></i>
+                      Delete <i className="fa-regular fa-trash-can"></i>
                     </button>
                   </div>
                 </div>

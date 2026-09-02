@@ -66,7 +66,7 @@ export default function CreateGroup() {
       <h1 className="Members_H1">Group Members</h1>
       <div className="GroupMembers">
         <div className="Search_Users">
-          <Search setResults={setSearchResults} />
+          {/* <Search setResults={setSearchResults} /> */}
         </div>
         <div className="Search_Results">
           {searchResults &&

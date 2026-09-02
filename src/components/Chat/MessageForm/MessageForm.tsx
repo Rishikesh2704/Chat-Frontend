@@ -3,24 +3,24 @@ import { Socket } from "socket.io-client";
 import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
 import "./MessageForm.css";
 
-import axios from "../../../lib/axios"; 
+import axios from "../../../lib/axios";
 import { useUser } from "../../../lib/context";
+import { useAppSelector } from "../../../redux/hooks";
 
 type propsType = {
   message: string | undefined;
   setMessage: (message: any) => void;
   setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
-  selectedUser: User | Group ;
-  socketRef: React.RefObject<Socket | null>;
+  // selectedUser: User | Group;
 };
 
-const isGroup = (user:User|Group):user is Group =>{
-  return "members" in user
-}
+const isGroup = (user: User | Group): user is Group => {
+  return "members" in user;
+};
 
-function getSelectedUserSocketId(SocketIds: any[] | null, selectedUser:any) {
- const isGroup = Object.hasOwn(selectedUser,'RoomId');
-  if(isGroup) return selectedUser.RoomId as Group ;
+function getSelectedUserSocketId(SocketIds: any[] | null, selectedUser: any) {
+  const isGroup = Object.hasOwn(selectedUser, "RoomId");
+  if (isGroup) return selectedUser.RoomId as Group;
   if (SocketIds) {
     const selectedUserSocketId = Object.entries(SocketIds).find(
       ([key, _]) => key == selectedUser._id,
@@ -40,11 +40,16 @@ async function messageFriendRequest(
 ) {
   // const userSocketId = getSelectedUserSocketId(SocketIds, selectedUser);
   const userSocketId = SocketIds ? SocketIds[selectedUser._id as any] : "";
-  console.log("Socket Ids : ", SocketIds, "\n Receiver socket id: ", userSocketId);
+  console.log(
+    "Socket Ids : ",
+    SocketIds,
+    "\n Receiver socket id: ",
+    userSocketId,
+  );
   const form = new FormData();
   form.append("image", file);
   form.append("message", message);
-  form.append("receiverSocketId", userSocketId );
+  form.append("receiverSocketId", userSocketId);
   return await axios.post(
     `${import.meta.env.VITE_API}/messages/sendMessage/${selectedUser._id}`,
     form,
@@ -56,7 +61,7 @@ async function messageFriendRequest(
   );
 }
 
-async function  groupMessageRequest(
+async function groupMessageRequest(
   group: Group,
   message: string,
   file: string,
@@ -77,16 +82,21 @@ async function  groupMessageRequest(
 }
 
 export default function MessageForm(props: propsType) {
-  const { message, setMessage, setAllMessages, selectedUser, socketRef } =
-    props;
-  const { onlineUsers: SocketIds, getUser } = useUser();
+  const { message, setMessage, setAllMessages } = props;
+  const { selectedUser } = useAppSelector(state => state.chat)
+  const { onlineUsers: SocketIds, getUser, socket } = useUser();
   const [file, setFile] = useState<any>();
   const [preview, setPreview] = useState("");
   const [emojiVisible, setEmojiVisible] = useState(false);
   let selectedUserSocketId: any = getSelectedUserSocketId(
     SocketIds,
-    selectedUser ,
+    selectedUser,
   );
+
+  if(!selectedUser) {
+    console.log("No SelectedUser")
+    return;
+  }
 
   const handleImageUploadChange = (
     e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
@@ -102,14 +112,18 @@ export default function MessageForm(props: propsType) {
     e.preventDefault();
     const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
     if (!message) return;
-    try { 
-      const isGroup = Object.hasOwn(selectedUser, "roomId");
+    try {
       const messageRequest = !isGroup
-        ? await messageFriendRequest(SocketIds, selectedUser as User, file, message)
+        ? await messageFriendRequest(
+            SocketIds,
+            selectedUser as User,
+            file,
+            message,
+          )
         : await groupMessageRequest(selectedUser as Group, message, file);
 
       if (messageRequest.status === 201) {
-        console.log("Message request: ", messageRequest)
+        console.log("Message request: ", messageRequest);
         setAllMessages((prev) => [...prev, messageRequest.data.newMessage]);
         setMessage("");
         messageSpaceDiv.scrollTo({
@@ -131,24 +145,28 @@ export default function MessageForm(props: propsType) {
   };
 
   const handleOnFocus = () => {
-    if (socketRef.current) {
-      const socket = socketRef.current;
-      let roomId = isGroup(selectedUser) ? selectedUser.roomId : selectedUserSocketId
+    // const socket = socketRef.current
+    if (socket) {
+      let roomId = isGroup(selectedUser)
+        ? selectedUser.roomId
+        : selectedUserSocketId;
       socket.emit("Typing", {
         roomId: roomId,
-        typerId:getUser()._id,
+        typerId: getUser()._id,
         isTyping: true,
       });
     }
   };
 
   const handleOffFocus = () => {
-    if (socketRef.current) {
-      const socket = socketRef.current;
-     let roomId = isGroup(selectedUser) ? selectedUser.roomId : selectedUserSocketId
+    // const socket = socketRef.current;
+    if (socket) {
+      let roomId = isGroup(selectedUser)
+        ? selectedUser.roomId
+        : selectedUserSocketId;
       socket.emit("Typing", {
         roomId: roomId,
-        typerId:getUser()._id,
+        typerId: getUser()._id,
         isTyping: false,
       });
     }

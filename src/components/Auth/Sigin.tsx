@@ -4,13 +4,15 @@ import "./AuthStyle.css";
 import axios from "../../lib/axios.js";
 import { io, Socket } from "socket.io-client";
 import { useUser } from "../../lib/context.js";
+import { setCurrentUser } from "../../redux/Slicers/AuthSlice.js";
+import { useAppDispatch } from "../../redux/hooks.js";
 type props = {
-  socketRef:React.RefObject<Socket | null>;
-}
+  socketRef: React.RefObject<Socket | null>;
+};
 
-export default function SignIn(props:props) {
-  // const { socketRef } = useUser();
-  const { socketRef } = props;
+export default function SignIn() {
+  const { socket } = useUser();
+  const dispatch = useAppDispatch();
   const [email, setEmail] = useState<string>();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
@@ -32,12 +34,12 @@ export default function SignIn(props:props) {
           withCredentials: true,
         },
       );
-      localStorage.setItem("Current_User", JSON.stringify(res.data.User));
       const user = res.data.User;
-      socketRef.current = io(import.meta.env.VITE_API, {
-        query: { userId: user?._id, username: user?.username },
-      })
-      console.log('User',user)
+      dispatch(setCurrentUser(user));
+      // socketRef.current = io(import.meta.env.VITE_API, {
+      //   query: { userId: user?._id, username: user?.username },
+      // })
+      console.log("User", user);
       navigate("/");
     } catch (error: any) {
       setEmail("");

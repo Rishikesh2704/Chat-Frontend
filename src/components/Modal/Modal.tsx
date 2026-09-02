@@ -15,10 +15,26 @@ export default function Modal(props: props) {
   const { setViewModal, Users } = props;
   const [groupName, setGroupName] = useState<string>("");
   const [searchResults, setSearchResults] = useState<User[] | null>(null);
+  const [query, setQuery] = useState<string>();
   const [groupMembers, setGroupMembers] = useState<Pick<User, "_id">[] | null>(
     [],
   );
+  const searchQuery = useDebounce(query, 500);
 
+  useEffect(() => {
+    if (!searchQuery) return;
+    const fetch = async () => {
+      try {
+        const request = await axios.get(
+          `${import.meta.env.VITE_API}/search?u=${searchQuery}&page=1`,
+        );
+        setSearchResults(request.data.users);
+      } catch (error) {
+        console.log("Failed fetch user: ", error);
+      }
+    };
+    fetch();
+  }, [searchQuery]);
 
   const handleCloseModal = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -89,7 +105,20 @@ export default function Modal(props: props) {
         <h1 className="Members_H1">Group Members</h1>
         <div className="GroupMembers">
           <div className="Search_Users">
-            <Search setResults={setSearchResults}/>
+            <form className="Search_Form">
+              <label id="search_label" htmlFor="search_input">
+                Search
+              </label>
+              <input
+                type="text"
+                id="search_input"
+                placeholder="Search..."
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              <button id="search_btn" aria-label="Search" type="submit">
+                <i className="fa-solid fa-magnifying-glass"></i>
+              </button>
+            </form>
           </div>
           <div className="Search_Results">
             {searchResults &&

@@ -8,18 +8,18 @@ import { Socket } from "socket.io-client";
 import Modal from "../Modal/Modal.js";
 import Account from "../Account/Account.js";
 import axios from "../../lib/axios.js";
+import Search from "../Modal/Search.js";
+import { useAppSelector } from "../../redux/hooks.js";
 
-type props = {
-  socketRef: React.RefObject<Socket | null>;
-};
-export default function Home(props: props) {
-  const { setOnlineUsers, onlineUsers, getUser } = useUser();
-  const { socketRef } = props;
+export default function Home() {
+  const { setOnlineUsers, onlineUsers, getUser, socket } = useUser();
 
   const [users, setUsers] = useState<User[]>([]);
-  const [selectedUser, setSelectedUser] = useState<User | Group | null>(null);
+  const { selectedUser } = useAppSelector(state => state.chat)
+  // const [selectedUser, setSelectedUser] = useState<User | Group | null>(null);
   const [allMessages, setAllMessages] = useState<any>([]);
   const [viewModal, setViewModal] = useState<boolean>(false);
+  const [searchViewModal, setViewSearchModal] = useState<boolean>(false);
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [groupRoomIds, setGroupRoomIds] = useState<Pick<Group, "roomId">[]>([]);
 
@@ -51,15 +51,15 @@ export default function Home(props: props) {
     //  socketRef.current = io(`${import.meta.env.VITE_API}`, {
     //   query: { userId: user?._id, username: user?.username },
     // });
+    // if (!socketRef.current) return;
+    // const socket = socketRef.current;
 
-    if (!socketRef.current) return;
+    if (!socket) return;
 
-    const socket = socketRef.current;
     const groupMessageHandler = (message: AllMessageType, ack: any) => {
       ack(true);
       console.log("Group Messages: ", message);
       if (message.SenderId !== getUser()?._id){
-
         setAllMessages((prev: any) => [...prev, message]);
       }
         
@@ -96,7 +96,7 @@ export default function Home(props: props) {
       socket.off("privateMessage", privateMessageHandler);
       socket.off("AfterDisconnection_Online_Users", afterDisconnectedUsers);
     };
-  }, [socketRef.current, groupRoomIds]);
+  }, [socket, groupRoomIds]);
 
   const handleCreateGroup = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -114,7 +114,7 @@ export default function Home(props: props) {
 
         <Friends
           users={users}
-          setSelectedUser={setSelectedUser}
+          // setSelectedUser={setSelectedUser}
           setAllMessages={setAllMessages}
           onlineUsers={onlineUsers}
           lastMessage={allMessages[allMessages.length - 1]}
@@ -128,17 +128,18 @@ export default function Home(props: props) {
         </button>
       </section>
 
-      {viewModal && <Modal setViewModal={setViewModal} Users={users} />}
+      {viewModal && <Modal setViewModal={setViewModal} Users={users}  />}
+      {searchViewModal && <Search setViewSearchModal={setViewSearchModal}  />}
       
       <section className="Chat_Space">
         {selectedUser ? (
           <MessageMain
-            selectedUser={selectedUser}
+            // selectedUser={selectedUser}
             allMessages={allMessages}
             setAllMessages={setAllMessages}
-            socketRef={socketRef}
             setShowDetails={setShowDetails}
             setViewModal={setViewModal}
+            setViewSearchModal={setViewSearchModal}
           />
         ) : (
           <div className="NoChats">
