@@ -8,7 +8,6 @@ import { useAppSelector } from "../../../redux/hooks";
 type propsType = {
   // selectedUser: User | Group;
   setShowDetails: React.Dispatch<React.SetStateAction<boolean>>;
-  setViewSearchModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const isGroup = (user: User | Group): user is Group => {
@@ -16,7 +15,7 @@ const isGroup = (user: User | Group): user is Group => {
 };
 
 export default function MessageHeader(props: propsType) {
-  const { setShowDetails, setViewSearchModal } = props;
+  const { setShowDetails } = props;
   const { selectedUser } = useAppSelector((state) => state.chat);
   const { getUser } = useUser();
   const [showOptions, setShowOptions] = useState(false);
@@ -28,14 +27,13 @@ export default function MessageHeader(props: propsType) {
   }
 
   const handleAddMember = async () => {
-    setViewSearchModal(true);
     try {
-      const response = await axios.put(
-        `${import.meta.env.VITE_API}/group/${selectedUser._id}/addMember`,
-        {
-          groupId: selectedUser._id,
-        },
-      );
+      // const response = await axios.put(
+      //   `${import.meta.env.VITE_API}/group/${selectedUser._id}/addMember`,
+      //   {
+      //     groupId: selectedUser._id,
+      //   },
+      // );
     } catch (error) {
       console.log("Failed To Add Member: ", error);
     }

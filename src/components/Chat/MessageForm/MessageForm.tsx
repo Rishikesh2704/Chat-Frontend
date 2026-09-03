@@ -5,12 +5,13 @@ import "./MessageForm.css";
 
 import axios from "../../../lib/axios";
 import { useUser } from "../../../lib/context";
-import { useAppSelector } from "../../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { addNewMessage } from "../../../redux/Slicers/ChatSlice";
 
 type propsType = {
   message: string | undefined;
   setMessage: (message: any) => void;
-  setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
+  // setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
   // selectedUser: User | Group;
 };
 
@@ -82,8 +83,9 @@ async function groupMessageRequest(
 }
 
 export default function MessageForm(props: propsType) {
-  const { message, setMessage, setAllMessages } = props;
-  const { selectedUser } = useAppSelector(state => state.chat)
+  const { message, setMessage } = props;
+  const { selectedUser, allMessages } = useAppSelector((state) => state.chat);
+  const dispatch = useAppDispatch();
   const { onlineUsers: SocketIds, getUser, socket } = useUser();
   const [file, setFile] = useState<any>();
   const [preview, setPreview] = useState("");
@@ -93,8 +95,8 @@ export default function MessageForm(props: propsType) {
     selectedUser,
   );
 
-  if(!selectedUser) {
-    console.log("No SelectedUser")
+  if (!selectedUser) {
+    console.log("No SelectedUser");
     return;
   }
 
@@ -113,7 +115,7 @@ export default function MessageForm(props: propsType) {
     const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
     if (!message) return;
     try {
-      const messageRequest = !isGroup
+      const messageRequest = !isGroup(selectedUser)
         ? await messageFriendRequest(
             SocketIds,
             selectedUser as User,
@@ -121,10 +123,10 @@ export default function MessageForm(props: propsType) {
             message,
           )
         : await groupMessageRequest(selectedUser as Group, message, file);
-
+          console.log("Message Request : ", messageRequest)
       if (messageRequest.status === 201) {
         console.log("Message request: ", messageRequest);
-        setAllMessages((prev) => [...prev, messageRequest.data.newMessage]);
+        dispatch(addNewMessage(messageRequest.data.newMessage));
         setMessage("");
         messageSpaceDiv.scrollTo({
           top: messageSpaceDiv.scrollHeight,

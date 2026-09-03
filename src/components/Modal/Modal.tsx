@@ -4,15 +4,17 @@ import { useUser } from "../../lib/context";
 import { useDebounce } from "../../hooks/useDebounce";
 import axios from "../../lib/axios";
 import Search from "./Search";
+import { useAppDispatch } from "../../redux/hooks";
+import { setViewModal } from "../../redux/Slicers/ModalSlice";
 
 type props = {
-  setViewModal: React.Dispatch<React.SetStateAction<boolean>>;
-  Users: User[] | null;
+  // setViewModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default function Modal(props: props) {
-  const { onlineUsers } = useUser();
-  const { setViewModal, Users } = props;
+  // const { onlineUsers } = useUser();
+  // const { setViewModal  } = props;
+  const dispatch = useAppDispatch();
   const [groupName, setGroupName] = useState<string>("");
   const [searchResults, setSearchResults] = useState<User[] | null>(null);
   const [query, setQuery] = useState<string>();
@@ -41,7 +43,7 @@ export default function Modal(props: props) {
   ) => {
     const element = e.target as HTMLDivElement;
     if (element.classList.contains("Modal_Background")) {
-      setViewModal(false);
+      dispatch(setViewModal(false));
       document.getElementsByTagName("main")[0].style.alignItems = "center";
     }
   };

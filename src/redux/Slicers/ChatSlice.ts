@@ -1,28 +1,70 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 type stateType = {
-    allMessages:AllMessageType[] | [],
-    selectedUser: User | Group | null
-}
+  users:User[] | Group[],
+  onlineUsers: any;
+  selectedUser: User | Group | null;
+  allMessages: AllMessageType[] | [];
+};
 
-const initialState:stateType = {
-    allMessages:[],
-    selectedUser:null,
-}
+const initialState: stateType = {
+  users:[],
+  onlineUsers: {},
+  selectedUser: null,
+  allMessages: [],
+  
+};
 
 const chatSlicer = createSlice({
-    name:"Chat",
-    initialState,
-    reducers:{
-        setAllMessages: (state, action:PayloadAction<AllMessageType>) =>{
-            state.allMessages=[...state.allMessages,action.payload]
-        },
-        setSelectedUser: (state, action:PayloadAction<User>) => {
-            console.log("Redux Slice: ", action)
-            state.selectedUser = action.payload
-        }
-    }
-})
+  name: "Chat",
+  initialState,
+  reducers: {
 
-export const { setAllMessages, setSelectedUser } = chatSlicer.actions;
-export default chatSlicer.reducer
+    setUsers:(state, action: PayloadAction<any>) => {
+      return {
+        ...state, 
+        users:[...action.payload]
+      }
+    },
+
+    setOnlineUsers: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        onlineUsers: {...action.payload},
+      };
+    },
+
+    setAllMessages: (state, action: PayloadAction<any>) => {
+      return { ...state, allMessages: [...action.payload] };
+    },
+
+    prependMessages: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        allMessages: [...action.payload, ...state.allMessages],
+      };
+    },
+
+    addNewMessage: (state, action: PayloadAction<any>) => {
+      return {
+        ...state,
+        allMessages: [...state.allMessages, action.payload],
+      };
+    },
+
+    setSelectedUser: (state, action: PayloadAction<User>) => {
+      return { ...state, selectedUser: action.payload };
+    },
+  },
+});
+
+export const {
+  setUsers,
+  setOnlineUsers,
+  setAllMessages,
+  prependMessages,
+  addNewMessage,
+  setSelectedUser,
+} = chatSlicer.actions;
+
+export default chatSlicer.reducer;

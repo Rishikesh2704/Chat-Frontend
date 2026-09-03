@@ -8,15 +8,14 @@ import MessageHeader from "./Header/MessageHeader";
 import Messages from "./MessageSpace/Messages";
 import { useUser } from "../../lib/context";
 import axios from "../../lib/axios";
-import { useAppSelector } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { prependMessages, setAllMessages } from "../../redux/Slicers/ChatSlice";
 
 type MessageSpaceProps = {
   // selectedUser: User | Group;
-  allMessages: AllMessageType[];
-  setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
+  // allMessages: AllMessageType[];
+  // setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
   setShowDetails: React.Dispatch<React.SetStateAction<boolean>>;
-  setViewModal: React.Dispatch<React.SetStateAction<boolean>>
-  setViewSearchModal: React.Dispatch<React.SetStateAction<boolean>>
 };
 
 const isGroup = (user: User | Group): user is Group => {
@@ -48,15 +47,14 @@ const fetchMessages = async (
 
 export default function MessageSpace(props: MessageSpaceProps) {
   const {
-    allMessages,
-    setAllMessages,
+    // allMessages,
+    // setAllMessages,
     setShowDetails,
-    setViewModal,
-    setViewSearchModal
   } = props;
 
   const { getUser, socket } = useUser();
-  const { selectedUser } = useAppSelector(state => state.chat)
+  const { selectedUser, allMessages } = useAppSelector(state => state.chat)
+  const dispatch = useAppDispatch();
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [isTop, setIsTop] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<any>({ id: "", isTyping: false });
@@ -87,7 +85,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
         } else return messages;
       });
       console.log("Updated Messages: ", updatedMessage);
-      setAllMessages([...updatedMessage]);
+      dispatch(setAllMessages([...updatedMessage]));
     };
 
     const handleGroupSeenMessages = (mess: AllMessageType) => {
@@ -99,7 +97,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
         } else return messages;
       });
       console.log("Updated Group Messages: ", updatedMessage);
-      setAllMessages([...updatedMessage]);
+      dispatch(setAllMessages([...updatedMessage]));
     };
 
     const handleReaction = (res: AllMessageType) => {
@@ -108,7 +106,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
           return { ...message, reactions: res.reactions };
         } else return message;
       });
-      setAllMessages([...updatedMessages]);
+      dispatch(setAllMessages([...updatedMessages]));
     };
 
     const handleGroupMessageReaction = (res: AllMessageType) => {
@@ -118,7 +116,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
           return { ...message, reactions: res.reactions };
         } else return message;
       });
-      setAllMessages([...updatedMessages]);
+      dispatch( setAllMessages([...updatedMessages]));
     };
 
     const handleDeleteReaction = (message: any) => {
@@ -127,7 +125,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
           return { ...m, reactions: message.reactions };
         } else return m;
       });
-      setAllMessages([...updatedMessages]);
+      dispatch(setAllMessages([...updatedMessages]));
     };
 
     const handleDeleteGroupReaction = (res: AllMessageType) => {
@@ -137,7 +135,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
           return { ...m, reactions: res.reactions };
         } else return m;
       });
-      setAllMessages([...updatedMessages]);
+      dispatch(setAllMessages([...updatedMessages]));
     };
 
     socket.on("Typing", handleIsTyping);
@@ -249,7 +247,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
           (message: AllMessageType) => message.SenderId === user._id,
         );
         setSeenMessage(lastSeenMessage[lastSeenMessage?.length - 1]);
-        setAllMessages([...messages]);
+        dispatch(setAllMessages(messages))
       } catch (error) {
         console.log(error);
       }
@@ -257,7 +255,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
     setRecentMessages();
     return () => {
-      setAllMessages([]);
+      dispatch(setAllMessages([]));
       skipMessages.current = 0;
     };
   }, [selectedUser]);
@@ -278,7 +276,10 @@ export default function MessageSpace(props: MessageSpaceProps) {
           skipMessages.current,
           getUser(),
         );
-        setAllMessages((prev) => [...messages1, ...prev]);
+        console.log("effect : ", allMessages);
+        console.log("recent : ", messages1)
+        dispatch(prependMessages(messages1));
+        // dispatch(setAllMessages((prev) => [...messages1, ...prev]));
       } catch (error) {
         console.log(error);
       } finally {
@@ -312,7 +313,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
     return () => {
       messageSpaceDiv.removeEventListener("scroll", windw);
-      setAllMessages([]);
+      dispatch(setAllMessages([]));
       skipMessages.current = 0;
     };
   }, [selectedUser]);
@@ -363,15 +364,13 @@ export default function MessageSpace(props: MessageSpaceProps) {
   return (
     <>
       <MessageHeader
-        // selectedUser={selectedUser}
         setShowDetails={setShowDetails}
-        setViewSearchModal={setViewSearchModal}
       />
       <div className="chat_messages">
         <div className="Messages" ref={MessageSpaceRef}>
           <Messages
-            allMessages={allMessages}
-            setAllMessages={setAllMessages}
+            // allMessages={allMessages}
+            // setAllMessages={setAllMessages}
             // selectedUser={selectedUser}
             lastMessageRef={lastMessageRef}
             seenMessage={seenMessage}
@@ -399,7 +398,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
         // selectedUser={selectedUser}
         message={message}
         setMessage={setMessage}
-        setAllMessages={setAllMessages}
+        // setAllMessages={setAllMessages}
       />
     </>
   );

@@ -9,17 +9,20 @@ import Modal from "../Modal/Modal.js";
 import Account from "../Account/Account.js";
 import axios from "../../lib/axios.js";
 import Search from "../Modal/Search.js";
-import { useAppSelector } from "../../redux/hooks.js";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks.js";
+import { addNewMessage, setOnlineUsers, setUsers } from "../../redux/Slicers/ChatSlice.js";
+import { setViewModal } from "../../redux/Slicers/ModalSlice.js";
 
 export default function Home() {
-  const { setOnlineUsers, onlineUsers, getUser, socket } = useUser();
+  const {  getUser, socket } = useUser();
+  const dispatch = useAppDispatch();
 
-  const [users, setUsers] = useState<User[]>([]);
+  // const [users, setUsers] = useState<User[]>([]);
   const { selectedUser } = useAppSelector(state => state.chat)
+  const { viewModal } = useAppSelector(state => state.modal)
   // const [selectedUser, setSelectedUser] = useState<User | Group | null>(null);
-  const [allMessages, setAllMessages] = useState<any>([]);
-  const [viewModal, setViewModal] = useState<boolean>(false);
-  const [searchViewModal, setViewSearchModal] = useState<boolean>(false);
+  // const [allMessages, setAllMessages] = useState<any>([]);
+  // const [viewModal, setViewModal] = useState<boolean>(false);
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [groupRoomIds, setGroupRoomIds] = useState<Pick<Group, "roomId">[]>([]);
 
@@ -32,7 +35,9 @@ export default function Home() {
             withCredentials: true,
           },
         );
-        setUsers([...data?.data?.Friends, ...data.data.Groups]);
+        // setUsers([...data?.data?.Friends, ...data.data.Groups]);
+        const userList = [...data?.data?.Friends, ...data.data.Groups]
+        dispatch(setUsers(userList))
         const groups = data.data.Groups || [];
         const roomIds = groups.map((group: Group) => {
           return group.roomId;
@@ -60,23 +65,28 @@ export default function Home() {
       ack(true);
       console.log("Group Messages: ", message);
       if (message.SenderId !== getUser()?._id){
-        setAllMessages((prev: any) => [...prev, message]);
+        // setAllMessages((prev: any) => [...prev, message]);
+      dispatch(addNewMessage(message))
+
       }
         
     };
 
     const onlineUsersHandler = (UsersList: any) => {
-      setOnlineUsers(UsersList);
+      dispatch(setOnlineUsers(UsersList));
+      // setOnlineUsers(UsersList);
     };
 
     const privateMessageHandler = (message: AllMessageType, ack: any) => {
       console.log("Private Message: ", message);
-      setAllMessages((prev: any) => [...prev, message]);
+      // setAllMessages((prev: any) => [...prev, message]);
+      dispatch(addNewMessage(message))
       ack(true);
     };
 
     const afterDisconnectedUsers = (onlineUsers: any) => {
-      setOnlineUsers(onlineUsers);
+      dispatch(setOnlineUsers(onlineUsers));
+      // setOnlineUsers(onlineUsers);
     };
 
     if (groupRoomIds.length > 0) {
@@ -101,7 +111,7 @@ export default function Home() {
   const handleCreateGroup = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
-    setViewModal(true);
+    dispatch(setViewModal(true));
     document.getElementsByTagName("main")[0].style.alignItems = "initial";
   };
 
@@ -113,11 +123,10 @@ export default function Home() {
         </div>
 
         <Friends
-          users={users}
           // setSelectedUser={setSelectedUser}
-          setAllMessages={setAllMessages}
-          onlineUsers={onlineUsers}
-          lastMessage={allMessages[allMessages.length - 1]}
+          // setAllMessages={setAllMessages}
+          // onlineUsers={onlineUsers}
+          // lastMessage={allMessages[allMessages.length - 1]}
         />
         <button
           className="Create_Group_Btn"
@@ -128,18 +137,15 @@ export default function Home() {
         </button>
       </section>
 
-      {viewModal && <Modal setViewModal={setViewModal} Users={users}  />}
-      {searchViewModal && <Search setViewSearchModal={setViewSearchModal}  />}
+      {viewModal && <Modal />}
       
       <section className="Chat_Space">
         {selectedUser ? (
           <MessageMain
             // selectedUser={selectedUser}
-            allMessages={allMessages}
-            setAllMessages={setAllMessages}
+            // allMessages={allMessages}
+            // setAllMessages={setAllMessages}
             setShowDetails={setShowDetails}
-            setViewModal={setViewModal}
-            setViewSearchModal={setViewSearchModal}
           />
         ) : (
           <div className="NoChats">
@@ -148,6 +154,7 @@ export default function Home() {
           </div>
         )}
       </section>
+
       {showDetails && (
         <aside className="Account_Details">
           <Account />

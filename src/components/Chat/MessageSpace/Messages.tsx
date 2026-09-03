@@ -4,11 +4,12 @@ import EmojiPicker from "emoji-picker-react";
 import { memo, useRef } from "react";
 import type { Socket } from "socket.io-client";
 import { useUser } from "../../../lib/context";
-import { useAppSelector } from "../../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { setAllMessages } from "../../../redux/Slicers/ChatSlice";
 
 type propsType = {
-  allMessages: AllMessageType[];
-  setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
+  // allMessages: AllMessageType[];
+  // setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
   // selectedUser: User | Group;
   seenMessage: AllMessageType | null;
   lastMessageRef: React.RefObject<null>;
@@ -68,15 +69,16 @@ const deleteMessageRequest = async (message: AllMessageType) => {
 
 export default memo(function Messages(props: propsType) {
   const {
-    allMessages,
-    setAllMessages,
+    // allMessages,
+    // setAllMessages,
     // selectedUser,
     seenMessage,
     lastMessageRef,
     groupMembers,
   } = props;
 
-  const { selectedUser } = useAppSelector(state => state.chat)
+  const { selectedUser, allMessages } = useAppSelector(state => state.chat)
+  const dispatch = useAppDispatch();
 
   const { getUser, socket } = useUser();
   const previousMessageTime = useRef<string>("");
@@ -94,7 +96,8 @@ export default memo(function Messages(props: propsType) {
           const filteredMessages = allMessages.filter(
             (messages) => messages._id !== message._id,
           );
-          setAllMessages([...filteredMessages]);
+          dispatch(setAllMessages([...filteredMessages]));
+          
         }
       } catch (error) {
         console.log(error);
