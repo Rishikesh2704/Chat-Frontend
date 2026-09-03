@@ -1,25 +1,19 @@
-import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
-import type { Socket } from "socket.io-client";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+
+import axios from "../../lib/axios";
+import { useUser } from "../../lib/context";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { prependMessages, setAllMessages } from "../../redux/Slicers/ChatSlice";
+import { isGroup } from "../../utils/IsGroup";
 import "./MessageMain.css";
 
 import MessageForm from "./MessageForm/MessageForm";
-
 import MessageHeader from "./Header/MessageHeader";
 import Messages from "./MessageSpace/Messages";
-import { useUser } from "../../lib/context";
-import axios from "../../lib/axios";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { prependMessages, setAllMessages } from "../../redux/Slicers/ChatSlice";
+
 
 type MessageSpaceProps = {
-  // selectedUser: User | Group;
-  // allMessages: AllMessageType[];
-  // setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
   setShowDetails: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const isGroup = (user: User | Group): user is Group => {
-  return "members" in user;
 };
 
 const fetchMessages = async (
@@ -46,34 +40,28 @@ const fetchMessages = async (
 };
 
 export default function MessageSpace(props: MessageSpaceProps) {
-  const {
-    // allMessages,
-    // setAllMessages,
-    setShowDetails,
-  } = props;
-
-  const { getUser, socket } = useUser();
-  const { selectedUser, allMessages } = useAppSelector(state => state.chat)
+  const { setShowDetails } = props;
+  const { currentUser } = useAppSelector((state) => state.auth);
+  const { selectedUser, allMessages } = useAppSelector((state) => state.chat);
+  const { socket } = useUser();
   const dispatch = useAppDispatch();
+
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [isTop, setIsTop] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<any>({ id: "", isTyping: false });
-  const [seenMessage, setSeenMessage] = useState<AllMessageType | null>(null);
   const [groupMembers, setGroupMembers] = useState<Map<any, any>>();
+  
   const MessageSpaceRef = useRef<HTMLDivElement | null>(null);
   const loadingRef = useRef(false);
   const scrollPosRef = useRef<number | null>(null);
   const skipMessages = useRef(0);
   const lastMessageRef = useRef(null);
-  // const socket = socketRef.current;
-  // if(!selectedUser) return ;
 
   //isTyping
   useEffect(() => {
-    // const socket = socketRef.current;
     if (!socket) return;
     const handleIsTyping = (user: any) => {
-      if (user.typerId === getUser()._id) return;
+      if (user.typerId === currentUser._id) return;
       setIsTyping({ id: user.typerId, isTyping: user.isTyping });
     };
 
@@ -116,7 +104,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
           return { ...message, reactions: res.reactions };
         } else return message;
       });
-      dispatch( setAllMessages([...updatedMessages]));
+      dispatch(setAllMessages([...updatedMessages]));
     };
 
     const handleDeleteReaction = (message: any) => {
@@ -158,7 +146,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
   }, [allMessages]);
 
   useEffect(() => {
-    if(!selectedUser) return
+    if (!selectedUser) return;
     if (!Object.hasOwn(selectedUser, "roomId")) return;
     const fetchMemberDetails = async () => {
       try {
@@ -181,22 +169,19 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   //Seen Message
   useEffect(() => {
-    // const socket = socketRef.current;
-    if(!socket) return;
-    if(!selectedUser) return
-
+    if (!socket) return;
+    if (!selectedUser) return;
 
     const messages = document.querySelectorAll(".ReceivedText_Wrapper");
     const groupMessageSeenHandler = (message: AllMessageType | undefined) => {
-      const currentUser = getUser();
       const seen = message?.seen as string[];
       if (seen.includes(currentUser._id)) return;
-        socket.emit(
-          "groupMessage_Seen",
-          message,
-          currentUser,
-          isGroup(selectedUser) ? selectedUser.roomId : "",
-        );
+      socket.emit(
+        "groupMessage_Seen",
+        message,
+        currentUser,
+        isGroup(selectedUser) ? selectedUser.roomId : "",
+      );
     };
 
     const privateMessageSeenHandler = (message: AllMessageType | undefined) => {
@@ -233,21 +218,17 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   //Initial Recent Messages
   useEffect(() => {
-    if(!selectedUser) return
+    if (!selectedUser) return;
 
     const setRecentMessages = async () => {
       try {
-        const user = JSON.parse(localStorage.getItem("Current_User") as string);
         const messages = await fetchMessages(
           selectedUser,
           skipMessages.current,
-          getUser(),
+          currentUser,
         );
-        const lastSeenMessage = messages.filter(
-          (message: AllMessageType) => message.SenderId === user._id,
-        );
-        setSeenMessage(lastSeenMessage[lastSeenMessage?.length - 1]);
-        dispatch(setAllMessages(messages))
+
+        dispatch(setAllMessages(messages));
       } catch (error) {
         console.log(error);
       }
@@ -262,7 +243,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   //Fetch Recent Messages
   useEffect(() => {
-    if(!selectedUser) return
+    if (!selectedUser) return;
     const messageSpaceDiv = MessageSpaceRef.current;
 
     if (!messageSpaceDiv) return;
@@ -274,12 +255,11 @@ export default function MessageSpace(props: MessageSpaceProps) {
         const messages1 = await fetchMessages(
           selectedUser,
           skipMessages.current,
-          getUser(),
+          currentUser,
         );
         console.log("effect : ", allMessages);
-        console.log("recent : ", messages1)
+        console.log("recent : ", messages1);
         dispatch(prependMessages(messages1));
-        // dispatch(setAllMessages((prev) => [...messages1, ...prev]));
       } catch (error) {
         console.log(error);
       } finally {
@@ -303,12 +283,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
         MoreRecentMessages();
       }
     };
-    // if (messageSpaceDiv) {
-    //   setTimeout(
-    //     () => (messageSpaceDiv.scrollTop = messageSpaceDiv.scrollHeight),
-    //     39,
-    //   );
-    // }
+
     messageSpaceDiv.addEventListener("scroll", windw);
 
     return () => {
@@ -320,7 +295,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   //Infinite Scroll(up)
   useLayoutEffect(() => {
-    if(!selectedUser) return
+    if (!selectedUser) return;
 
     const messageSpaceDiv = MessageSpaceRef.current;
     if (messageSpaceDiv && allMessages.length === 15) {
@@ -333,49 +308,39 @@ export default function MessageSpace(props: MessageSpaceProps) {
       });
     }
     try {
-      const string = localStorage.getItem("Recent_Messages")
-      if(string === null){
-          let recent:any = {};
-         recent[selectedUser._id] = allMessages[allMessages.length - 1];
-         console.log("Setting Recent: ", recent)
-        localStorage.setItem('Recent_Messages', JSON.stringify(recent))
-
+      const string = localStorage.getItem("Recent_Messages");
+      if (string === null) {
+        let recent: any = {};
+        recent[selectedUser._id] = allMessages[allMessages.length - 1];
+        console.log("Setting Recent: ", recent);
+        localStorage.setItem("Recent_Messages", JSON.stringify(recent));
       }
       const recentMessagesArray = JSON.parse(string as string);
-      recentMessagesArray[selectedUser._id] = allMessages[allMessages.length - 1]
-      localStorage.setItem("Recent_Messages", JSON.stringify(recentMessagesArray))
+      recentMessagesArray[selectedUser._id] =
+        allMessages[allMessages.length - 1];
+      localStorage.setItem(
+        "Recent_Messages",
+        JSON.stringify(recentMessagesArray),
+      );
     } catch (error) {
       console.log("Failed to Set Recent Message In Local Storage: ", error);
     }
-   
+
     setIsTop(false);
   }, [allMessages]);
 
-  // useEffect(() => {
-  //   const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
-  //   if (messageSpaceDiv) {
-  //     messageSpaceDiv.scrollTo({
-  //       top: messageSpaceDiv.scrollHeight,
-  //       behavior: "smooth",
-  //     });
-  //   }
-  // }, [message]);
-
   return (
     <>
-      <MessageHeader
-        setShowDetails={setShowDetails}
-      />
+      <MessageHeader setShowDetails={setShowDetails} />
+
       <div className="chat_messages">
         <div className="Messages" ref={MessageSpaceRef}>
+
           <Messages
-            // allMessages={allMessages}
-            // setAllMessages={setAllMessages}
-            // selectedUser={selectedUser}
             lastMessageRef={lastMessageRef}
-            seenMessage={seenMessage}
             groupMembers={groupMembers}
           />
+
           {isTyping.isTyping && (
             <div className="Typing_Wrapper">
               <img
@@ -392,14 +357,12 @@ export default function MessageSpace(props: MessageSpaceProps) {
               </div>
             </div>
           )}
+
         </div>
       </div>
-      <MessageForm
-        // selectedUser={selectedUser}
-        message={message}
-        setMessage={setMessage}
-        // setAllMessages={setAllMessages}
-      />
+
+      <MessageForm message={message} setMessage={setMessage} />
+
     </>
   );
 }

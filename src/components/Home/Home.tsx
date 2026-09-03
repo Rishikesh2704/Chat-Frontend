@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from "react";
+import axios from "../../lib/axios.js";
 import { useUser } from "../../lib/context.js";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks.js";
 
 import "./Home.css";
 import Friends from "../Chat/Friends/Friends.js";
 import MessageMain from "../Chat/MessageMain.js";
-import { Socket } from "socket.io-client";
 import Modal from "../Modal/Modal.js";
 import Account from "../Account/Account.js";
-import axios from "../../lib/axios.js";
-import Search from "../Modal/Search.js";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks.js";
-import { addNewMessage, setOnlineUsers, setUsers } from "../../redux/Slicers/ChatSlice.js";
+
+import {
+  addNewMessage,
+  setOnlineUsers,
+  setUsers,
+} from "../../redux/Slicers/ChatSlice.js";
 import { setViewModal } from "../../redux/Slicers/ModalSlice.js";
 
 export default function Home() {
-  const {  getUser, socket } = useUser();
+  const { getUser, socket } = useUser();
   const dispatch = useAppDispatch();
 
-  // const [users, setUsers] = useState<User[]>([]);
-  const { selectedUser } = useAppSelector(state => state.chat)
-  const { viewModal } = useAppSelector(state => state.modal)
-  // const [selectedUser, setSelectedUser] = useState<User | Group | null>(null);
-  // const [allMessages, setAllMessages] = useState<any>([]);
-  // const [viewModal, setViewModal] = useState<boolean>(false);
+  const { selectedUser } = useAppSelector((state) => state.chat);
+  const { viewModal } = useAppSelector((state) => state.modal);
+
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [groupRoomIds, setGroupRoomIds] = useState<Pick<Group, "roomId">[]>([]);
 
@@ -35,9 +35,8 @@ export default function Home() {
             withCredentials: true,
           },
         );
-        // setUsers([...data?.data?.Friends, ...data.data.Groups]);
-        const userList = [...data?.data?.Friends, ...data.data.Groups]
-        dispatch(setUsers(userList))
+        const userList = [...data?.data?.Friends, ...data.data.Groups];
+        dispatch(setUsers(userList));
         const groups = data.data.Groups || [];
         const roomIds = groups.map((group: Group) => {
           return group.roomId;
@@ -52,41 +51,28 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    // const user = JSON.parse(localStorage.getItem("Current_User") as string);
-    //  socketRef.current = io(`${import.meta.env.VITE_API}`, {
-    //   query: { userId: user?._id, username: user?.username },
-    // });
-    // if (!socketRef.current) return;
-    // const socket = socketRef.current;
-
     if (!socket) return;
 
     const groupMessageHandler = (message: AllMessageType, ack: any) => {
       ack(true);
       console.log("Group Messages: ", message);
-      if (message.SenderId !== getUser()?._id){
-        // setAllMessages((prev: any) => [...prev, message]);
-      dispatch(addNewMessage(message))
-
+      if (message.SenderId !== getUser()?._id) {
+        dispatch(addNewMessage(message));
       }
-        
     };
 
     const onlineUsersHandler = (UsersList: any) => {
       dispatch(setOnlineUsers(UsersList));
-      // setOnlineUsers(UsersList);
     };
 
     const privateMessageHandler = (message: AllMessageType, ack: any) => {
       console.log("Private Message: ", message);
-      // setAllMessages((prev: any) => [...prev, message]);
-      dispatch(addNewMessage(message))
+      dispatch(addNewMessage(message));
       ack(true);
     };
 
     const afterDisconnectedUsers = (onlineUsers: any) => {
       dispatch(setOnlineUsers(onlineUsers));
-      // setOnlineUsers(onlineUsers);
     };
 
     if (groupRoomIds.length > 0) {
@@ -122,12 +108,7 @@ export default function Home() {
           <h1 className="Heading">Messages</h1>
         </div>
 
-        <Friends
-          // setSelectedUser={setSelectedUser}
-          // setAllMessages={setAllMessages}
-          // onlineUsers={onlineUsers}
-          // lastMessage={allMessages[allMessages.length - 1]}
-        />
+        <Friends />
         <button
           className="Create_Group_Btn"
           aria-label="Create Group"
@@ -138,15 +119,10 @@ export default function Home() {
       </section>
 
       {viewModal && <Modal />}
-      
+
       <section className="Chat_Space">
         {selectedUser ? (
-          <MessageMain
-            // selectedUser={selectedUser}
-            // allMessages={allMessages}
-            // setAllMessages={setAllMessages}
-            setShowDetails={setShowDetails}
-          />
+          <MessageMain setShowDetails={setShowDetails} />
         ) : (
           <div className="NoChats">
             <i className="fa-solid fa-message"></i>
