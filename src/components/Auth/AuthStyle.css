@@ -82,8 +82,8 @@
   font-size: 2.4rem;
   letter-spacing: 0.2rem;
   color: black !important;
-  position:relative;
-  bottom:1rem;
+  position: relative;
+  bottom: 1rem;
 }
 
 #SignIn_Form {
@@ -100,7 +100,6 @@
   transform: translateY(-100%);
   opacity: 0;
   animation: FadeIn 0.5s ease-in;
-  animation-delay: 1.1s;
   animation-fill-mode: forwards;
 }
 

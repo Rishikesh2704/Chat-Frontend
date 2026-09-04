@@ -7,20 +7,6 @@ import SignIn from "./components/Auth/Sigin.tsx";
 import ProtectedRoute from "./lib/protectedRoute.tsx";
 
 function App() {
-    // const user = JSON.parse(localStorage.getItem("Current_User") as string);
-    // useEffect(() => {
-    //   if (user) {
-    //   socketRef.current = io(import.meta.env.VITE_API, {
-    //     query: { userId: user?._id, username: user?.username },
-    //   });
-    // }
-     
-    // // return () => {
-    // //   socketRef.current?.disconnect();
-    // //   socketRef.current = null;
-    // // }
-    // },[])
-    
  
   const routes = createBrowserRouter([
     {

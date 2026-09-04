@@ -7,6 +7,7 @@ import axios from "../../../lib/axios";
 import { useUser } from "../../../lib/context";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { addNewMessage } from "../../../redux/Slicers/ChatSlice";
+import { isGroup } from "../../../utils/IsGroup";
 
 type propsType = {
   message: string | undefined;
@@ -15,41 +16,36 @@ type propsType = {
   // selectedUser: User | Group;
 };
 
-const isGroup = (user: User | Group): user is Group => {
-  return "members" in user;
-};
-
-function getSelectedUserSocketId(SocketIds: any[] | null, selectedUser: any) {
-  const isGroup = Object.hasOwn(selectedUser, "RoomId");
-  if (isGroup) return selectedUser.RoomId as Group;
-  if (SocketIds) {
-    const selectedUserSocketId = Object.entries(SocketIds).find(
+function getSelectedUserSocketId(onlineUsers: any[] | null, selectedUser: any) {
+  if (isGroup(selectedUser)) return selectedUser.roomId;
+  if (onlineUsers) {
+    const selectedUserSocketId = Object.entries(onlineUsers).find(
       ([key, _]) => key == selectedUser._id,
     );
     return selectedUserSocketId && selectedUserSocketId[1];
   } else {
     return null;
   }
-  // if (SocketIds) return SocketIds[selectedUser._id as any];
 }
 
 async function messageFriendRequest(
-  SocketIds: any[] | null,
+  onlineUsers: any[] | null,
   selectedUser: User,
-  file: any,
-  message: string,
+  file: File | null,
+  message: string | undefined,
 ) {
-  // const userSocketId = getSelectedUserSocketId(SocketIds, selectedUser);
-  const userSocketId = SocketIds ? SocketIds[selectedUser._id as any] : "";
-  console.log(
-    "Socket Ids : ",
-    SocketIds,
-    "\n Receiver socket id: ",
-    userSocketId,
-  );
+  if (!onlineUsers || !selectedUser) {
+    console.log("One of the args is missing");
+    return;
+  }
+  if (!file && !message) {
+    console.log("NO Messag and File Provided");
+  }
+  const userSocketId = onlineUsers ? onlineUsers[selectedUser._id as any] : "";
+
   const form = new FormData();
-  form.append("image", file);
-  form.append("message", message);
+  form.append("image", file || "");
+  form.append("message", message || "");
   form.append("receiverSocketId", userSocketId);
   return await axios.post(
     `${import.meta.env.VITE_API}/messages/sendMessage/${selectedUser._id}`,
@@ -64,12 +60,16 @@ async function messageFriendRequest(
 
 async function groupMessageRequest(
   group: Group,
-  message: string,
-  file: string,
+  message: string | undefined,
+  file: File | null,
 ) {
+  if (!file && !message) {
+    console.log("NO Messag and File Provided");
+  }
+
   const form = new FormData();
-  form.append("message", message);
-  form.append("image", file);
+  form.append("message", message || "");
+  form.append("image", file || "");
   form.append("room", group.roomId);
   return await axios.post(
     `${import.meta.env.VITE_API}/group/${group._id}/message`,
@@ -84,14 +84,18 @@ async function groupMessageRequest(
 
 export default function MessageForm(props: propsType) {
   const { message, setMessage } = props;
-  const { selectedUser, allMessages } = useAppSelector((state) => state.chat);
+  const { selectedUser, onlineUsers } = useAppSelector((state) => state.chat);
+  const { currentUser } = useAppSelector((state) => state.auth);
+  const { socket } = useUser();
+
   const dispatch = useAppDispatch();
-  const { onlineUsers: SocketIds, getUser, socket } = useUser();
-  const [file, setFile] = useState<any>();
+
+  const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
   const [emojiVisible, setEmojiVisible] = useState(false);
+
   let selectedUserSocketId: any = getSelectedUserSocketId(
-    SocketIds,
+    onlineUsers,
     selectedUser,
   );
 
@@ -113,18 +117,21 @@ export default function MessageForm(props: propsType) {
   const sendMessage = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
-    if (!message) return;
     try {
       const messageRequest = !isGroup(selectedUser)
         ? await messageFriendRequest(
-            SocketIds,
+            onlineUsers,
             selectedUser as User,
             file,
             message,
           )
-        : await groupMessageRequest(selectedUser as Group, message, file);
-          console.log("Message Request : ", messageRequest)
-      if (messageRequest.status === 201) {
+        : await groupMessageRequest(
+            selectedUser as Group,
+            message ,
+            file ,
+          );
+      console.log("Message Request : ", messageRequest);
+      if (messageRequest?.status === 201) {
         console.log("Message request: ", messageRequest);
         dispatch(addNewMessage(messageRequest.data.newMessage));
         setMessage("");
@@ -133,7 +140,7 @@ export default function MessageForm(props: propsType) {
           behavior: "smooth",
         });
       }
-      setFile("");
+      setFile(null);
       setPreview("");
     } catch (error: any) {
       console.log(error.response.data);
@@ -154,7 +161,7 @@ export default function MessageForm(props: propsType) {
         : selectedUserSocketId;
       socket.emit("Typing", {
         roomId: roomId,
-        typerId: getUser()._id,
+        typerId: currentUser._id,
         isTyping: true,
       });
     }
@@ -168,7 +175,7 @@ export default function MessageForm(props: propsType) {
         : selectedUserSocketId;
       socket.emit("Typing", {
         roomId: roomId,
-        typerId: getUser()._id,
+        typerId: currentUser._id,
         isTyping: false,
       });
     }
@@ -229,7 +236,7 @@ export default function MessageForm(props: propsType) {
                 type="button"
                 onClick={() => {
                   setPreview("");
-                  setFile("");
+                  setFile(null);
                 }}
               >
                 <i className="fa-solid fa-x"></i>

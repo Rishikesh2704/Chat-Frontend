@@ -5,17 +5,18 @@ import { getDayOfMessages } from "../../../utils/MessagesDay";
 import { useAppSelector } from "../../../redux/hooks";
 import EmojiPicker from "emoji-picker-react";
 import { toLocaleTime } from "../../../utils/MessagesTime";
+import { getGroupSeenMembers } from "../../../utils/getGroupSeenMembers";
 
 type propsType = {
   messages: AllMessageType;
   previousMessageTime: React.RefObject<string>;
-  lastMessageRef: React.RefObject<null>;
+  lastMessageRef: React.RefObject<HTMLDivElement | null>;
   groupMembers: Map<any, any> | undefined;
-  groupSeenMembers: (members: any) => any;
-  handleReactionEmojis: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   reactToMessage: (messageId: string, emojiObject: EmojiClickData) => void;
-  handleHoverOut: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
-  handleDeleteReaction: (e: React.MouseEvent<HTMLParagraphElement, MouseEvent>, messageId: string) => void;
+  handleDeleteReaction: (
+    e: React.MouseEvent<HTMLParagraphElement, MouseEvent>,
+    messageId: string,
+  ) => void;
 };
 export default function ReceivedMessages(props: propsType) {
   const {
@@ -23,24 +24,31 @@ export default function ReceivedMessages(props: propsType) {
     previousMessageTime,
     lastMessageRef,
     groupMembers,
-    groupSeenMembers,
-    handleReactionEmojis,
     reactToMessage,
-    handleHoverOut,
     handleDeleteReaction,
   } = props;
 
-  const { selectedUser } = useAppSelector((state) => state.chat);
+  const { currentUser } = useAppSelector((state) => state.auth);
+  const { selectedUser, allMessages } = useAppSelector((state) => state.chat);
+
+  const handleReactionEmojis = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ) => {
+    const reactionPicker = e.currentTarget.nextElementSibling as HTMLDivElement;
+    const isVisible = reactionPicker.classList.contains("reactionVisible");
+    if (isVisible) {
+      reactionPicker.classList.remove("reactionVisible");
+    } else {
+      reactionPicker.classList.add("reactionVisible");
+    }
+  };
 
   return (
     <div key={messages._id}>
       <h6 className="Messages_Day">
         {getDayOfMessages(messages.createdAt, previousMessageTime)}
       </h6>
-      <div
-        className="ReceivedMessages_Wrapper"
-        onMouseOut={(e) => handleHoverOut(e)}
-      >
+      <div className="ReceivedMessages_Wrapper">
         <div className="Reactions">
           <div
             id="ReactionEmoji_Button"
@@ -115,14 +123,20 @@ export default function ReceivedMessages(props: propsType) {
         <div className="Message_details">
           {Array.isArray(messages.seen) && (
             <div className="Seen_GroupMembers">
-              {groupSeenMembers(messages)?.map((id: any) => (
-                <img
-                  className="ReceivedMessage_Profile"
-                  src={id}
-                  width={18}
-                  height={18}
-                ></img>
-              ))}
+              {groupMembers &&
+                getGroupSeenMembers(
+                  messages,
+                  currentUser,
+                  allMessages,
+                  groupMembers,
+                )?.map((id: any) => (
+                  <img
+                    className="ReceivedMessage_Profile"
+                    src={id}
+                    width={18}
+                    height={18}
+                  ></img>
+                ))}
             </div>
           )}
         </div>

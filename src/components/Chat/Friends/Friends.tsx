@@ -7,13 +7,6 @@ import {
   setSelectedUser,
 } from "../../../redux/Slicers/ChatSlice";
 
-type FriendsProps = {
-  // users: User[];
-  // setSelectedUser: React.Dispatch<React.SetStateAction<User | Group | null>>;
-  // onlineUsers: any;
-  // lastMessage: AllMessageType;
-  // setAllMessages: React.Dispatch<React.SetStateAction<any[]>>;
-};
 
 function toLocaleTime(time: string) {
   const date = new Date(time);
@@ -27,7 +20,7 @@ function toLocaleTime(time: string) {
   return formattedTime;
 }
 
-export default function Friends(props: FriendsProps) {
+export default function Friends() {
   const { users, onlineUsers, allMessages } = useAppSelector((state) => state.chat);
   const dispatch = useAppDispatch();
 

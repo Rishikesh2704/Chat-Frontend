@@ -33,3 +33,8 @@ type AllMessageType = {
 };
 
 
+type groupMembersType = {
+  id:string,
+  username:string,
+  profile:string,
+}

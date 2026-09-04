@@ -2,27 +2,37 @@ import type React from "react";
 import { getDayOfMessages } from "../../../utils/MessagesDay";
 import { toLocaleTime } from "../../../utils/MessagesTime";
 import { useAppSelector } from "../../../redux/hooks";
+import { getGroupSeenMembers } from "../../../utils/getGroupSeenMembers";
 
 type propsType = {
   messages: AllMessageType;
+  groupMembers: Map<string, { username: string; profile: string }> | undefined;
   previousMessageTime: React.RefObject<string>;
-  groupSeenMembers: (members: any) => any;
-  handleOptions: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   handleDeleteMessage: (message: AllMessageType) => void;
-  handleMouseLeave: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
-  isSeen: (messages: any) => boolean;
 };
 export default function SentMessages(props: propsType) {
-  const {
-    messages,
-    previousMessageTime,
-    groupSeenMembers,
-    handleOptions,
-    handleMouseLeave,
-    isSeen,
-    handleDeleteMessage,
-  } = props;
+  const { messages, groupMembers, previousMessageTime, handleDeleteMessage } =
+    props;
+  const { currentUser } = useAppSelector((state) => state.auth);
+  const { allMessages } = useAppSelector((state) => state.chat);
 
+  const isSeen = (messages: AllMessageType) => {
+    const seenMessages = allMessages.filter((message) => message.seen === true);
+    return seenMessages[seenMessages.length - 1]?._id === messages?._id;
+  };
+
+  const handleOptions = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    const options = e.currentTarget.nextElementSibling as HTMLDivElement;
+    options?.style.setProperty("--displayOptions", "block");
+  };
+
+  const handleMouseLeave = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ) => {
+    const optiions = e.currentTarget.lastChild as HTMLDivElement;
+    optiions.style.setProperty("--displayOptions", "none");
+  };
+  
   return (
     <>
       <h6 className="Messages_Day">
@@ -62,14 +72,20 @@ export default function SentMessages(props: propsType) {
             )}
             {Array.isArray(messages.seen) && (
               <div className="Seen_GroupMembers">
-                {groupSeenMembers(messages)?.map((id: any) => (
-                  <img
-                    className="ReceivedMessage_Profile"
-                    src={id}
-                    width={18}
-                    height={18}
-                  ></img>
-                ))}
+                {groupMembers &&
+                  getGroupSeenMembers(
+                    messages,
+                    currentUser,
+                    allMessages,
+                    groupMembers,
+                  )?.map((id: any) => (
+                    <img
+                      className="ReceivedMessage_Profile"
+                      src={id}
+                      width={18}
+                      height={18}
+                    ></img>
+                  ))}
               </div>
             )}
           </div>
