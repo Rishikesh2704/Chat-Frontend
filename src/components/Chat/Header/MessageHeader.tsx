@@ -3,7 +3,8 @@ import profile from "../../../assets/profile.jpg";
 import "./MessageHeader.css";
 import { useUser } from "../../../lib/context";
 import axios from "../../../lib/axios";
-import { useAppSelector } from "../../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { setViewSearchModal } from "../../../redux/Slicers/ModalSlice";
 
 type propsType = {
   // selectedUser: User | Group;
@@ -18,6 +19,9 @@ export default function MessageHeader(props: propsType) {
   const { setShowDetails } = props;
   const { selectedUser } = useAppSelector((state) => state.chat);
   const { getUser } = useUser();
+
+  const dispatch = useAppDispatch();
+  
   const [showOptions, setShowOptions] = useState(false);
   const [users, setUser] = useState<User[] | null>(null);
 
@@ -27,13 +31,16 @@ export default function MessageHeader(props: propsType) {
   }
 
   const handleAddMember = async () => {
+    dispatch(setViewSearchModal(true));
     try {
-      // const response = await axios.put(
-      //   `${import.meta.env.VITE_API}/group/${selectedUser._id}/addMember`,
-      //   {
-      //     groupId: selectedUser._id,
-      //   },
-      // );
+      const response = await axios.put(
+        `${import.meta.env.VITE_API}/group/addMember`,
+        {
+          groupId: selectedUser._id,
+          member:sele
+        },
+      );
+      
     } catch (error) {
       console.log("Failed To Add Member: ", error);
     }

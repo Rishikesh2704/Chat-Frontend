@@ -10,12 +10,13 @@ import Account from "../Account/Account.js";
 import { setViewModal } from "../../redux/Slicers/ModalSlice.js";
 import useChatUsers from "../../hooks/useChatUsers.js";
 import useChatSocket from "../../hooks/useChatSocket.js";
+import Search from "../Modal/Search.js";
 
 export default function Home() {
   const dispatch = useAppDispatch();
 
   const { selectedUser } = useAppSelector((state) => state.chat);
-  const { viewModal } = useAppSelector((state) => state.modal);
+  const { viewModal, viewSearchModal } = useAppSelector((state) => state.modal);
 
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<any>({ id: "", isTyping: false });
@@ -47,6 +48,7 @@ export default function Home() {
       </section>
 
       {viewModal && <Modal />}
+      {viewSearchModal && <Search />}
 
       <section className="Chat_Space">
         {selectedUser ? (
