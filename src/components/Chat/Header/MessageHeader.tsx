@@ -4,7 +4,7 @@ import "./MessageHeader.css";
 import { useUser } from "../../../lib/context";
 import axios from "../../../lib/axios";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { setViewSearchModal } from "../../../redux/Slicers/ModalSlice";
+import { setModalType, setViewModal, setViewSearchModal } from "../../../redux/Slicers/ModalSlice";
 
 type propsType = {
   // selectedUser: User | Group;
@@ -18,6 +18,7 @@ const isGroup = (user: User | Group): user is Group => {
 export default function MessageHeader(props: propsType) {
   const { setShowDetails } = props;
   const { selectedUser } = useAppSelector((state) => state.chat);
+  const { searchResults } = useAppSelector((state) => state.modal );
   const { getUser } = useUser();
 
   const dispatch = useAppDispatch();
@@ -31,20 +32,15 @@ export default function MessageHeader(props: propsType) {
   }
 
   const handleAddMember = async () => {
-    dispatch(setViewSearchModal(true));
-    try {
-      const response = await axios.put(
-        `${import.meta.env.VITE_API}/group/addMember`,
-        {
-          groupId: selectedUser._id,
-          member:sele
-        },
-      );
-      
-    } catch (error) {
-      console.log("Failed To Add Member: ", error);
-    }
+    dispatch(setModalType("addMember"));
+    dispatch(setViewModal(true));
   };
+
+  const handleRemoveMember = async () => {
+    dispatch(setModalType("removeMember"));
+    dispatch(setViewModal(true));
+  };
+  
   return (
     <div className="Chat_header">
       <div className="profile">
@@ -75,6 +71,7 @@ export default function MessageHeader(props: propsType) {
               selectedUser.admins.includes(getUser()?._id) && (
                 <>
                   <button onClick={() => handleAddMember()}>Add Member</button>
+                  <button onClick={() => handleRemoveMember()}>Remove Member</button>
                 </>
               )}
           </div>

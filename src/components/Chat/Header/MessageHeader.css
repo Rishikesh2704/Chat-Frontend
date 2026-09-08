@@ -1,3 +1,9 @@
+
+@font-face {
+  font-family: SF-Bold;
+  src: url(../../assets/SFPRODISPLAYREGULAR.OTF);
+}
+
 .Chat_header {
   height: 9%;
   width: 100%;
@@ -69,28 +75,33 @@
 }
 
 .options {
-  height: 150%;
+  height:fit-content;
   z-index: 1;
   position: absolute;
-  bottom: -130%;
-  right: 2%;
-  background-color: black;
-  color: white;
+  bottom: -25%;
+  right: 3%;
+  background-color: rgb(242, 242, 242);
   border-radius: 0.45rem;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  overflow: hidden;
+  border:1px solid gainsboro
 }
 
 .options > button {
+  height: 2rem;
+  width: 100%;
   background: none;
   border: none;
-  color: white;
   padding: 0.3rem 0.4rem;
-  border-bottom: 1px solid gainsboro;
   transition:0.1s ease-out;
-  border-top-right-radius:0.45rem;
-  border-top-left-radius:0.45rem;
   cursor:pointer;
+  font-family:SF-Bold;
   &:hover {
-    background-color: var(--primary-hover-color);
+   background-color: rgb(26, 25, 25);
+  color:white;
     transition:0.1s ease-out;
   }
   &:active {

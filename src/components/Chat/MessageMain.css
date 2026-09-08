@@ -231,6 +231,14 @@
   position: relative;
 }
 
+.Options_bg{
+  height: 100%;
+  width:100%;
+  position:absolute;
+  /* background-color:red; */
+  z-index: 3;
+}
+
 .Options > i {
   height: 1.3rem;
   width: 1.3rem;
@@ -255,17 +263,20 @@
   height: 5rem;
   position: absolute;
   bottom: -5rem;
-  background-color: rgb(57, 53, 53);
-  border-radius: 0.3rem;
+  right:-2rem;
+  background-color: rgb(242, 242, 242);
+  border:1px solid gainsboro;
+  border-radius: 0.45rem;
   overflow: hidden;
   z-index: 1;
+  
 }
 
 .option > button {
   padding: 0.5rem 0.8rem;
   border: none;
   background: transparent;
-  color: white;
+  font-family: SF-Bold;
   font-size: 0.8rem;
   display:flex;
   gap:0.5rem;
@@ -273,6 +284,7 @@
 
 .option > button:hover {
   background-color: rgb(26, 25, 25);
+  color:white;
   cursor: pointer;
 }
 

@@ -101,7 +101,7 @@ export default function SentMessages(props: propsType) {
               aria-label="Delete"
               onClick={() => handleDeleteMessage(messages)}
             >
-              Delete <i className="fa-regular fa-trash-can"></i>
+              Delete 
             </button>
           </div>
         </div>

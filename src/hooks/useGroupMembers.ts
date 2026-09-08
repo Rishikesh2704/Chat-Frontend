@@ -22,7 +22,6 @@ export default function useGroupMembers() {
               { username: member.username, profile: member.profile },
             ]),
           );
-        console.log("updateMap : ", updatedMap);
         setGroupMembers(updatedMap);
       } catch (error) {
         console.log(error);

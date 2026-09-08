@@ -1,22 +1,22 @@
+import "./Home.css";
+
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks.js";
 
-import "./Home.css";
-import Friends from "../Chat/Friends/Friends.js";
-import MessageMain from "../Chat/MessageMain.js";
-import Modal from "../Modal/Modal.js";
-import Account from "../Account/Account.js";
-
-import { setViewModal } from "../../redux/Slicers/ModalSlice.js";
+import { setModalType, setViewModal } from "../../redux/Slicers/ModalSlice.js";
 import useChatUsers from "../../hooks/useChatUsers.js";
 import useChatSocket from "../../hooks/useChatSocket.js";
-import Search from "../Modal/Search.js";
+
+import Friends from "../Chat/Friends/Friends.js";
+import MessageMain from "../Chat/MessageMain.js";
+import {Modal} from "../Modal/Modal.js";
+import Account from "../Account/Account.js";
 
 export default function Home() {
   const dispatch = useAppDispatch();
 
   const { selectedUser } = useAppSelector((state) => state.chat);
-  const { viewModal, viewSearchModal } = useAppSelector((state) => state.modal);
+  const { viewModal } = useAppSelector((state) => state.modal);
 
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<any>({ id: "", isTyping: false });
@@ -26,6 +26,7 @@ export default function Home() {
   useChatSocket(setIsTyping);
 
   const handleCreateGroup = () => {
+    dispatch(setModalType("createGroup"));
     dispatch(setViewModal(true));
     document.getElementsByTagName("main")[0].style.alignItems = "initial";
   };
@@ -41,14 +42,13 @@ export default function Home() {
         <button
           className="Create_Group_Btn"
           aria-label="Create Group"
-          onClick={handleCreateGroup}
+          onClick={() => handleCreateGroup()}
         >
           +
         </button>
       </section>
 
-      {viewModal && <Modal />}
-      {viewSearchModal && <Search />}
+      {viewModal && <Modal/>}
 
       <section className="Chat_Space">
         {selectedUser ? (
@@ -66,6 +66,7 @@ export default function Home() {
           <Account />
         </aside>
       )}
+      
     </div>
   );
 }

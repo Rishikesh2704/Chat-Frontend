@@ -7,10 +7,17 @@
   font-family: Inter;
   src: url(./assets/Inter-Regular.otf);
 }
+
 @font-face {
   font-family: SF-Pro;
   src: url(./assets/SF-Pro.OTF);
 }
+
+@font-face {
+  font-family: SF-Bold;
+  src: url(../../assets/SFPRODISPLAYREGULAR.OTF);
+}
+
 
 * {
   padding: 0;

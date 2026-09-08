@@ -4,7 +4,7 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setSearchResults, setViewSearchModal } from "../../redux/Slicers/ModalSlice";
 
-export default function Search() {
+export const Search = () => {
   const [query, setQuery] = useState<string>();
   const { searchResults } = useAppSelector((state) => state.modal);
   const dispatch = useAppDispatch();

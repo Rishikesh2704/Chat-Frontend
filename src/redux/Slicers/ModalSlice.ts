@@ -2,12 +2,14 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 type initialState = {
     viewModal:boolean,
+    modalType:string,
     viewSearchModal:boolean,
     searchResults:User[] | [];
 }
 
 const initialState = {
     viewModal:false,
+    modalType:"",
     viewSearchModal:false,
     searchResults:[],
 }
@@ -22,6 +24,14 @@ const modalSlicer = createSlice({
                 viewModal:action.payload,
             }
         },
+        setModalType: (state, action:PayloadAction<string>) => {
+            console.log("Redux-Modal Type: ", action.payload)
+            return {
+                ...state,
+                modalType:action.payload,
+            }
+        }
+        ,
         setViewSearchModal:(state, action:PayloadAction<boolean>) => {
             return{
                 ...state,
@@ -37,6 +47,6 @@ const modalSlicer = createSlice({
     }
 })
 
-export const { setViewModal, setViewSearchModal, setSearchResults } = modalSlicer.actions
+export const { setViewModal, setModalType, setViewSearchModal, setSearchResults } = modalSlicer.actions
 
 export default modalSlicer.reducer
