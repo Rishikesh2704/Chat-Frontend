@@ -4,9 +4,10 @@ import axios from "../../lib/axios";
 import { useUser } from "../../lib/context";
 import { removeCurrentUser } from "../../redux/Slicers/AuthSlice";
 import { useAppDispatch } from "../../redux/hooks";
+import { setShowDetails } from "../../redux/Slicers/ChatSlice";
 
 export default function Navbar() {
-  const { logoutUser, socket } = useUser();
+  const {  socket } = useUser();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const page = useLocation();
@@ -23,7 +24,6 @@ export default function Navbar() {
   const handleLogOut = async () => {
     try {
       await axios.get(`${import.meta.env.VITE_API}/auth/logout`);
-      // logoutUser();
       dispatch(removeCurrentUser())
       socket && socket.disconnect();
       navigate("/authentication/login");
@@ -46,14 +46,14 @@ export default function Navbar() {
         </form>
         <div className="Icons_Wrapper">
           {icons.map((icon) => (
-            <a
+            <button
               key={icon.id}
               className={`Anchor ${pagePath === icon.path ? "selectedPage" : ""}`}
-              href={`/${icon.name}`}
               aria-label={icon.name}
+              onClick={() => dispatch(setShowDetails(true))}
             >
               <i className={icon.icon}></i>
-            </a>
+            </button>
           ))}
           <button
             className="Logout_Btn Anchor"

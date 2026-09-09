@@ -1,9 +1,10 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { enableMapSet} from 'immer'
+import { enableMapSet } from "immer";
 
 enableMapSet();
 type stateType = {
   users: User[] | Group[];
+  showDetails:boolean,
   onlineUsers: any;
   selectedUser: User | Group | null;
   allMessages: AllMessageType[] | [];
@@ -11,6 +12,7 @@ type stateType = {
 
 const initialState: stateType = {
   users: [],
+  showDetails:false,
   onlineUsers: {},
   selectedUser: null,
   allMessages: [],
@@ -24,6 +26,13 @@ const chatSlicer = createSlice({
       return {
         ...state,
         users: [...action.payload],
+      };
+    },
+
+    setShowDetails: (state, action: PayloadAction<boolean>) => {
+      return {
+        ...state,
+        showDetails: action.payload,
       };
     },
 
@@ -88,6 +97,7 @@ const chatSlicer = createSlice({
 
 export const {
   setUsers,
+  setShowDetails,
   setOnlineUsers,
   setAllMessages,
   prependMessages,

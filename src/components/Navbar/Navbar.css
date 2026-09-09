@@ -3,12 +3,11 @@
   font-size: 2.1rem;
   letter-spacing: 0.2rem;
   background: var(--primary-gradient);
-  color:transparent;
+  color: transparent;
   background-clip: text;
   width: 10rem;
   text-align: center;
 }
-
 
 nav {
   width: 99%;
@@ -47,7 +46,7 @@ nav {
   justify-content: end;
   align-items: center;
   /* flex-direction:row-reverse; */
-  gap:0.8rem; 
+  gap: 0.8rem;
 }
 
 .Search_Form {
@@ -103,6 +102,7 @@ nav {
   align-items: center;
   justify-content: end;
   gap: 0.5rem;
+
   --icons-width: 50%;
   --icons-height: 100%;
 }
@@ -119,6 +119,9 @@ nav {
   border-radius: 0.6rem;
   color: rgb(0, 0, 0);
   transition: 0.2s ease-out;
+  background: none;
+  border: none;
+  font-size:1.35rem;
 }
 
 a:hover {

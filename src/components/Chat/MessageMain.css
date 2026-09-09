@@ -259,7 +259,7 @@
 }
 
 .option {
-  display: var(--displayOptions, none);
+  display:none;
   height: 5rem;
   position: absolute;
   bottom: -5rem;
@@ -270,6 +270,10 @@
   overflow: hidden;
   z-index: 1;
   
+}
+
+.DisplayOptions{
+  display:block;
 }
 
 .option > button {

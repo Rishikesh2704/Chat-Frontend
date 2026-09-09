@@ -29,7 +29,8 @@ const authSlicer = createSlice({
     removeCurrentUser:(state) => {
         state.currentUser = null,
         localStorage.removeItem("Current_User")
-    }
+    },
+   
   },
 });
 

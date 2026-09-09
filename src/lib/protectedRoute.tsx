@@ -1,14 +1,11 @@
 import { Navigate, Outlet } from "react-router";
 import Navbar from "../components/Navbar/Navbar";
-import type { Socket } from "socket.io-client";
-import type React from "react";
-import { useUser } from "./context";
+import { useAppSelector } from "../redux/hooks";
 
 
 
 export default function ProtectedRoute() {
-  const { getUser } = useUser();
-  const user = getUser();
+  const { currentUser:user } = useAppSelector(state => state.auth);
   return user ? (
     <>
       <Navbar  />

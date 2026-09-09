@@ -3,6 +3,8 @@ import { getDayOfMessages } from "../../../utils/MessagesDay";
 import { toLocaleTime } from "../../../utils/MessagesTime";
 import { useAppSelector } from "../../../redux/hooks";
 import { getGroupSeenMembers } from "../../../utils/getGroupSeenMembers";
+import { useRef, useState } from "react";
+import { useOutsideElement } from "../../../hooks/useOutsideElement";
 
 type propsType = {
   messages: AllMessageType;
@@ -15,24 +17,34 @@ export default function SentMessages(props: propsType) {
     props;
   const { currentUser } = useAppSelector((state) => state.auth);
   const { allMessages } = useAppSelector((state) => state.chat);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+
+  let optionElementRef = useRef<any>(null)
+
+  useOutsideElement(optionElementRef, setIsVisible)
 
   const isSeen = (messages: AllMessageType) => {
     const seenMessages = allMessages.filter((message) => message.seen === true);
     return seenMessages[seenMessages.length - 1]?._id === messages?._id;
   };
+  function closeOptions(){
+
+  }
 
   const handleOptions = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    setIsVisible(true)
     const options = e.currentTarget.nextElementSibling as HTMLDivElement;
-    options?.style.setProperty("--displayOptions", "block");
+    console.log("Current Target", options)
+    optionElementRef.current = e.target;
+    options?.classList.add("DisplayOptions");
   };
 
-  const handleMouseLeave = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-  ) => {
-    const optiions = e.currentTarget.lastChild as HTMLDivElement;
-    optiions.style.setProperty("--displayOptions", "none");
-  };
-  
+  if(!isVisible && optionElementRef.current){
+    console.log("Close")
+    optionElementRef.current.nextElementSibling.classList.remove("DisplayOptions");
+  }
+
+
   return (
     <>
       <h6 className="Messages_Day">
@@ -90,7 +102,7 @@ export default function SentMessages(props: propsType) {
             )}
           </div>
         </div>
-        <div className="Options" onMouseLeave={(e) => handleMouseLeave(e)}>
+        <div className="Options" >
           <i
             className="fa-solid fa-ellipsis-vertical"
             onClick={(e) => handleOptions(e)}
@@ -101,7 +113,7 @@ export default function SentMessages(props: propsType) {
               aria-label="Delete"
               onClick={() => handleDeleteMessage(messages)}
             >
-              Delete 
+              Delete
             </button>
           </div>
         </div>

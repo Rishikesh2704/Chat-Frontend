@@ -15,10 +15,9 @@ import Account from "../Account/Account.js";
 export default function Home() {
   const dispatch = useAppDispatch();
 
-  const { selectedUser } = useAppSelector((state) => state.chat);
+  const { selectedUser, showDetails } = useAppSelector((state) => state.chat);
   const { viewModal } = useAppSelector((state) => state.modal);
 
-  const [showDetails, setShowDetails] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<any>({ id: "", isTyping: false });
 
   useChatUsers();
@@ -52,7 +51,7 @@ export default function Home() {
 
       <section className="Chat_Space">
         {selectedUser ? (
-          <MessageMain setShowDetails={setShowDetails} isTyping={isTyping} />
+          <MessageMain  isTyping={isTyping} />
         ) : (
           <div className="NoChats">
             <i className="fa-solid fa-message"></i>

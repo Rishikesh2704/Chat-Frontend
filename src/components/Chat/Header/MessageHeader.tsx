@@ -5,18 +5,14 @@ import { useUser } from "../../../lib/context";
 import axios from "../../../lib/axios";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { setModalType, setViewModal, setViewSearchModal } from "../../../redux/Slicers/ModalSlice";
+import { setShowDetails } from "../../../redux/Slicers/ChatSlice";
 
-type propsType = {
-  // selectedUser: User | Group;
-  setShowDetails: React.Dispatch<React.SetStateAction<boolean>>;
-};
 
 const isGroup = (user: User | Group): user is Group => {
   return "members" in user;
 };
 
-export default function MessageHeader(props: propsType) {
-  const { setShowDetails } = props;
+export default function MessageHeader() {
   const { selectedUser } = useAppSelector((state) => state.chat);
   const { searchResults } = useAppSelector((state) => state.modal );
   const { getUser } = useUser();
@@ -61,9 +57,10 @@ export default function MessageHeader(props: propsType) {
           <i className="fa-solid fa-ellipsis"></i>
         </button>
         {showOptions && (
-          <div className="options">
+          <div className="options" onClick={() => setShowOptions(false)}>
             <button
-              onClick={() => setShowDetails((prev) => (prev ? false : true))}
+              onClick={() => dispatch(setShowDetails(true))}
+
             >
               Details
             </button>

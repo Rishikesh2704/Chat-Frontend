@@ -1,8 +1,11 @@
 import "./Account.css";
 import axiosInstance from "../../lib/axios";
-import { useEffect, useState } from "react";
-import type { Socket } from "socket.io-client";
-import { useAppSelector } from "../../redux/hooks";
+import profile from "../../assets/profile.jpg";
+import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { isGroup } from "../../utils/IsGroup";
+import useGroupMembers from "../../hooks/useGroupMembers";
+import { setShowDetails } from "../../redux/Slicers/ChatSlice";
 
 function toLocaleTime(time: string) {
   const date = new Date(time);
@@ -18,6 +21,10 @@ export default function Account() {
   const { currentUser } = useAppSelector((state) => state.auth);
   const { selectedUser } = useAppSelector((state) => state.chat);
   const current_user = selectedUser ? selectedUser : currentUser;
+  const groupMembers = useGroupMembers();
+
+  const dispatch = useAppDispatch();
+
   const handleUpdateProfile = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
@@ -65,12 +72,19 @@ export default function Account() {
 
   return (
     <main className="Account">
+      <div
+        className="Close_Details"
+        aria-label="close details"
+        onClick={() => dispatch(setShowDetails(false))}
+      >
+        <i className="fa-solid fa-xmark"></i>
+      </div>
       <div className="Account_Profile">
         <figure className="Account_Image">
           <div className="Profile_Wrapper">
             <img
               className="Profile"
-              src={preview || current_user.profile}
+              src={preview || current_user?.profile || profile}
             ></img>
 
             <label
@@ -87,7 +101,7 @@ export default function Account() {
             </label>
           </div>
           <figcaption id="Profile_Username">
-            {user?.username || current_user.username}
+            {user?.username || current_user.username || current_user?.groupName}
           </figcaption>
         </figure>
         {preview && (
@@ -101,12 +115,14 @@ export default function Account() {
       </div>
 
       <div className="Account_Info">
-        <h3 id="Heading">Account Details</h3>
+        <h1 id="Heading">Account Details</h1>
 
-        <div className="rows">
-          <h4>Email</h4>
-          <span> {current_user.email}</span>
-        </div>
+        {isGroup(currentUser) && (
+          <div className="rows">
+            <h4>Email</h4>
+            <span> {current_user.email}</span>
+          </div>
+        )}
         <div className="rows">
           <h4>Created At</h4>
           <span>
@@ -123,6 +139,30 @@ export default function Account() {
           </span>
         </div>
       </div>
+      {groupMembers &&<div className="GroupMembers_Info">
+        <h1 id="Heading">Members</h1>
+        
+          {Array.from(groupMembers.entries()).map(
+            ([id, user]: [id: any, user: any]) => {
+              if (Object.hasOwn(user, "roomId")) return;
+              return (
+                <div key={id} className="User_Wrapper">
+                  <figure>
+                    <div className="profile_picture">
+                      <img src={user.profile} />
+                    </div>
+                    <div
+                    // className={`${Object.keys(onlineUsers).includes(user._id) ? "online" : ""}`}
+                    ></div>
+                  </figure>
+                  <div className="User_Details">
+                    <h2>{user.username}</h2>
+                  </div>
+                </div>
+              );
+            },
+          )}
+      </div>}
     </main>
   );
 }

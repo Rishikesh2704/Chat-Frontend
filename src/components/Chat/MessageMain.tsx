@@ -12,12 +12,11 @@ import useMessagesSeen from "../../hooks/useMessagesSeen";
 import { useAppSelector } from "../../redux/hooks";
 
 type MessageSpaceProps = {
-  setShowDetails: React.Dispatch<React.SetStateAction<boolean>>;
   isTyping:any;
 };
 
 export default function MessageSpace(props: MessageSpaceProps) {
-  const { setShowDetails,isTyping } = props;
+  const { isTyping } = props;
   const { selectedUser, allMessages } = useAppSelector((state) => state.chat);
 
   const [message, setMessage] = useState<string | undefined>(undefined);
@@ -53,7 +52,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   return (
     <>
-      <MessageHeader setShowDetails={setShowDetails} />
+      <MessageHeader  />
 
       <div className="chat_messages">
         <div className="Messages" ref={MessageSpaceRef}>
