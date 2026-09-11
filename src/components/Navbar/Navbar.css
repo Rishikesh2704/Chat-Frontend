@@ -124,7 +124,7 @@ nav {
   font-size:1.35rem;
 }
 
-a:hover {
+.Anchor:hover {
   transition: 0.1s ease-in;
   background-color: var(--primary-color);
   color: black;

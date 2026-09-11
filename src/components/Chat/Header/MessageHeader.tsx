@@ -1,31 +1,38 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import profile from "../../../assets/profile.jpg";
 import "./MessageHeader.css";
 import { useUser } from "../../../lib/context";
 import axios from "../../../lib/axios";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { setModalType, setViewModal, setViewSearchModal } from "../../../redux/Slicers/ModalSlice";
+import {
+  setModalType,
+  setViewModal,
+  setViewSearchModal,
+} from "../../../redux/Slicers/ModalSlice";
 import { setShowDetails } from "../../../redux/Slicers/ChatSlice";
-
+import { useOutsideElement } from "../../../hooks/useOutsideElement";
 
 const isGroup = (user: User | Group): user is Group => {
   return "members" in user;
 };
 
 export default function MessageHeader() {
+  const { currentUser } = useAppSelector((state) => state.auth);
   const { selectedUser } = useAppSelector((state) => state.chat);
-  const { searchResults } = useAppSelector((state) => state.modal );
-  const { getUser } = useUser();
 
   const dispatch = useAppDispatch();
-  
+
   const [showOptions, setShowOptions] = useState(false);
-  const [users, setUser] = useState<User[] | null>(null);
+  let optionsRef = useRef<any>(null);
 
   if (!selectedUser) {
     console.log("No selected User");
     return;
   }
+
+  function closeOptions(){ setShowOptions(false)}
+
+  useOutsideElement(optionsRef, closeOptions)
 
   const handleAddMember = async () => {
     dispatch(setModalType("addMember"));
@@ -36,7 +43,12 @@ export default function MessageHeader() {
     dispatch(setModalType("removeMember"));
     dispatch(setViewModal(true));
   };
-  
+
+  const handleShowOptions = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    optionsRef.current = e.target;
+    setShowOptions((prev) => !prev);
+  };
+
   return (
     <div className="Chat_header">
       <div className="profile">
@@ -52,23 +64,22 @@ export default function MessageHeader() {
         <button
           className="options_button"
           aria-label="options"
-          onClick={() => setShowOptions((prev) => (prev ? false : true))}
+          onClick={(e) => handleShowOptions(e)}
         >
           <i className="fa-solid fa-ellipsis"></i>
         </button>
         {showOptions && (
           <div className="options" onClick={() => setShowOptions(false)}>
-            <button
-              onClick={() => dispatch(setShowDetails(true))}
-
-            >
+            <button onClick={() => dispatch(setShowDetails({currentUser:false, state:true}))}>
               Details
             </button>
             {isGroup(selectedUser) &&
-              selectedUser.admins.includes(getUser()?._id) && (
+              selectedUser.admins.includes(currentUser?._id) && (
                 <>
                   <button onClick={() => handleAddMember()}>Add Member</button>
-                  <button onClick={() => handleRemoveMember()}>Remove Member</button>
+                  <button onClick={() => handleRemoveMember()}>
+                    Remove Member
+                  </button>
                 </>
               )}
           </div>

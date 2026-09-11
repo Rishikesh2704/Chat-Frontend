@@ -7,7 +7,6 @@ import {
   setSelectedUser,
 } from "../../../redux/Slicers/ChatSlice";
 
-
 function toLocaleTime(time: string) {
   const date = new Date(time);
   const hoursAndSecs = date.toLocaleTimeString().split(":");
@@ -21,12 +20,14 @@ function toLocaleTime(time: string) {
 }
 
 export default function Friends() {
-  const { users, onlineUsers, allMessages } = useAppSelector((state) => state.chat);
+  const { users, onlineUsers, allMessages } = useAppSelector(
+    (state) => state.chat,
+  );
   const dispatch = useAppDispatch();
 
   const [onlineUsersIds, setOnlineUsersIds] = useState<string[]>([]);
   const [recentMessages, setRecentMessages] = useState<any>();
-  const lastMessage = allMessages[allMessages.length - 1];
+  const lastMessage = allMessages.at(-1);
 
   useEffect(() => {
     if (onlineUsers) {
@@ -34,18 +35,18 @@ export default function Friends() {
     }
   }, [onlineUsers]);
 
-  useEffect(() => {
-    if (!lastMessage) {
-      try {
-        const storedMessage = JSON.parse(
-          localStorage.getItem("Recent_Messages") as string,
-        );
-        setRecentMessages(storedMessage);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  }, [lastMessage]);
+  // useEffect(() => {
+  //   if (!lastMessage) {
+  //     try {
+  //       const storedMessage = JSON.parse(
+  //         localStorage.getItem("Recent_Messages") as string,
+  //       );
+  //       setRecentMessages(storedMessage);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }
+  // }, [lastMessage]);
 
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -63,7 +64,6 @@ export default function Friends() {
     }
     e.currentTarget.classList.add("selectedUser");
 
-    // setSelectedUser(user);
     dispatch(setSelectedUser(user));
     dispatch(setAllMessages([]));
   };
@@ -72,36 +72,38 @@ export default function Friends() {
     <div className="Chat_Friends">
       {users &&
         users.map((user: any) => {
+          console.log("Users: ", users)
           return (
             <div
-              key={user._id}
+              key={user?._id}
               className="User_Wrapper"
               onClick={(e) => handleClick(e, user)}
             >
               <figure>
                 <div className="profile_picture">
-                  <img src={user.profile || profile} />
+                  <img src={user?.profile || profile} />
                 </div>
                 <div
-                  className={`${onlineUsersIds.includes(user._id) ? "online" : ""}`}
+                  className={`${onlineUsersIds.includes(user?._id) ? "online" : ""}`}
                 ></div>
               </figure>
               <div className="User_Details">
-                <h2>{user.username || user.groupName}</h2>
-                {recentMessages && recentMessages[user._id] && (
+                <h2>{user.username || user?.groupName}</h2>
+                {
                   <div id="Last_message">
                     <p
-                      className={`${recentMessages[user._id] && !recentMessages[user._id].seen && recentMessages[user._id]?.ReceiverId !== user._id ? "Unseen" : ""}`}
                     >
-                      {recentMessages[user._id] &&
-                        recentMessages[user._id].text}
+                      {user?.lastMessage?.messageType === "text" ? (
+                        user?.lastMessage?.message
+                      ) : (
+                        <>
+                          <i className="fa-regular fa-image" /> Photo
+                        </>
+                      )}
                     </p>
-                    <p>
-                      {recentMessages[user._id] &&
-                        toLocaleTime(recentMessages[user._id].createdAt)}
-                    </p>
+                    <p>{toLocaleTime(user?.updatedAt)}</p>
                   </div>
-                )}
+                }
               </div>
             </div>
           );

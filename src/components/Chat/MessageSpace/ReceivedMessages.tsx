@@ -6,6 +6,8 @@ import { useAppSelector } from "../../../redux/hooks";
 import EmojiPicker from "emoji-picker-react";
 import { toLocaleTime } from "../../../utils/MessagesTime";
 import { getGroupSeenMembers } from "../../../utils/getGroupSeenMembers";
+import { useRef, useState } from "react";
+import { useOutsideElement } from "../../../hooks/useOutsideElement";
 
 type propsType = {
   messages: AllMessageType;
@@ -30,17 +32,43 @@ export default function ReceivedMessages(props: propsType) {
 
   const { currentUser } = useAppSelector((state) => state.auth);
   const { selectedUser, allMessages } = useAppSelector((state) => state.chat);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+
+  let reactionRef = useRef<any>(null);
+
+  useOutsideElement(reactionRef, closeReactionOption);
+
+  function closeReactionOption() {
+    reactionRef.current.parentElement.nextElementSibling.classList.remove(
+      "reactionVisible",
+    );
+    setIsVisible(false);
+  }
 
   const handleReactionEmojis = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   ) => {
     const reactionPicker = e.currentTarget.nextElementSibling as HTMLDivElement;
-    const isVisible = reactionPicker.classList.contains("reactionVisible");
-    if (isVisible) {
+    const doesContain = reactionPicker.classList.contains("reactionVisible");
+    setIsVisible((prev) => !prev);
+    reactionRef.current = e.target;
+    if (doesContain) {
       reactionPicker.classList.remove("reactionVisible");
     } else {
       reactionPicker.classList.add("reactionVisible");
     }
+  };
+
+  const handleMouseOver = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const hoverdMessage = e.currentTarget.children[0];
+    hoverdMessage.classList.add("displayReactionBtn");
+  };
+
+  const handleMouseLeave = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ) => {
+    const hoverdMessage = e.currentTarget.children[0];
+    hoverdMessage.classList.remove("displayReactionBtn");
   };
 
   return (
@@ -48,7 +76,11 @@ export default function ReceivedMessages(props: propsType) {
       <h6 className="Messages_Day">
         {getDayOfMessages(messages.createdAt, previousMessageTime)}
       </h6>
-      <div className="ReceivedMessages_Wrapper">
+      <div
+        className="ReceivedMessages_Wrapper"
+        onMouseOver={(e) => handleMouseOver(e)}
+        onMouseLeave={(e) => (!isVisible ? handleMouseLeave(e) : null)}
+      >
         <div className="Reactions">
           <div
             id="ReactionEmoji_Button"
@@ -94,7 +126,7 @@ export default function ReceivedMessages(props: propsType) {
             </p>
           }
           <div className="messageStyle received">
-            {messages.text}
+            {messages.text || messages.messageContent}
             {!Array.isArray(messages.reactions) && messages.reactions && (
               <p
                 className="PrivateMessage_reaction"

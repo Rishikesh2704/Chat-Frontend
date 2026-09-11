@@ -61,7 +61,7 @@ export default function useChatSocket(setIsTyping: any) {
       dispatch(setOnlineUsers(UsersList));
     };
 
-    const privateMessageHandler = (message: AllMessageType, ack: any) => {
+    const privateMessageHandler = (message: AllMessageType, ack: any) => {      
       dispatch(addNewMessage(message));
       ack(true);
     };

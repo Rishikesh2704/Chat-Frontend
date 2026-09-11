@@ -37,9 +37,11 @@
   position: relative;
   --displayReactionEmojiButton: none;
 }
-.ReceivedMessages_Wrapper:hover {
+/* .ReceivedMessages_Wrapper:hover {
   --displayReactionEmojiButton: flex;
-}
+} */
+
+
 
 .SentMessages_Wrapper {
   width: 100%;
@@ -80,10 +82,14 @@
 }
 
 .Reactions {
-  display: var(--displayReactionEmojiButton);
+  display: none;
   align-items: center;
   justify-content: center;
   position: relative;
+}
+
+.displayReactionBtn{
+  display:flex;
 }
 
 #ReactionEmoji_Button {
@@ -254,7 +260,12 @@
   transition: 0.1s ease-out;
 }
 
-.SentMessages_Wrapper:hover > .Options {
+/* .SentMessages_Wrapper:hover > .Options {
+  display: flex;
+} */
+
+
+.displayOptionBtn{
   display: flex;
 }
 

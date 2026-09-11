@@ -2,18 +2,18 @@ import { useEffect } from "react";
 
 export const useOutsideElement = (
   element: React.RefObject<any>,
-  setIsVisible: React.Dispatch<React.SetStateAction<boolean>>
+  closeElement:() => void
 ) => {
 
   useEffect(() => {
     if (!element.current) {
-      console.log("No Element");
       return;
     }
+
     const windowListener = (e: PointerEvent) => {
         const ele = element.current;
         if(e.target != ele){
-            setIsVisible(false)
+           closeElement();
         }
     };
 

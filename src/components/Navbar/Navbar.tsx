@@ -50,7 +50,7 @@ export default function Navbar() {
               key={icon.id}
               className={`Anchor ${pagePath === icon.path ? "selectedPage" : ""}`}
               aria-label={icon.name}
-              onClick={() => dispatch(setShowDetails(true))}
+              onClick={() => dispatch(setShowDetails({currentUser:true, state:true}))}
             >
               <i className={icon.icon}></i>
             </button>

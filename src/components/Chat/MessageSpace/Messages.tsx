@@ -1,7 +1,7 @@
 import { memo, useRef } from "react";
 
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { setAllMessages } from "../../../redux/Slicers/ChatSlice";
+import { deleteMessage, setAllMessages, updateUserConversation } from "../../../redux/Slicers/ChatSlice";
 import axios from "../../../lib/axios";
 
 import ReceivedMessages from "./ReceivedMessages";
@@ -43,10 +43,8 @@ export default memo(function Messages(props: propsType) {
     try {
       const response = await deleteMessageRequest(message);
       if (response.status === 200) {
-        const filteredMessages = allMessages.filter(
-          (messages) => messages._id !== message._id,
-        );
-        dispatch(setAllMessages(filteredMessages));
+        dispatch(updateUserConversation(response.data?.conversation))
+        dispatch(deleteMessage(message));
       }
     } catch (error) {
       console.log(error);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
 import "./MessageForm.css";
@@ -6,8 +6,12 @@ import "./MessageForm.css";
 import axios from "../../../lib/axios";
 import { useUser } from "../../../lib/context";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { addNewMessage } from "../../../redux/Slicers/ChatSlice";
+import {
+  addNewMessage,
+  updateUserConversation,
+} from "../../../redux/Slicers/ChatSlice";
 import { isGroup } from "../../../utils/IsGroup";
+import { useOutsideElement } from "../../../hooks/useOutsideElement";
 
 type propsType = {
   message: string | undefined;
@@ -33,35 +37,34 @@ async function messageFriendRequest(
   selectedUser: User,
   file: File | null,
   message: string | undefined,
+  conversationId: string | "",
 ) {
   if (!onlineUsers || !selectedUser) {
     console.log("One of the args is missing");
     return;
   }
   if (!file && !message) {
-    console.log("NO Messag and File Provided");
+    console.log("NO Message and File Provided");
   }
   const userSocketId = onlineUsers ? onlineUsers[selectedUser._id as any] : "";
 
   const form = new FormData();
   form.append("image", file || "");
   form.append("message", message || "");
+  form.append("conversationId", conversationId);
   form.append("receiverSocketId", userSocketId);
-  return await axios.post(
-    `${import.meta.env.VITE_API}/messages/sendMessage/${selectedUser._id}`,
-    form,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+  return await axios.post(`/messages/sendMessage/${selectedUser._id}`, form, {
+    headers: {
+      "Content-Type": "multipart/form-data",
     },
-  );
+  });
 }
 
 async function groupMessageRequest(
   group: Group,
   message: string | undefined,
   file: File | null,
+  conversationId:string | ""
 ) {
   if (!file && !message) {
     console.log("NO Messag and File Provided");
@@ -70,9 +73,10 @@ async function groupMessageRequest(
   const form = new FormData();
   form.append("message", message || "");
   form.append("image", file || "");
+  form.append("conversationId", conversationId);
   form.append("room", group.roomId);
   return await axios.post(
-    `${import.meta.env.VITE_API}/group/${group._id}/message`,
+    `/group/${group._id}/message`,
     form,
     {
       headers: {
@@ -84,7 +88,9 @@ async function groupMessageRequest(
 
 export default function MessageForm(props: propsType) {
   const { message, setMessage } = props;
-  const { selectedUser, onlineUsers } = useAppSelector((state) => state.chat);
+  const { selectedUser, onlineUsers, allMessages } = useAppSelector(
+    (state) => state.chat,
+  );
   const { currentUser } = useAppSelector((state) => state.auth);
   const { socket } = useUser();
 
@@ -93,6 +99,15 @@ export default function MessageForm(props: propsType) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
   const [emojiVisible, setEmojiVisible] = useState(false);
+
+  const emojiBtnRef = useRef<any>(null);
+  const lastMessage = allMessages.at(-1);
+
+  function closeEmojiBtn(){
+    setEmojiVisible(false)
+  }
+
+  useOutsideElement(emojiBtnRef, closeEmojiBtn);
 
   let selectedUserSocketId: any = getSelectedUserSocketId(
     onlineUsers,
@@ -117,6 +132,10 @@ export default function MessageForm(props: propsType) {
   const sendMessage = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
+    // if(!lastMessage?.conversationId){
+    //   console.log("No conversation Id: ", lastMessage);
+    //   return;
+    // }
     try {
       const messageRequest = !isGroup(selectedUser)
         ? await messageFriendRequest(
@@ -124,15 +143,13 @@ export default function MessageForm(props: propsType) {
             selectedUser as User,
             file,
             message,
+            lastMessage?.conversationId || "",
           )
-        : await groupMessageRequest(
-            selectedUser as Group,
-            message ,
-            file ,
-          );
+        : await groupMessageRequest(selectedUser as Group, message, file, lastMessage?.conversationId || "");
       console.log("Message Request : ", messageRequest);
       if (messageRequest?.status === 201) {
-        console.log("Message request: ", messageRequest);
+        console.log(messageRequest.data);
+        !isGroup(selectedUser) && dispatch(updateUserConversation(messageRequest.data.conversation));
         dispatch(addNewMessage(messageRequest.data.newMessage));
         setMessage("");
         messageSpaceDiv.scrollTo({
@@ -143,7 +160,7 @@ export default function MessageForm(props: propsType) {
       setFile(null);
       setPreview("");
     } catch (error: any) {
-      console.log(error.response.data);
+      console.log(error);
     }
   };
 
@@ -154,7 +171,6 @@ export default function MessageForm(props: propsType) {
   };
 
   const handleOnFocus = () => {
-    // const socket = socketRef.current
     if (socket) {
       let roomId = isGroup(selectedUser)
         ? selectedUser.roomId
@@ -168,7 +184,6 @@ export default function MessageForm(props: propsType) {
   };
 
   const handleOffFocus = () => {
-    // const socket = socketRef.current;
     if (socket) {
       let roomId = isGroup(selectedUser)
         ? selectedUser.roomId
@@ -180,6 +195,12 @@ export default function MessageForm(props: propsType) {
       });
     }
   };
+
+  const handleEmojiBtn = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    emojiBtnRef.current = e.target;
+    setEmojiVisible((prev) => !prev);
+  };
+
   return (
     <div className="SendMessageFrom_Wrapper">
       <form className="message_form" onSubmit={(e) => sendMessage(e)}>
@@ -210,9 +231,7 @@ export default function MessageForm(props: propsType) {
           aria-label="Emojis"
           type="button"
           id="Emojis"
-          onClick={() =>
-            setEmojiVisible((prev) => (prev == true ? false : true))
-          }
+          onClick={(e) => handleEmojiBtn(e)}
         >
           <i className="fa-regular fa-face-grin"></i>
         </button>

@@ -20,10 +20,12 @@ type Group = {
 
 
 type AllMessageType = {
+  conversationId:string,
   _id:string
   SenderId: string ;
   ReceiverId: string;
   text: string;
+  messageContent:string,
   seen:boolean|string[];
   image: string;
   createdAt: string;
@@ -37,4 +39,21 @@ type groupMembersType = {
   id:string,
   username:string,
   profile:string,
+}
+
+type Conversation = {
+  participants:{_id:string, username:string, profile:string,}[],
+  isGroup:boolean,
+  group?:{
+    _id:string,
+    groupName:string,
+    profile:string,
+  }
+  lastMessage:{
+    message:string,
+    senderId:string,
+    messageType:string,
+  }
+  updatedAt:string,
+  createdAt:string,
 }

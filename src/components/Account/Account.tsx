@@ -19,8 +19,8 @@ export default function Account() {
   const [file, setFile] = useState<File>();
   const [loading, setLoading] = useState<boolean>(false);
   const { currentUser } = useAppSelector((state) => state.auth);
-  const { selectedUser } = useAppSelector((state) => state.chat);
-  const current_user = selectedUser ? selectedUser : currentUser;
+  const { selectedUser, showDetails } = useAppSelector((state) => state.chat);
+  const current_user = showDetails.currentUser ? currentUser : selectedUser ;
   const groupMembers = useGroupMembers();
 
   const dispatch = useAppDispatch();
@@ -75,7 +75,7 @@ export default function Account() {
       <div
         className="Close_Details"
         aria-label="close details"
-        onClick={() => dispatch(setShowDetails(false))}
+        onClick={() => dispatch(setShowDetails({currentUser:true, state:false}))}
       >
         <i className="fa-solid fa-xmark"></i>
       </div>

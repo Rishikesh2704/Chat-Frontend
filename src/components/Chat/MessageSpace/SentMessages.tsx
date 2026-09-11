@@ -19,38 +19,52 @@ export default function SentMessages(props: propsType) {
   const { allMessages } = useAppSelector((state) => state.chat);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
-  let optionElementRef = useRef<any>(null)
+  let optionElementRef = useRef<any>(null);
 
-  useOutsideElement(optionElementRef, setIsVisible)
+  function closeOptions() {
+    optionElementRef.current.nextElementSibling.classList.remove(
+      "DisplayOptions",
+    );
+    setIsVisible(false);
+  }
+
+  useOutsideElement(optionElementRef, closeOptions);
 
   const isSeen = (messages: AllMessageType) => {
     const seenMessages = allMessages.filter((message) => message.seen === true);
     return seenMessages[seenMessages.length - 1]?._id === messages?._id;
   };
-  function closeOptions(){
-
-  }
 
   const handleOptions = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    setIsVisible(true)
+    setIsVisible(true);
     const options = e.currentTarget.nextElementSibling as HTMLDivElement;
-    console.log("Current Target", options)
+    console.log("Current Target", options);
     optionElementRef.current = e.target;
     options?.classList.add("DisplayOptions");
   };
 
-  if(!isVisible && optionElementRef.current){
-    console.log("Close")
-    optionElementRef.current.nextElementSibling.classList.remove("DisplayOptions");
-  }
+  const handleMouseOver = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const hoverdMessage = e.currentTarget.children[2];
+    hoverdMessage.classList.add("displayOptionBtn");
+  };
 
+  const handleMouseLeave = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ) => {
+    const hoverdMessage = e.currentTarget.children[2];
+    hoverdMessage.classList.remove("displayOptionBtn");
+  };
 
   return (
     <>
       <h6 className="Messages_Day">
         {getDayOfMessages(messages.createdAt, previousMessageTime)}
       </h6>
-      <div className="SentMessages_Wrapper">
+      <div
+        className="SentMessages_Wrapper"
+        onMouseOver={(e) => handleMouseOver(e)}
+        onMouseLeave={(e) => (!isVisible ? handleMouseLeave(e) : null)}
+      >
         <p className="sentTime time">{toLocaleTime(messages.createdAt)}</p>
         <div className="SentText_Wrapper">
           {messages.image && (
@@ -64,7 +78,7 @@ export default function SentMessages(props: propsType) {
             </div>
           )}
           <div className="messageStyle ">
-            {messages.text}
+            {messages.messageContent || messages.text}
             {!Array.isArray(messages.reactions) && messages.reactions && (
               <p className="PrivateMessage_reaction">{messages.reactions}</p>
             )}
@@ -102,7 +116,7 @@ export default function SentMessages(props: propsType) {
             )}
           </div>
         </div>
-        <div className="Options" >
+        <div className="Options">
           <i
             className="fa-solid fa-ellipsis-vertical"
             onClick={(e) => handleOptions(e)}

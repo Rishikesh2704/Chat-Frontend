@@ -60,7 +60,7 @@ export default function Home() {
         )}
       </section>
 
-      {showDetails && (
+      {showDetails.state && (
         <aside className="Account_Details">
           <Account />
         </aside>

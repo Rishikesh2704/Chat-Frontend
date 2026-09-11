@@ -3,8 +3,8 @@ import { enableMapSet } from "immer";
 
 enableMapSet();
 type stateType = {
-  users: User[] | Group[];
-  showDetails:boolean,
+  users: User[] | Group[] | Conversation[];
+  showDetails: { currentUser: boolean; state: boolean };
   onlineUsers: any;
   selectedUser: User | Group | null;
   allMessages: AllMessageType[] | [];
@@ -12,7 +12,7 @@ type stateType = {
 
 const initialState: stateType = {
   users: [],
-  showDetails:false,
+  showDetails: { currentUser: true, state: false },
   onlineUsers: {},
   selectedUser: null,
   allMessages: [],
@@ -29,7 +29,10 @@ const chatSlicer = createSlice({
       };
     },
 
-    setShowDetails: (state, action: PayloadAction<boolean>) => {
+    setShowDetails: (
+      state,
+      action: PayloadAction<{ currentUser: boolean; state: boolean }>,
+    ) => {
       return {
         ...state,
         showDetails: action.payload,
@@ -58,6 +61,42 @@ const chatSlicer = createSlice({
       return {
         ...state,
         allMessages: [...state.allMessages, action.payload],
+      };
+    },
+
+    deleteMessage: (state, action: PayloadAction<AllMessageType>) => {
+      const message = action.payload;
+      console.log("Redux - deleted message: ", message)
+      const filteredMessages = state.allMessages.filter(
+        (messages) => messages._id !== message._id,
+      );
+      return {
+        ...state,
+        allMessages:filteredMessages
+      }
+    },
+
+    updateUserConversation: (state, action: PayloadAction<Conversation>) => {
+      const conversation = action.payload;
+      
+      let transformedConversation = {
+        _id: conversation.participants[1]?._id,
+        username: conversation.participants[1]?.username,
+        profile: conversation.participants[1]?.profile,
+        lastMessage: conversation.lastMessage,
+        updatedAt: conversation.updatedAt,
+      };
+     
+      const updatedUserConversation = state.users.map((u: any) => {
+        if (u._id === transformedConversation._id) {
+          return transformedConversation;
+        }
+        return u;
+      });
+
+      return {
+        ...state,
+        users: updatedUserConversation,
       };
     },
 
@@ -102,6 +141,8 @@ export const {
   setAllMessages,
   prependMessages,
   addNewMessage,
+  deleteMessage,
+  updateUserConversation,
   setSelectedUser,
   updateReaction,
   updateSeenMessage,
