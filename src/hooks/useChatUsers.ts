@@ -37,7 +37,8 @@ export default function useChatUser() {
             updatedAt:convos.updatedAt
           }
         })
-        let conversations = [...data?.data?.Friends, ...data?.data?.Groups]
+        // let conversations = [...data?.data?.Friends, ...data?.data?.Groups]
+        let conversations = [...friendsConversations,...groupConversations]
         const userList = conversations;
         dispatch(setUsers(userList));
       } catch (error: any) {

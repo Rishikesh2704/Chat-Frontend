@@ -23,6 +23,7 @@ export default function Friends() {
   const { users, onlineUsers, allMessages } = useAppSelector(
     (state) => state.chat,
   );
+  const { searchResults } = useAppSelector((state) => state.modal);
   const dispatch = useAppDispatch();
 
   const [onlineUsersIds, setOnlineUsersIds] = useState<string[]>([]);
@@ -47,6 +48,9 @@ export default function Friends() {
   //     }
   //   }
   // }, [lastMessage]);
+  const isFriendsOrSearch = () => {
+    return searchResults.length>0 ?searchResults:users
+  };
 
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -70,9 +74,8 @@ export default function Friends() {
 
   return (
     <div className="Chat_Friends">
-      {users &&
-        users.map((user: any) => {
-          console.log("Users: ", users)
+      {isFriendsOrSearch().map((user: any) => {
+          console.log("Users: ", users);
           return (
             <div
               key={user?._id}
@@ -91,8 +94,7 @@ export default function Friends() {
                 <h2>{user.username || user?.groupName}</h2>
                 {
                   <div id="Last_message">
-                    <p
-                    >
+                    <p>
                       {user?.lastMessage?.messageType === "text" ? (
                         user?.lastMessage?.message
                       ) : (

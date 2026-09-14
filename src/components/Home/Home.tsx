@@ -9,8 +9,9 @@ import useChatSocket from "../../hooks/useChatSocket.js";
 
 import Friends from "../Chat/Friends/Friends.js";
 import MessageMain from "../Chat/MessageMain.js";
-import {Modal} from "../Modal/Modal.js";
+import { Modal } from "../Modal/Modal.js";
 import Account from "../Account/Account.js";
+import { Search } from "../Modal/Search.js";
 
 export default function Home() {
   const dispatch = useAppDispatch();
@@ -36,7 +37,16 @@ export default function Home() {
         <div className="Header">
           <h1 className="Heading">Messages</h1>
         </div>
-
+        {/* <form className="Home_Search_Form">
+          <label id="search_label" htmlFor="search_input">
+            Search
+          </label>
+          <input type="text" id="search_input" placeholder="Search..." />
+          <button id="search_btn" aria-label="Search" type="submit">
+            <i className="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </form> */}
+        <Search />
         <Friends />
         <button
           className="Create_Group_Btn"
@@ -47,11 +57,11 @@ export default function Home() {
         </button>
       </section>
 
-      {viewModal && <Modal/>}
+      {viewModal && <Modal />}
 
       <section className="Chat_Space">
         {selectedUser ? (
-          <MessageMain  isTyping={isTyping} />
+          <MessageMain isTyping={isTyping} />
         ) : (
           <div className="NoChats">
             <i className="fa-solid fa-message"></i>
@@ -65,7 +75,6 @@ export default function Home() {
           <Account />
         </aside>
       )}
-      
     </div>
   );
 }

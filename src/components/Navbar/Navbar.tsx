@@ -35,15 +35,7 @@ export default function Navbar() {
     <nav>
       <h1 className="App_Symbol">Convo</h1>
       <div className="Nav_Options">
-        <form className="Search_Form">
-          <label id="search_label" htmlFor="search_input">
-            Search
-          </label>
-          <input type="text" id="search_input" placeholder="Search..." />
-          <button id="search_btn" aria-label="Search" type="submit">
-            <i className="fa-solid fa-magnifying-glass"></i>
-          </button>
-        </form>
+      
         <div className="Icons_Wrapper">
           {icons.map((icon) => (
             <button
