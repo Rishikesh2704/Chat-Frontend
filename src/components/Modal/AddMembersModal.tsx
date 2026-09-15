@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "../../lib/axios";
 import { useDebounce } from "../../hooks/useDebounce";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { setViewSearchModal } from "../../redux/Slicers/ModalSlice";
+import { useAppSelector } from "../../redux/hooks";
 
 export const AddMembersModal = () => {
   const { selectedUser } = useAppSelector((state) => state.chat);

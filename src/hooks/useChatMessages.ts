@@ -49,7 +49,6 @@ export default function useChatMessages(
           skipMessages.current,
           currentUser,
         );
-
         dispatch(setAllMessages(messages));
       } catch (error) {
         console.log(error);

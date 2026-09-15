@@ -16,14 +16,16 @@ type Group = {
   members:string[],
   roomId:string,
   profile:string;
+  createdAt: string,
+  updatedAt:string,
 }
 
 
 type AllMessageType = {
   conversationId:string,
   _id:string
-  SenderId: string ;
-  ReceiverId: string;
+  senderId: string ;
+  receiverId: string;
   text: string;
   messageContent:string,
   seen:boolean|string[];
@@ -42,12 +44,14 @@ type groupMembersType = {
 }
 
 type Conversation = {
+  _id:string,
   participants:{_id:string, username:string, profile:string,}[],
   isGroup:boolean,
   group?:{
     _id:string,
     groupName:string,
     profile:string,
+    roomId:string,
   }
   lastMessage:{
     message:string,

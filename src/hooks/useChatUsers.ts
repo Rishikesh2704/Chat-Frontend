@@ -4,8 +4,8 @@ import axios from "../lib/axios";
 import { setUsers } from "../redux/Slicers/ChatSlice";
 
 export default function useChatUser() {
-    const dispatch= useAppDispatch();
-    const { currentUser } = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
+  const { currentUser } = useAppSelector((state) => state.auth);
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -15,30 +15,41 @@ export default function useChatUser() {
             withCredentials: true,
           },
         );
-        console.log("Data: ", );
-        let c = data?.data?.Conversations.filter((u:any) => !u.isGroup)
-        let g = data?.data?.Conversations.filter((u:any) => u.isGroup);
-        let friendsConversations = c.map((convos:any) => {
-          if(!convos.isGroup) return {
-            _id:convos.participants[1]?._id,
-            username:convos.participants[1]?.username,
-            profile:convos.participants[1]?.profile,
-            lastMessage:convos.lastMessage,
-            updatedAt:convos.updatedAt
-          }
-        })
-        let groupConversations = g.map((convos:any) => {
-           return {
-            _id:convos.group?._id,
-            groupName:convos.group?.groupName,
-            profile:convos.group?.profile,
-            roomId:convos.group.roomId,
-            lastMessage:convos.lastMessage,
-            updatedAt:convos.updatedAt
-          }
-        })
+        let c = data?.data?.Conversations.filter(
+          (u: Conversation) => !u.isGroup,
+        );
+        let g = data?.data?.Conversations.filter(
+          (u: Conversation) => u.isGroup,
+        );
+        let friendsConversations = c.map((convos: Conversation) => {
+          if (!convos.isGroup){
+            let participants = convos.participants.filter(parti => parti._id !== currentUser._id) 
+            console.log("Participants: ", participants)
+            return {
+              _id: participants[0]?._id,
+              username:participants[0]?.username,
+              profile:participants[0]?.profile,
+              lastMessage: convos.lastMessage,
+              updatedAt: convos.updatedAt,
+            };}
+        });
+        let groupConversations = g.map((convos: Conversation) => {
+          return {
+            _id: convos.group?._id,
+            groupName: convos.group?.groupName,
+            profile: convos.group?.profile,
+            roomId: convos.group?.roomId,
+            lastMessage: convos.lastMessage,
+            updatedAt: convos.updatedAt,
+          };
+        });
+        const groups = data?.data?.Groups;
+        const filtered = groups.map((g: Group) => {
+          const k = groupConversations.filter((c: Group) => c._id == g._id);
+          return k.length > 0 ? k : g;
+        });
         // let conversations = [...data?.data?.Friends, ...data?.data?.Groups]
-        let conversations = [...friendsConversations,...groupConversations]
+        let conversations = [...friendsConversations, ...filtered];
         const userList = conversations;
         dispatch(setUsers(userList));
       } catch (error: any) {

@@ -7,12 +7,12 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { useAppDispatch } from "../../redux/hooks";
 import { setViewModal } from "../../redux/Slicers/ModalSlice";
 
-
-export const  CreateGroupModal = () => {
+export const CreateGroupModal = () => {
   const dispatch = useAppDispatch();
   const [groupName, setGroupName] = useState<string>("");
   const [searchResults, setSearchResults] = useState<User[] | null>(null);
   const [query, setQuery] = useState<string>();
+  const [selected, setSelected] = useState<User[]>([]);
   const [groupMembers, setGroupMembers] = useState<Pick<User, "_id">[] | null>(
     [],
   );
@@ -48,19 +48,19 @@ export const  CreateGroupModal = () => {
     user: User,
   ) => {
     const selectedMember = e.currentTarget;
-    const isSelected = groupMembers?.find((users) => users._id == user._id);
+    const isSelected = selected?.find((users) => users._id == user._id);
     if (isSelected) {
-      const afterRemovingGroupMember = groupMembers?.filter(
+      const afterRemovingGroupMember = selected?.filter(
         (users) => users._id != user._id,
       );
       selectedMember.style.backgroundColor = "white";
 
       if (afterRemovingGroupMember) {
-        setGroupMembers(afterRemovingGroupMember);
+        setSelected(afterRemovingGroupMember);
       }
     } else {
       selectedMember.style.backgroundColor = "#ff6a0d";
-      setGroupMembers((prev: any) => [...prev, user._id]);
+      setSelected((prev: any) => [...prev, user]);
     }
     console.log();
   };
@@ -118,13 +118,13 @@ export const  CreateGroupModal = () => {
             </form>
           </div>
           <div className="Search_Results">
-            {searchResults &&
-              searchResults.map((user: any) => {
+            {selected &&
+              selected.map((user: any) => {
                 if (Object.hasOwn(user, "roomId")) return;
                 return (
                   <div
                     key={user._id}
-                    className="User_Wrapper"
+                    className="Selecetd_User_Wrapper"
                     onClick={(e) => handleClick(e, user)}
                   >
                     <figure>
@@ -141,6 +141,34 @@ export const  CreateGroupModal = () => {
                   </div>
                 );
               })}
+            {searchResults &&
+              searchResults
+                .filter(
+                  (users: User) =>
+                    !selected.map((user) => user._id).includes(users._id),
+                )
+                .map((user: any) => {
+                  if (Object.hasOwn(user, "roomId")) return;
+                  return (
+                    <div
+                      key={user._id}
+                      className="User_Wrapper"
+                      onClick={(e) => handleClick(e, user)}
+                    >
+                      <figure>
+                        <div className="profile_picture">
+                          <img src={user.profile} />
+                        </div>
+                        <div
+                        // className={`${Object.keys(onlineUsers).includes(user._id) ? "online" : ""}`}
+                        ></div>
+                      </figure>
+                      <div className="User_Details">
+                        <h2>{user.username}</h2>
+                      </div>
+                    </div>
+                  );
+                })}
           </div>
         </div>
         <button
@@ -152,4 +180,4 @@ export const  CreateGroupModal = () => {
       </div>
     </div>
   );
-}
+};

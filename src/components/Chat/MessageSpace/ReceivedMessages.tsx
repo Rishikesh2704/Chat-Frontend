@@ -70,7 +70,6 @@ export default function ReceivedMessages(props: propsType) {
     const hoverdMessage = e.currentTarget.children[0];
     hoverdMessage.classList.remove("displayReactionBtn");
   };
-
   return (
     <div key={messages._id}>
       <h6 className="Messages_Day">
@@ -119,14 +118,14 @@ export default function ReceivedMessages(props: propsType) {
           )}
           {
             <p className="GroupMessage_Username">
-              {groupMembers?.get(messages.SenderId)?.username ||
+              {groupMembers?.get(messages.senderId)?.username ||
                 (selectedUser &&
                   !isGroup(selectedUser) &&
                   selectedUser?.username)}
             </p>
           }
           <div className="messageStyle received">
-            {messages.text || messages.messageContent}
+            { messages.messageContent}
             {!Array.isArray(messages.reactions) && messages.reactions && (
               <p
                 className="PrivateMessage_reaction"
@@ -176,7 +175,7 @@ export default function ReceivedMessages(props: propsType) {
         {selectedUser && isGroup(selectedUser) && (
           <img
             className="ReceivedMessage_Profile"
-            src={groupMembers?.get(messages.SenderId)?.profile}
+            src={groupMembers?.get(messages.senderId)?.profile}
             width={25}
             height={25}
           />

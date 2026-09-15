@@ -86,8 +86,9 @@ export default memo(function Messages(props: propsType) {
   };
 
   const isReceiver = (message: any) => {
-    return message.SenderId !== currentUser?._id;
+    return message.senderId !== currentUser?._id;
   };
+
 
   return (
     <>

@@ -45,14 +45,9 @@ export default function Account() {
           },
         );
         setUser(response.data.user);
-        console.log("Updated Profile: ", response.data);
         const stringUser = JSON.stringify(response.data.user);
-        console.log("Response", stringUser);
         localStorage.setItem("Current_User", stringUser);
-        console.log(
-          "After Response",
-          JSON.parse(localStorage.getItem("Current_User") as string),
-        );
+       
       };
       uploadProfile();
     } catch (error) {

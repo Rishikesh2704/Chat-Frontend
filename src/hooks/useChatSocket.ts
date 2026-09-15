@@ -52,7 +52,7 @@ export default function useChatSocket(setIsTyping: any) {
     const groupMessageHandler = (message: AllMessageType, ack: any) => {
       ack(true);
       console.log("Group Messages: ", message);
-      if (message.SenderId !== currentUser?._id) {
+      if (message.senderId !== currentUser?._id) {
         dispatch(addNewMessage(message));
       }
     };
@@ -61,8 +61,9 @@ export default function useChatSocket(setIsTyping: any) {
       dispatch(setOnlineUsers(UsersList));
     };
 
-    const privateMessageHandler = (message: AllMessageType, ack: any) => {      
-      dispatch(addNewMessage(message));
+    const privateMessageHandler = (message: {conversation:Conversation,savedMessage:AllMessageType}, ack: any) => {      
+      console.log("New Message: ", message)
+      dispatch(addNewMessage(message.savedMessage));
       ack(true);
     };
 

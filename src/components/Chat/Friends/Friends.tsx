@@ -27,7 +27,6 @@ export default function Friends() {
   const dispatch = useAppDispatch();
 
   const [onlineUsersIds, setOnlineUsersIds] = useState<string[]>([]);
-  const [recentMessages, setRecentMessages] = useState<any>();
   const lastMessage = allMessages.at(-1);
 
   useEffect(() => {
@@ -36,18 +35,7 @@ export default function Friends() {
     }
   }, [onlineUsers]);
 
-  // useEffect(() => {
-  //   if (!lastMessage) {
-  //     try {
-  //       const storedMessage = JSON.parse(
-  //         localStorage.getItem("Recent_Messages") as string,
-  //       );
-  //       setRecentMessages(storedMessage);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  // }, [lastMessage]);
+
   const isFriendsOrSearch = () => {
     return searchResults.length>0 ?searchResults:users
   };
@@ -75,7 +63,6 @@ export default function Friends() {
   return (
     <div className="Chat_Friends">
       {isFriendsOrSearch().map((user: any) => {
-          console.log("Users: ", users);
           return (
             <div
               key={user?._id}
@@ -95,12 +82,12 @@ export default function Friends() {
                 {
                   <div id="Last_message">
                     <p>
-                      {user?.lastMessage?.messageType === "text" ? (
-                        user?.lastMessage?.message
-                      ) : (
+                      {user.lastMessage&& user?.lastMessage?.messageType === "image" ?  (
                         <>
                           <i className="fa-regular fa-image" /> Photo
                         </>
+                      ):(
+                        user?.lastMessage?.message
                       )}
                     </p>
                     <p>{toLocaleTime(user?.updatedAt)}</p>
