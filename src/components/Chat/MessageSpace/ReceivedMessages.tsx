@@ -1,5 +1,4 @@
 import type { EmojiClickData, EmojiStyle } from "emoji-picker-react";
-import { useUser } from "../../../lib/context";
 import { isGroup } from "../../../utils/IsGroup";
 import { getDayOfMessages } from "../../../utils/MessagesDay";
 import { useAppSelector } from "../../../redux/hooks";
@@ -8,6 +7,8 @@ import { toLocaleTime } from "../../../utils/MessagesTime";
 import { getGroupSeenMembers } from "../../../utils/getGroupSeenMembers";
 import { useRef, useState } from "react";
 import { useOutsideElement } from "../../../hooks/useOutsideElement";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFaceGrin } from "@fortawesome/free-regular-svg-icons";
 
 type propsType = {
   messages: AllMessageType;
@@ -72,9 +73,10 @@ export default function ReceivedMessages(props: propsType) {
   };
   return (
     <div key={messages._id}>
-      <h6 className="Messages_Day">
+      <h2 className="Messages_Day">
         {getDayOfMessages(messages.createdAt, previousMessageTime)}
-      </h6>
+        <p className="visually-hidden">day</p>
+      </h2>
       <div
         className="ReceivedMessages_Wrapper"
         onMouseOver={(e) => handleMouseOver(e)}
@@ -87,7 +89,7 @@ export default function ReceivedMessages(props: propsType) {
             role="button"
             onClick={(e) => handleReactionEmojis(e)}
           >
-            <i className="fa-regular fa-face-grin"></i>
+            <FontAwesomeIcon icon ={faFaceGrin}/>
           </div>
           <div className="Reaction_Wrapper">
             <EmojiPicker

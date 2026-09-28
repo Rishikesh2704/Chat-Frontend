@@ -1,10 +1,7 @@
 .Home_Wrapper {
   height: 90vh;
   width: 99vw;
-  /* height: 95vh;
-  width: 100vw; */
   display: flex;
-  /* justify-content: center; */
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
@@ -43,7 +40,6 @@
 .Heading {
   font-size: 1.1rem;
   position: relative;
-  /* top:85%; */
   right: 28%;
 }
 
@@ -58,7 +54,7 @@
   color: gainsboro;
 }
 
-.NoChats > i {
+.NoChats > #NoChat_icon {
   font-size: 5vmax;
 }
 

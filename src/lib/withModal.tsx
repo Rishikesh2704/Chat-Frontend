@@ -5,7 +5,6 @@ export default function withModal(WrappedComponent: any) {
     ) => {
       const element = e.target as HTMLDivElement;
       if (element.classList.contains("Modal_Background")) {
-        // setViewModal(false);
         document.getElementsByTagName("main")[0].style.alignItems = "center";
       }
     };

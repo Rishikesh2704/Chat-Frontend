@@ -25,7 +25,6 @@ const modalSlicer = createSlice({
             }
         },
         setModalType: (state, action:PayloadAction<string>) => {
-            console.log("Redux-Modal Type: ", action.payload)
             return {
                 ...state,
                 modalType:action.payload,

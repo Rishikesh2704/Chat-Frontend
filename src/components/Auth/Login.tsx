@@ -2,8 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import "./AuthStyle.css";
 import axios from "../../lib/axios.js";
-import { io, Socket } from "socket.io-client";
-import { useUser } from "../../lib/context.js";
 import { useAppDispatch } from "../../redux/hooks.js";
 import { setCurrentUser } from "../../redux/Slicers/AuthSlice.js";
 
@@ -11,7 +9,6 @@ import { setCurrentUser } from "../../redux/Slicers/AuthSlice.js";
 
 export default function Login() {
   const dispatch = useAppDispatch();
-  const { loginUser } = useUser();
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
   const navigate = useNavigate();
@@ -32,11 +29,7 @@ export default function Login() {
       );
       console.log(res.data);
       const user = res.data.user;
-      // loginUser(user);
       dispatch(setCurrentUser(user));
-      // socketRef.current = io(import.meta.env.VITE_API, {
-      //   query: { userId: user?._id, username: user?.username },
-      // });
       navigate("/");
     } catch (error: any) {
       alert(error.response.data.message || error.response.data);

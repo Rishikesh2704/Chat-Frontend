@@ -5,6 +5,8 @@ import { useAppSelector } from "../../../redux/hooks";
 import { getGroupSeenMembers } from "../../../utils/getGroupSeenMembers";
 import { useRef, useState } from "react";
 import { useOutsideElement } from "../../../hooks/useOutsideElement";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 
 type propsType = {
   messages: AllMessageType;
@@ -35,7 +37,7 @@ export default function SentMessages(props: propsType) {
     return seenMessages[seenMessages.length - 1]?._id === messages?._id;
   };
 
-  const handleOptions = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+  const handleOptions = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     setIsVisible(true);
     const options = e.currentTarget.nextElementSibling as HTMLDivElement;
     console.log("Current Target", options);
@@ -57,9 +59,10 @@ export default function SentMessages(props: propsType) {
 
   return (
     <>
-      <h6 className="Messages_Day">
+      <h2 className="Messages_Day">
         {getDayOfMessages(messages.createdAt, previousMessageTime)}
-      </h6>
+        <p className="visually-hidden">day</p>
+      </h2>
       <div
         className="SentMessages_Wrapper"
         onMouseOver={(e) => handleMouseOver(e)}
@@ -117,10 +120,11 @@ export default function SentMessages(props: propsType) {
           </div>
         </div>
         <div className="Options">
-          <i
-            className="fa-solid fa-ellipsis-vertical"
+          <FontAwesomeIcon
+            className="optionBtn"
+            icon={faEllipsisVertical}
             onClick={(e) => handleOptions(e)}
-          ></i>
+          />
           <div className="option">
             <button
               className="option_buttton"

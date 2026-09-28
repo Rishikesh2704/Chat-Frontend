@@ -14,7 +14,6 @@ nav {
   height: 6.5%;
   background: var(--secondary-color);
   display: flex;
-  /* flex-direction: column; */
   align-items: center;
   justify-content: space-around;
   gap: 3rem;
@@ -23,21 +22,6 @@ nav {
   position: relative;
 }
 
-/* nav {
-  width: 91.2%;
-  height: 2.8%;
-  background: var(--secondary-color);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: start;
-  gap: 3rem;
-  font-size: 1.35vmax;
-  padding-top: 3rem;
-  border-radius: 0.3rem;
-  position: relative;
-  margin-left:0.5rem
-} */
 
 .Nav_Options {
   width: 90%;
@@ -45,7 +29,6 @@ nav {
   display: flex;
   justify-content: end;
   align-items: center;
-  /* flex-direction:row-reverse; */
   gap: 0.8rem;
 }
 
@@ -58,7 +41,6 @@ nav {
   justify-content: center;
   border-radius: 0.45rem;
   overflow: clip;
-  /* border: 1px solid black; */
   background-color: rgba(234, 234, 234, 0.723);
 }
 

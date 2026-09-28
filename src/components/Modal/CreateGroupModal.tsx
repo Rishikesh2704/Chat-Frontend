@@ -4,18 +4,15 @@ import { useEffect, useState } from "react";
 import axios from "../../lib/axios";
 
 import { useDebounce } from "../../hooks/useDebounce";
-import { useAppDispatch } from "../../redux/hooks";
-import { setViewModal } from "../../redux/Slicers/ModalSlice";
 
 export const CreateGroupModal = () => {
-  const dispatch = useAppDispatch();
   const [groupName, setGroupName] = useState<string>("");
   const [searchResults, setSearchResults] = useState<User[] | null>(null);
   const [query, setQuery] = useState<string>();
   const [selected, setSelected] = useState<User[]>([]);
-  const [groupMembers, setGroupMembers] = useState<Pick<User, "_id">[] | null>(
-    [],
-  );
+  // const [groupMembers, setGroupMembers] = useState<Pick<User, "_id">[] | null>(
+  //   [],
+  // );
   const searchQuery = useDebounce(query, 500);
 
   useEffect(() => {
@@ -33,15 +30,6 @@ export const CreateGroupModal = () => {
     fetch();
   }, [searchQuery]);
 
-  const handleCloseModal = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-  ) => {
-    const element = e.target as HTMLDivElement;
-    if (element.classList.contains("Modal_Background")) {
-      dispatch(setViewModal(false));
-      document.getElementsByTagName("main")[0].style.alignItems = "center";
-    }
-  };
 
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -72,7 +60,7 @@ export const CreateGroupModal = () => {
       )._id;
       const group = {
         groupName: groupName,
-        groupMembers,
+        selected,
         admin: userId,
       };
       const request = await axios.post(
@@ -85,10 +73,9 @@ export const CreateGroupModal = () => {
     }
   };
   return (
-    <div className="Modal_Background" onClick={handleCloseModal}>
-      <div className="Modal_Box">
+    <>
         <div className="GroupName">
-          <label htmlFor="name" id="GroupName_Label">
+          <label htmlFor="GroupName_Input" id="GroupName_Label">
             Group Name
           </label>
           <input
@@ -98,6 +85,7 @@ export const CreateGroupModal = () => {
             placeholder="Group Name"
             onChange={(e) => setGroupName(e.target.value)}
           />
+
         </div>
         <h1 className="Members_H1">Group Members</h1>
         <div className="GroupMembers">
@@ -172,12 +160,11 @@ export const CreateGroupModal = () => {
           </div>
         </div>
         <button
-          className={`Create_Group_Button ${groupMembers && groupMembers.length > 0 ? "" : "disabled"}`}
+          className={`Create_Group_Button ${selected && selected.length > 0 ? "" : "disabled"}`}
           onClick={handleCreateGroup}
         >
           Create Group
         </button>
-      </div>
-    </div>
+        </>
   );
 };

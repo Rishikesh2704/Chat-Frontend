@@ -1,22 +1,19 @@
-import { useAppSelector } from "../redux/hooks";
-
 export const getGroupSeenMembers = (
   messages: AllMessageType,
-  currentUser:User,
-  allMessages:AllMessageType[],
+  currentUser: User,
+  allMessages: AllMessageType[],
   groupMembers: Map<string, { username: string; profile: string }>,
 ) => {
-
-  if(!Array.isArray(messages.seen)) return [];
+  if (!Array.isArray(messages.seen)) return [];
 
   let seenProfile: string[] = [];
-  let mess = messages.seen ;
+  let mess = messages.seen;
 
   const seenMessage = mess.filter((m) => m !== currentUser._id);
 
   if (
-    messages.SenderId !== currentUser._id &&
-    !mess.includes(messages.SenderId)
+    messages.senderId !== currentUser._id &&
+    !mess.includes(messages.senderId)
   ) {
     // mess.push(messages.SenderId);
   }
@@ -25,7 +22,7 @@ export const getGroupSeenMembers = (
 
   const latestMessage = allMessages[allMessages.length - 1];
 
-  if(!Array.isArray(latestMessage.seen)) return [] ;
+  if (!Array.isArray(latestMessage.seen)) return [];
 
   const latestMessageSeenArray = latestMessage.seen;
 
@@ -43,9 +40,9 @@ export const getGroupSeenMembers = (
 
   let nextMesssage = allMessages[messageIndex + 1];
 
-  if(!Array.isArray(nextMesssage.seen)) return [] ;
+  if (!Array.isArray(nextMesssage.seen)) return [];
 
-  const nextMessageSeenArray = nextMesssage.seen ;
+  const nextMessageSeenArray = nextMesssage.seen;
   const updatedSeenProfile: string[] = [];
 
   seenProfile.forEach((mem) => {

@@ -1,20 +1,15 @@
-import { useRef, useState } from "react";
-import profile from "../../../assets/profile.jpg";
 import "./MessageHeader.css";
-import { useUser } from "../../../lib/context";
-import axios from "../../../lib/axios";
+import profile from "../../../assets/profile.jpg";
+
+import { useRef, useState } from "react";
+import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import {
-  setModalType,
-  setViewModal,
-  setViewSearchModal,
-} from "../../../redux/Slicers/ModalSlice";
+import { setModalType, setViewModal } from "../../../redux/Slicers/ModalSlice";
 import { setShowDetails } from "../../../redux/Slicers/ChatSlice";
 import { useOutsideElement } from "../../../hooks/useOutsideElement";
-
-const isGroup = (user: User | Group): user is Group => {
-  return "members" in user;
-};
+import { isGroup } from "../../../utils/IsGroup";
 
 export default function MessageHeader() {
   const { currentUser } = useAppSelector((state) => state.auth);
@@ -30,9 +25,11 @@ export default function MessageHeader() {
     return;
   }
 
-  function closeOptions(){ setShowOptions(false)}
+  function closeOptions() {
+    setShowOptions(false);
+  }
 
-  useOutsideElement(optionsRef, closeOptions)
+  useOutsideElement(optionsRef, closeOptions);
 
   const handleAddMember = async () => {
     dispatch(setModalType("addMember"));
@@ -44,7 +41,9 @@ export default function MessageHeader() {
     dispatch(setViewModal(true));
   };
 
-  const handleShowOptions = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleShowOptions = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
     optionsRef.current = e.target;
     setShowOptions((prev) => !prev);
   };
@@ -52,7 +51,7 @@ export default function MessageHeader() {
   return (
     <div className="Chat_header">
       <div className="profile">
-        <img height={30} width={30} src={selectedUser.profile || profile} />
+        <img height={30} width={30} src={selectedUser.profile || profile} alt=""/>
         <h1>
           {isGroup(selectedUser)
             ? selectedUser.groupName
@@ -66,11 +65,15 @@ export default function MessageHeader() {
           aria-label="options"
           onClick={(e) => handleShowOptions(e)}
         >
-          <i className="fa-solid fa-ellipsis"></i>
+          <FontAwesomeIcon icon={faEllipsis} />
         </button>
         {showOptions && (
           <div className="options" onClick={() => setShowOptions(false)}>
-            <button onClick={() => dispatch(setShowDetails({currentUser:false, state:true}))}>
+            <button
+              onClick={() =>
+                dispatch(setShowDetails({ currentUser: false, state: true }))
+              }
+            >
               Details
             </button>
             {isGroup(selectedUser) &&

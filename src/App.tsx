@@ -1,21 +1,22 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 
-import Home from "./components/Home/Home.tsx";
-import Account from "./components/Account/Account.tsx";
-import Login from "./components/Auth/Login.tsx";
-import SignIn from "./components/Auth/Sigin.tsx";
 import ProtectedRoute from "./lib/protectedRoute.tsx";
+import { lazy } from "react";
+
+const Home = lazy(() => import("./components/Home/Home.tsx"));
+const Login = lazy(() => import("./components/Auth/Login.tsx"));
+const SignIn = lazy(() => import("./components/Auth/Sigin.tsx"));
+const Account = lazy(() => import("./components/Account/Account.tsx"));
 
 function App() {
- 
   const routes = createBrowserRouter([
     {
       path: "/",
-      element: <ProtectedRoute  />,
+      element: <ProtectedRoute />,
       children: [
         {
           path: "/",
-          element: <Home  />,
+          element: <Home />,
         },
         {
           path: "/account",
@@ -29,7 +30,7 @@ function App() {
     },
     {
       path: "/authentication/login",
-      element: <Login  />,
+      element: <Login />,
     },
   ]);
 

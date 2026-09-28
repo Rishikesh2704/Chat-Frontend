@@ -6,7 +6,6 @@
   position: relative;
   flex-direction: column;
   background:var(--secondary-color);
-  font-family: SF-Bold;
   transition:0.1s ease-in;
   gap:1rem;
 }
@@ -106,11 +105,11 @@
   display:flex;
   justify-content: space-between;
 }
-.rows > h4 {
+.rows > h2 {
   color:rgb(88, 87, 87);
   font-size:0.85rem;
 } 
-.rows > h4 > span{
+.rows > h2 > span{
   color:black;
 }
 

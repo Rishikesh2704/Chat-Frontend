@@ -1,33 +1,21 @@
-import { useEffect, useState } from "react";
 import "./Friends.css";
 import profile from "../../../assets/profile.jpg";
+
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import {
   setAllMessages,
   setSelectedUser,
 } from "../../../redux/Slicers/ChatSlice";
 
-function toLocaleTime(time: string) {
-  const date = new Date(time);
-  const hoursAndSecs = date.toLocaleTimeString().split(":");
-  const formattedTime =
-    hoursAndSecs[0] +
-    ":" +
-    hoursAndSecs[1] +
-    " " +
-    hoursAndSecs[2]?.split(" ")[1];
-  return formattedTime;
-}
+import { toLocaleTime } from "../../../utils/MessagesTime";
 
 export default function Friends() {
-  const { users, onlineUsers, allMessages } = useAppSelector(
-    (state) => state.chat,
-  );
+  const { users, onlineUsers } = useAppSelector((state) => state.chat);
   const { searchResults } = useAppSelector((state) => state.modal);
   const dispatch = useAppDispatch();
 
   const [onlineUsersIds, setOnlineUsersIds] = useState<string[]>([]);
-  const lastMessage = allMessages.at(-1);
 
   useEffect(() => {
     if (onlineUsers) {
@@ -35,9 +23,8 @@ export default function Friends() {
     }
   }, [onlineUsers]);
 
-
   const isFriendsOrSearch = () => {
-    return searchResults.length>0 ?searchResults:users
+    return searchResults.length > 0 ? searchResults : users;
   };
 
   const handleClick = (
@@ -59,44 +46,45 @@ export default function Friends() {
     dispatch(setSelectedUser(user));
     dispatch(setAllMessages([]));
   };
-
+  console.log("Friends: ", users);
   return (
     <div className="Chat_Friends">
       {isFriendsOrSearch().map((user: any) => {
-          return (
-            <div
-              key={user?._id}
-              className="User_Wrapper"
-              onClick={(e) => handleClick(e, user)}
-            >
-              <figure>
-                <div className="profile_picture">
-                  <img src={user?.profile || profile} />
-                </div>
-                <div
-                  className={`${onlineUsersIds.includes(user?._id) ? "online" : ""}`}
-                ></div>
-              </figure>
-              <div className="User_Details">
-                <h2>{user.username || user?.groupName}</h2>
-                {
-                  <div id="Last_message">
-                    <p>
-                      {user.lastMessage&& user?.lastMessage?.messageType === "image" ?  (
-                        <>
-                          <i className="fa-regular fa-image" /> Photo
-                        </>
-                      ):(
-                        user?.lastMessage?.message
-                      )}
-                    </p>
-                    <p>{toLocaleTime(user?.updatedAt)}</p>
-                  </div>
-                }
+        return (
+          <div
+            key={user?._id}
+            className="User_Wrapper"
+            onClick={(e) => handleClick(e, user)}
+          >
+            <figure>
+              <div className="profile_picture">
+                <img height={37} width={37} src={user?.profile || profile} loading="lazy" alt="" />
               </div>
+              <div
+                className={`${onlineUsersIds.includes(user?._id) ? "online" : ""}`}
+              ></div>
+            </figure>
+            <div className="User_Details">
+              <h2>{user.username || user?.groupName}</h2>
+              {
+                <div id="Last_message">
+                  <p>
+                    {user.lastMessage &&
+                    user?.lastMessage?.messageType === "image" ? (
+                      <>
+                        <i className="fa-regular fa-image" /> Photo
+                      </>
+                    ) : (
+                      user?.lastMessage?.message
+                    )}
+                  </p>
+                  <p>{toLocaleTime(user?.updatedAt)}</p>
+                </div>
+              }
             </div>
-          );
-        })}
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -1,8 +1,11 @@
+import './Search.css'
 import { useEffect, useState } from "react";
 import axios from "../../lib/axios";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useAppDispatch } from "../../redux/hooks";
 import { setSearchResults } from "../../redux/Slicers/ModalSlice";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
 export const Search = () => {
   const [query, setQuery] = useState<string>();
@@ -38,7 +41,8 @@ export const Search = () => {
           onChange={(e) => setQuery(e.target.value)}
         />
         <button id="search_btn" aria-label="Search" type="submit">
-          <i className="fa-solid fa-magnifying-glass"></i>
+          {/* <i className="fa-solid fa-magnifying-glass"></i> */}
+          <FontAwesomeIcon icon={faMagnifyingGlass}/>
         </button>
       </form>
     </div>

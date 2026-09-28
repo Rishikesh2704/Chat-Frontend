@@ -1,5 +1,8 @@
-import { useLocation, useNavigate } from "react-router";
 import "./Navbar.css";
+import { useLocation, useNavigate } from "react-router";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleUser, faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+
 import axios from "../../lib/axios";
 import { useUser } from "../../lib/context";
 import { removeCurrentUser } from "../../redux/Slicers/AuthSlice";
@@ -16,7 +19,7 @@ export default function Navbar() {
     {
       id: 13,
       name: "account",
-      icon: "fa-solid fa-circle-user",
+      icon: (<FontAwesomeIcon icon={faCircleUser}/>),
       path: "/account",
     },
   ];
@@ -44,7 +47,7 @@ export default function Navbar() {
               aria-label={icon.name}
               onClick={() => dispatch(setShowDetails({currentUser:true, state:true}))}
             >
-              <i className={icon.icon}></i>
+              {icon.icon}
             </button>
           ))}
           <button
@@ -52,7 +55,7 @@ export default function Navbar() {
             aria-label="Logout"
             onClick={handleLogOut}
           >
-            <i className="fa-solid fa-arrow-right-from-bracket"></i>
+            <FontAwesomeIcon icon={faArrowRightFromBracket}/>
           </button>
         </div>
       </div>

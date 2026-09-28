@@ -1,17 +1,22 @@
 import "./Home.css";
 
-import { useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks.js";
+import { lazy, useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faMessage } from '@fortawesome/free-solid-svg-icons'
 
+import { useAppDispatch, useAppSelector } from "../../redux/hooks.js";
 import { setModalType, setViewModal } from "../../redux/Slicers/ModalSlice.js";
 import useChatUsers from "../../hooks/useChatUsers.js";
 import useChatSocket from "../../hooks/useChatSocket.js";
 
 import Friends from "../Chat/Friends/Friends.js";
 import MessageMain from "../Chat/MessageMain.js";
-import { Modal } from "../Modal/Modal.js";
+// import { Modal } from "../Modal/Modal.js";
 import Account from "../Account/Account.js";
-import { Search } from "../Modal/Search.js";
+import { Search } from "../Search/Search.js";
+
+const Modal = lazy(() => import("../Modal/Modal.js").then((m) => ({default:m.Modal})))
+// const MessageMain = lazy(() => import("../Chat/MessageMain.js"))
 
 export default function Home() {
   const dispatch = useAppDispatch();
@@ -37,15 +42,7 @@ export default function Home() {
         <div className="Header">
           <h1 className="Heading">Messages</h1>
         </div>
-        {/* <form className="Home_Search_Form">
-          <label id="search_label" htmlFor="search_input">
-            Search
-          </label>
-          <input type="text" id="search_input" placeholder="Search..." />
-          <button id="search_btn" aria-label="Search" type="submit">
-            <i className="fa-solid fa-magnifying-glass"></i>
-          </button>
-        </form> */}
+      
         <Search />
         <Friends />
         <button
@@ -64,8 +61,8 @@ export default function Home() {
           <MessageMain isTyping={isTyping} />
         ) : (
           <div className="NoChats">
-            <i className="fa-solid fa-message"></i>
-            <span>No Chats Selected</span>
+            <FontAwesomeIcon id="NoChat_icon" icon={faMessage} />
+            <span >No Chats Selected</span>
           </div>
         )}
       </section>

@@ -1,8 +1,8 @@
 import { memo, useRef } from "react";
 
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { deleteMessage, setAllMessages, updateUserConversation } from "../../../redux/Slicers/ChatSlice";
 import axios from "../../../lib/axios";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { deleteMessage, updateUserConversation } from "../../../redux/Slicers/ChatSlice";
 
 import ReceivedMessages from "./ReceivedMessages";
 import SentMessages from "./SentMessages";

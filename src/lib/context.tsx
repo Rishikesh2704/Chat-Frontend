@@ -2,7 +2,6 @@ import React, {
   createContext,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import { io, Socket } from "socket.io-client";
@@ -26,7 +25,6 @@ export const User = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (!user) return;
-
     const newSocket = io(import.meta.env.VITE_API, {
       query: { userId: user?._id, username: user?.username },
     });
@@ -37,7 +35,6 @@ export const User = ({ children }: { children: React.ReactNode }) => {
       setSocket(null);
     };
   }, [user]);
-
 
   const value = {
     socket,

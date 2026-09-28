@@ -1,15 +1,19 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { lazy, useLayoutEffect, useRef, useState } from "react";
 
 import "./MessageMain.css";
 
-import MessageForm from "./MessageForm/MessageForm";
-import MessageHeader from "./Header/MessageHeader";
-import Messages from "./MessageSpace/Messages";
+// import MessageForm from "./MessageForm/MessageForm";
+// import MessageHeader from "./Header/MessageHeader";
+// import Messages from "./MessageSpace/Messages"; 
 
 import useGroupMembers from "../../hooks/useGroupMembers";
 import useChatMessages from "../../hooks/useChatMessages";
 import useMessagesSeen from "../../hooks/useMessagesSeen";
 import { useAppSelector } from "../../redux/hooks";
+
+const MessageForm = lazy(() => import("./MessageForm/MessageForm"))
+const MessageHeader = lazy(() => import("./Header/MessageHeader"))
+const Messages = lazy(() => import("./MessageSpace/Messages"))
 
 type MessageSpaceProps = {
   isTyping:any;
@@ -86,22 +90,3 @@ export default function MessageSpace(props: MessageSpaceProps) {
     </>
   );
 }
-
-// try {
-//       const string = localStorage.getItem("Recent_Messages");
-//       if (string === null) {
-//         let recent: any = {};
-//         recent[selectedUser._id] = allMessages[allMessages.length - 1];
-//         console.log("Setting Recent: ", recent);
-//         localStorage.setItem("Recent_Messages", JSON.stringify(recent));
-//       }
-//       const recentMessagesArray = JSON.parse(string as string);
-//       recentMessagesArray[selectedUser._id] =
-//         allMessages[allMessages.length - 1];
-//       localStorage.setItem(
-//         "Recent_Messages",
-//         JSON.stringify(recentMessagesArray),
-//       );
-//     } catch (error) {
-//       console.log("Failed to Set Recent Message In Local Storage: ", error);
-//     }

@@ -6,6 +6,8 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { isGroup } from "../../utils/IsGroup";
 import useGroupMembers from "../../hooks/useGroupMembers";
 import { setShowDetails } from "../../redux/Slicers/ChatSlice";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCamera, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 function toLocaleTime(time: string) {
   const date = new Date(time);
@@ -17,7 +19,6 @@ export default function Account() {
   const [user, setUser] = useState<User | null>(null);
   const [preview, setPreview] = useState<string>("");
   const [file, setFile] = useState<File>();
-  const [loading, setLoading] = useState<boolean>(false);
   const { currentUser } = useAppSelector((state) => state.auth);
   const { selectedUser, showDetails } = useAppSelector((state) => state.chat);
   const current_user = showDetails.currentUser ? currentUser : selectedUser ;
@@ -72,7 +73,7 @@ export default function Account() {
         aria-label="close details"
         onClick={() => dispatch(setShowDetails({currentUser:true, state:false}))}
       >
-        <i className="fa-solid fa-xmark"></i>
+        <FontAwesomeIcon icon={faXmark} />
       </div>
       <div className="Account_Profile">
         <figure className="Account_Image">
@@ -80,6 +81,7 @@ export default function Account() {
             <img
               className="Profile"
               src={preview || current_user?.profile || profile}
+              alt=""
             ></img>
 
             <label
@@ -87,7 +89,7 @@ export default function Account() {
               className="Upload_Button"
               aria-label="Upload Profile"
             >
-              <i className="fa-solid fa-camera "></i>
+              <FontAwesomeIcon icon={faCamera} />
               <input
                 id="profileUpload"
                 type="file"
@@ -104,7 +106,7 @@ export default function Account() {
             onClick={(e) => handleUpdateProfile(e)}
             id="UpdateProfile_Btn"
           >
-            {loading ? <div className="loader"></div> : <p>Update Profile</p>}
+            {/* {loading ? <div className="loader"></div> : <p>Update Profile</p>} */}
           </button>
         )}
       </div>
@@ -112,14 +114,14 @@ export default function Account() {
       <div className="Account_Info">
         <h1 id="Heading">Account Details</h1>
 
-        {isGroup(currentUser) && (
+        {!isGroup(currentUser) && (
           <div className="rows">
-            <h4>Email</h4>
+            <h2>Email</h2>
             <span> {current_user.email}</span>
           </div>
         )}
         <div className="rows">
-          <h4>Created At</h4>
+          <h2>Created At</h2>
           <span>
             {" "}
             {(user && toLocaleTime(user.createdAt)) ||
@@ -127,7 +129,7 @@ export default function Account() {
           </span>
         </div>
         <div className="rows">
-          <h4>Updated At</h4>
+          <h2>Updated At</h2>
           <span>
             {(user && toLocaleTime(user.updatedAt)) ||
               toLocaleTime(current_user.updatedAt)}

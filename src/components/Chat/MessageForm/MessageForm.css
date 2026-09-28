@@ -1,6 +1,5 @@
 .SendMessageFrom_Wrapper {
-  /* height: 6%; */
-  height:8%;
+  height: 8%;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -36,12 +35,11 @@
 #message_input {
   height: 80%;
   width: 100%;
-  /* border: 1px solid rgb(84, 84, 84); */
-  background-color:rgb(231, 228, 228);
+  background-color: rgb(231, 228, 228);
   font-size: 1.1vmax;
   border-radius: 0.7rem;
   padding: 0rem 1rem;
-  border:none;
+  border: none;
   z-index: 1;
 
   &:focus {
@@ -94,14 +92,13 @@
     left: 45%;
     top: -6rem;
     opacity: 0;
-    transform: translate(-50%,25%);
+    transform: translate(-50%, 25%);
   }
-  
-  
+
   100% {
     left: 45%;
     top: -6rem;
-    transform: translate(-50%,0%);
+    transform: translate(-50%, 0%);
     opacity: 1;
   }
 }
@@ -112,7 +109,7 @@
   position: absolute;
   left: 45%;
   top: -6rem;
-  transform: translate(-50%,0%);
+  transform: translate(-50%, 0%);
   background-color: rgb(27, 26, 26);
   border-top-left-radius: 0.6rem;
   border-top-right-radius: 0.6rem;
@@ -121,18 +118,18 @@
   justify-content: center;
   align-items: start;
   animation: slideInPreview 0.2s ease-out;
-  padding-top:0.2rem;
+  padding-top: 0.2rem;
 }
 
 .Preview {
   height: 85%;
-  width:fit-content;
+  width: fit-content;
   position: relative;
 }
 
-.Preview_Img{
-  height:100%;
-  width:100%;
+.Preview_Img {
+  height: 100%;
+  width: 100%;
   object-fit: contain;
 }
 
@@ -150,34 +147,31 @@
   color: rgb(182, 179, 179);
 }
 
-.Emoji_Wrapper{
-  height:27.5rem;
-  width:90%;
-  position:absolute;
-  bottom:95%;
-  left:0;
-  display:flex;
-  flex-direction:row-reverse
+.Emoji_Wrapper {
+  height: 27.5rem;
+  width: 90%;
+  position: absolute;
+  bottom: 95%;
+  left: 0;
+  display: flex;
+  flex-direction: row-reverse;
 }
 
-
-
-#Emojis{
-  background:transparent;
-  border:none;
-  font-size:1.3vmax;
-  cursor:pointer;
-  &:hover{
-    color:var(--primary-hover-color)
+#Emojis {
+  background: transparent;
+  border: none;
+  font-size: 1.3vmax;
+  cursor: pointer;
+  &:hover {
+    color: var(--primary-hover-color);
   }
-  &:active{
-    color:#fe6506;
+  &:active {
+    color: #fe6506;
   }
 }
 
 
 /**** Typing Animation ****/
-
 
 .typing {
   align-items: center;
@@ -186,7 +180,7 @@
 }
 .typing .dot {
   animation: mercuryTypingAnimation 1.8s infinite ease-in-out;
-  background-color: #121212 ;
+  background-color: #121212;
   border-radius: 50%;
   height: 5px;
   margin-right: 4px;
@@ -218,5 +212,3 @@
     transform: translateY(0px);
   }
 }
-
-

@@ -1,6 +1,11 @@
 import React, { useRef, useState } from "react";
-import { Socket } from "socket.io-client";
 import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faImage } from "@fortawesome/free-regular-svg-icons";
+import { faFaceGrin, faPaperPlane } from "@fortawesome/free-regular-svg-icons";
+import { faX } from "@fortawesome/free-solid-svg-icons";
+
 import "./MessageForm.css";
 
 import axios from "../../../lib/axios";
@@ -64,7 +69,7 @@ async function groupMessageRequest(
   group: Group,
   message: string | undefined,
   file: File | null,
-  conversationId:string | ""
+  conversationId: string | "",
 ) {
   if (!file && !message) {
     console.log("NO Messag and File Provided");
@@ -75,15 +80,11 @@ async function groupMessageRequest(
   form.append("image", file || "");
   form.append("conversationId", conversationId);
   form.append("room", group.roomId);
-  return await axios.post(
-    `/group/${group._id}/message`,
-    form,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+  return await axios.post(`/group/${group._id}/message`, form, {
+    headers: {
+      "Content-Type": "multipart/form-data",
     },
-  );
+  });
 }
 
 export default function MessageForm(props: propsType) {
@@ -103,8 +104,8 @@ export default function MessageForm(props: propsType) {
   const emojiBtnRef = useRef<any>(null);
   const lastMessage = allMessages.at(-1);
 
-  function closeEmojiBtn(){
-    setEmojiVisible(false)
+  function closeEmojiBtn() {
+    setEmojiVisible(false);
   }
 
   useOutsideElement(emojiBtnRef, closeEmojiBtn);
@@ -132,10 +133,7 @@ export default function MessageForm(props: propsType) {
   const sendMessage = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
-    // if(!lastMessage?.conversationId){
-    //   console.log("No conversation Id: ", lastMessage);
-    //   return;
-    // }
+
     try {
       const messageRequest = !isGroup(selectedUser)
         ? await messageFriendRequest(
@@ -145,11 +143,17 @@ export default function MessageForm(props: propsType) {
             message,
             lastMessage?.conversationId || "",
           )
-        : await groupMessageRequest(selectedUser as Group, message, file, lastMessage?.conversationId || "");
+        : await groupMessageRequest(
+            selectedUser as Group,
+            message,
+            file,
+            lastMessage?.conversationId || "",
+          );
       console.log("Message Request : ", messageRequest);
       if (messageRequest?.status === 201) {
         console.log(messageRequest.data);
-        !isGroup(selectedUser) && dispatch(updateUserConversation(messageRequest.data.conversation));
+        !isGroup(selectedUser) &&
+          dispatch(updateUserConversation(messageRequest.data.conversation));
         dispatch(addNewMessage(messageRequest.data.newMessage));
         setMessage("");
         messageSpaceDiv.scrollTo({
@@ -196,7 +200,9 @@ export default function MessageForm(props: propsType) {
     }
   };
 
-  const handleEmojiBtn = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleEmojiBtn = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
     emojiBtnRef.current = e.target;
     setEmojiVisible((prev) => !prev);
   };
@@ -218,13 +224,14 @@ export default function MessageForm(props: propsType) {
           value={message as string}
         ></input>
         <label id="ImageInputFor" htmlFor="select_image">
-          <i id="ImageIcon" className="fa-regular fa-image"></i>
+          <FontAwesomeIcon id="ImageIcon" icon={faImage} />
           <input
             type="file"
             name="image"
             id="select_image"
             onChange={(e) => handleImageUploadChange(e)}
           />
+          <p className="visually-hidden">emoji</p>
         </label>
 
         <button
@@ -233,11 +240,11 @@ export default function MessageForm(props: propsType) {
           id="Emojis"
           onClick={(e) => handleEmojiBtn(e)}
         >
-          <i className="fa-regular fa-face-grin"></i>
+          <FontAwesomeIcon icon={faFaceGrin} />
         </button>
 
         <button type="submit" id="sendMessage_button" aria-label="send message">
-          <i className="fa-regular fa-paper-plane"></i>
+          <FontAwesomeIcon icon={faPaperPlane} />
         </button>
 
         {preview && (
@@ -258,7 +265,7 @@ export default function MessageForm(props: propsType) {
                   setFile(null);
                 }}
               >
-                <i className="fa-solid fa-x"></i>
+                <FontAwesomeIcon icon={faX} />
               </button>
             </div>
           </div>

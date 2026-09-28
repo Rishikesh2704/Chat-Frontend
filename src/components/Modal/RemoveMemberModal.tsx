@@ -1,33 +1,12 @@
-import { useEffect, useState } from "react";
-import axios from "../../lib/axios";
-import { useDebounce } from "../../hooks/useDebounce";
+import { useState } from "react";
 import { useAppSelector } from "../../redux/hooks";
+import axios from "../../lib/axios";
 import useGroupMembers from "../../hooks/useGroupMembers";
 
 export const RemoveMemberModal = () => {
   const { selectedUser } = useAppSelector((state) => state.chat);
   const groupMembers = useGroupMembers();
-
-  const [query, setQuery] = useState<string>();
-  const [searchResults, setSearchResults] = useState([]);
-
-  const searchQuery = useDebounce(query, 500);
   const [selected, setSelected] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (!searchQuery) return;
-    const fetch = async () => {
-      try {
-        const request = await axios.get(
-          `${import.meta.env.VITE_API}/search?u=${searchQuery}&page=1`,
-        );
-        setSearchResults(request.data.users);
-      } catch (error) {
-        console.log("Failed fetch user: ", error);
-      }
-    };
-    fetch();
-  }, [searchQuery]);
 
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,

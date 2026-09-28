@@ -1,36 +1,39 @@
 @font-face {
   font-family: Beverage;
-  src: url(./assets/LT\ Beverage.otf);
+  src: url(./assets/LT\ Beverage.otf) format("woff2");
+  font-display: swap;
 }
 
 @font-face {
   font-family: Inter;
-  src: url(./assets/Inter-Regular.otf);
+  src: url(./assets/Inter-Regular.otf) format("woff2");
+  font-display: swap;
 }
 
 @font-face {
   font-family: SF-Pro;
-  src: url(./assets/SF-Pro.OTF);
+  src: url(./assets/SF-Pro.OTF) format("woff2");
+  font-display: swap;
 }
 
 @font-face {
   font-family: SF-Bold;
-  src: url(../../assets/SFPRODISPLAYREGULAR.OTF);
+  src: url(../../assets/SFPRODISPLAYREGULAR.OTF) format("woff2");
+  /* font-display: swap; */
 }
-
 
 * {
   padding: 0;
   margin: 0;
   --primary-gradient: linear-gradient(to bottom right, #f79f58 0%, #ff6a0d 50%);
   --primary-color: #ff6a0d;
-  --primary-hover-color:#eb5d04;
+  --primary-hover-color: #eb5d04;
   --secondary-color: #f9faf9;
 }
 
 body {
   color: black;
-  font-family:SF-Pro;
+  font-family: SF-Pro;
   overflow: clip;
   background-color: #e6e4e4;
 }
@@ -39,11 +42,11 @@ main {
   height: 100vh;
   width: 100vw;
   display: flex;
-  flex-direction:column;
+  flex-direction: column;
   align-items: center;
-  padding:0.2rem 0rem;
-  padding:0rem ;
-  gap:0.5rem;
+  padding: 0.2rem 0rem;
+  padding: 0rem;
+  gap: 0.5rem;
 }
 
 .AppName {
@@ -51,21 +54,36 @@ main {
   font-size: 2.4rem;
   letter-spacing: 0.2rem;
   background: var(--primary-gradient);
-  color:transparent;
+  color: transparent;
   background-clip: text;
+}
+
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 
 .loader {
   width: 50px;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: 
-    radial-gradient(farthest-side,#ffa516 94%,#0000) top/8px 8px no-repeat,
-    conic-gradient(#0000 30%,#ffa516);
-  mask: radial-gradient(farthest-side,#0000 calc(100% - 8px),#000 0);
+  background:
+    radial-gradient(farthest-side, #ffa516 94%, #0000) top/8px 8px no-repeat,
+    conic-gradient(#0000 30%, #ffa516);
+  mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
   animation: l13 1s infinite linear;
 }
 
-@keyframes l13{ 
-  100%{transform: rotate(1turn)}
+@keyframes l13 {
+  100% {
+    transform: rotate(1turn);
+  }
 }
