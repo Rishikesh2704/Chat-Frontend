@@ -51,7 +51,7 @@
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-  color: gainsboro;
+  color: rgb(196, 195, 195);
 }
 
 .NoChats > #NoChat_icon {
@@ -110,4 +110,40 @@
 .Account_Details {
   height: 100%;
   width: 20%;
+}
+
+@media only screen and (max-width:500px) {
+  .Home_Wrapper {
+    height: 90vh;
+    width: 99vw;
+    display: block;
+  }
+
+  .ContentSection {
+    height: 100%;
+    width: 100%;
+  }
+
+  .Chat_Space {
+    height: 100% !important;
+    width: 100% !important;
+    position: absolute;
+    top: 0;
+    display: none !important;
+  }
+
+  .mobileChat {
+    display: flex !important;
+  }
+
+  .Header{
+    justify-content: start;
+  }
+
+  .Heading {
+    right: 0%;
+    left:5%;
+    font-size:0.9em
+  }
+  
 }

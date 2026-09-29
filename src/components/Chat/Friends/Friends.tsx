@@ -32,6 +32,7 @@ export default function Friends() {
     user: User,
   ) => {
     const allElements = document.querySelectorAll(".User_Wrapper");
+    const mobileChatSpace = document.querySelector(".Chat_Space")
     if (allElements.length > 0) {
       allElements.forEach((element) => {
         if (
@@ -42,11 +43,11 @@ export default function Friends() {
       });
     }
     e.currentTarget.classList.add("selectedUser");
-
+    mobileChatSpace?.classList.add('mobileChat')
     dispatch(setSelectedUser(user));
     dispatch(setAllMessages([]));
   };
-  console.log("Friends: ", users);
+  
   return (
     <div className="Chat_Friends">
       {isFriendsOrSearch().map((user: any) => {

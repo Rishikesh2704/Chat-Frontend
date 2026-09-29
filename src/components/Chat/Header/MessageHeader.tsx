@@ -2,12 +2,15 @@ import "./MessageHeader.css";
 import profile from "../../../assets/profile.jpg";
 
 import { useRef, useState } from "react";
-import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { setModalType, setViewModal } from "../../../redux/Slicers/ModalSlice";
-import { setShowDetails } from "../../../redux/Slicers/ChatSlice";
+import {
+  setSelectedUser,
+  setShowDetails,
+} from "../../../redux/Slicers/ChatSlice";
 import { useOutsideElement } from "../../../hooks/useOutsideElement";
 import { isGroup } from "../../../utils/IsGroup";
 
@@ -47,11 +50,25 @@ export default function MessageHeader() {
     optionsRef.current = e.target;
     setShowOptions((prev) => !prev);
   };
+  const handleMobileBackBtn = () => {
+    const chatSpace = document.querySelector(".Chat_Space");
+    chatSpace?.classList.remove("mobileChat");
+    dispatch(setSelectedUser(null));
+    console.log("Clicked Back Button");
+  };
 
   return (
     <div className="Chat_header">
       <div className="profile">
-        <img height={30} width={30} src={selectedUser.profile || profile} alt=""/>
+      <button className="Mobile_Back" onClick={() => handleMobileBackBtn()}>
+        <FontAwesomeIcon icon={faArrowLeft} />
+      </button>
+        <img
+          height={30}
+          width={30}
+          src={selectedUser.profile || profile}
+          alt=""
+        />
         <h1>
           {isGroup(selectedUser)
             ? selectedUser.groupName

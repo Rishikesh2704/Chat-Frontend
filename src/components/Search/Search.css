@@ -1,4 +1,3 @@
-
 .Search_Users {
   width: 100%;
   height: 2rem;
@@ -17,4 +16,10 @@
   overflow: clip;
   /* border: 1px solid black; */
   background-color: rgba(234, 234, 234, 0.723);
+}
+
+@media only screen and (max-width: 500px) {
+  .Search_Users {
+    height: 2.5rem;
+  }
 }

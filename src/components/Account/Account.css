@@ -1,47 +1,47 @@
 .Account {
   height: 100%;
-  width:100%;
+  width: 100%;
   border-radius: 0.5rem;
   display: flex;
   position: relative;
   flex-direction: column;
-  background:var(--secondary-color);
-  transition:0.1s ease-in;
-  gap:1rem;
+  background: var(--secondary-color);
+  transition: 0.1s ease-in;
+  gap: 1rem;
 }
 
 #Heading {
-  font-size:0.9rem;
+  font-size: 0.9rem;
   width: 97%;
   height: fit-content;
   top: 0.5rem;
-  position:relative;
+  position: relative;
 }
 
-.Close_Details{
+.Close_Details {
   position: absolute;
-  top:0.5rem;
-  right:1rem;
-  cursor:pointer;
+  top: 0.5rem;
+  right: 1rem;
+  cursor: pointer;
   z-index: 5;
 }
 
-.Account_Profile{
+.Account_Profile {
   width: 100%;
-  height:25%;
-  border-radius:0.5rem;
+  height: 25%;
+  border-radius: 0.5rem;
   display: flex;
-  justify-content:center;
+  justify-content: center;
   align-items: center;
-  position:relative;
+  position: relative;
 }
 
-.Account_Image{
-  display:flex;
-  flex-direction:column;
+.Account_Image {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content:start;
-  gap:0.6rem;
+  justify-content: start;
+  gap: 0.6rem;
 }
 
 .Profile_Wrapper {
@@ -61,11 +61,11 @@
   width: 100%;
   border-radius: 50%;
   border: 2px solid rgb(30, 30, 30);
-  position:relative;
+  position: relative;
 }
 
-#Profile_Username{
-  font-size:1vmax;
+#Profile_Username {
+  font-size: 1vmax;
 }
 
 .Upload_Button {
@@ -94,46 +94,78 @@
   display: flex;
   flex-direction: column;
   justify-content: start;
-  align-items:start;
-  border-radius:0.5rem;
+  align-items: start;
+  border-radius: 0.5rem;
   gap: 2rem;
 }
 
-.rows{
+.rows {
   width: 100%;
-  font-size:0.9rem;
-  display:flex;
+  font-size: 0.9rem;
+  display: flex;
   justify-content: space-between;
 }
 .rows > h2 {
-  color:rgb(88, 87, 87);
-  font-size:0.85rem;
-} 
-.rows > h2 > span{
-  color:black;
+  color: rgb(88, 87, 87);
+  font-size: 0.85rem;
+}
+.rows > h2 > span {
+  color: black;
 }
 
-#UpdateProfile_Btn{
-  position:absolute;
-  right:1rem;
-  bottom:1rem;
-  border:none;
-  background-color:var(--primary-color);
-  padding:0.7rem 0.5rem;
-  border-radius:0.5rem;
-  font-size:0.9rem;
+#UpdateProfile_Btn {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  border: none;
+  background-color: var(--primary-color);
+  padding: 0.7rem 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
   font-weight: 500;
-  cursor:pointer;
-
+  cursor: pointer;
 }
 
-.GroupMembers_Info > h1{
-  margin-bottom:1rem;
+.GroupMembers_Info > h1 {
+  margin-bottom: 1rem;
 }
 
-.GroupMembers_Info{
-  width:95%;
-  display:flex;
-  flex-direction:column;
-  
+.GroupMembers_Info {
+  width: 95%;
+  display: flex;
+  flex-direction: column;
+}
+
+@media only screen and (max-width: 500px) {
+  .Account_Details {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+  }
+
+  .Close_Icon {
+    font-size: 1.7em;
+  }
+
+  .Profile_Wrapper {
+    height: 7rem;
+    width: 7rem;
+  }
+
+  #Profile_Username {
+    font-size: 2.2vmax;
+  }
+
+  #Heading {
+    font-size: 1.1rem;
+  }
+
+  .rows {
+    font-size: 1.2rem;
+  }
+
+  .rows > h2 {
+    font-size: 1.1rem;
+  }
 }

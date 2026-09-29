@@ -56,7 +56,7 @@ export default function Home() {
 
       {viewModal && <Modal />}
 
-      <section className="Chat_Space">
+      <section className="Chat_Space ">
         {selectedUser ? (
           <MessageMain isTyping={isTyping} />
         ) : (

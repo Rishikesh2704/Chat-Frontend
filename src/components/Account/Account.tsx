@@ -73,7 +73,7 @@ export default function Account() {
         aria-label="close details"
         onClick={() => dispatch(setShowDetails({currentUser:true, state:false}))}
       >
-        <FontAwesomeIcon icon={faXmark} />
+        <FontAwesomeIcon icon={faXmark} className="Close_Icon" />
       </div>
       <div className="Account_Profile">
         <figure className="Account_Image">

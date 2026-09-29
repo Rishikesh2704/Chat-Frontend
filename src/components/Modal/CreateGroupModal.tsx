@@ -140,7 +140,7 @@ export const CreateGroupModal = () => {
                   return (
                     <div
                       key={user._id}
-                      className="User_Wrapper"
+                      className="Modal_User_Wrapper"
                       onClick={(e) => handleClick(e, user)}
                     >
                       <figure>

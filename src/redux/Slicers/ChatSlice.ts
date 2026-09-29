@@ -100,7 +100,7 @@ const chatSlicer = createSlice({
       };
     },
 
-    setSelectedUser: (state, action: PayloadAction<User>) => {
+    setSelectedUser: (state, action: PayloadAction<User | null>) => {
       return { ...state, selectedUser: action.payload };
     },
 

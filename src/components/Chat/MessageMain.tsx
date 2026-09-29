@@ -2,10 +2,6 @@ import { lazy, useLayoutEffect, useRef, useState } from "react";
 
 import "./MessageMain.css";
 
-// import MessageForm from "./MessageForm/MessageForm";
-// import MessageHeader from "./Header/MessageHeader";
-// import Messages from "./MessageSpace/Messages"; 
-
 import useGroupMembers from "../../hooks/useGroupMembers";
 import useChatMessages from "../../hooks/useChatMessages";
 import useMessagesSeen from "../../hooks/useMessagesSeen";
