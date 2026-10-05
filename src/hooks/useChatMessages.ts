@@ -78,8 +78,6 @@ export default function useChatMessages(
           skipMessages.current,
           currentUser,
         );
-        console.log("effect : ", allMessages);
-        console.log("recent : ", messages1);
         dispatch(prependMessages(messages1));
       } catch (error) {
         console.log(error);

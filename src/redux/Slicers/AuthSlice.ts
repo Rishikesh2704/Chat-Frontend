@@ -23,8 +23,11 @@ const authSlicer = createSlice({
   initialState,
   reducers: {
     setCurrentUser: (state, action: PayloadAction<User>) => {
-      state.currentUser = action.payload;
       localStorage.setItem("Current_User", JSON.stringify(action.payload));
+      return {
+        ...state,
+        currentUser: action.payload
+      }
     },
     removeCurrentUser:(state) => {
         state.currentUser = null,

@@ -26,11 +26,10 @@
 * {
   padding: 0;
   margin: 0;
-  --primary-gradient: linear-gradient(to bottom right, #f79f58 0%, #ff6a0d 50%);
+  --primary-gradient: linear-gradient(to top right, #fca258 0%, #ff690b 80%);
   --primary-color: #ff6a0d;
   --primary-hover-color: #eb5d04;
   --secondary-color: #f9faf9;
-  --mobile-media-breakpoint: max-width:500px;
 }
 
 body {

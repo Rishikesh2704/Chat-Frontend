@@ -11,12 +11,10 @@ import useChatSocket from "../../hooks/useChatSocket.js";
 
 import Friends from "../Chat/Friends/Friends.js";
 import MessageMain from "../Chat/MessageMain.js";
-// import { Modal } from "../Modal/Modal.js";
 import Account from "../Account/Account.js";
 import { Search } from "../Search/Search.js";
 
 const Modal = lazy(() => import("../Modal/Modal.js").then((m) => ({default:m.Modal})))
-// const MessageMain = lazy(() => import("../Chat/MessageMain.js"))
 
 export default function Home() {
   const dispatch = useAppDispatch();

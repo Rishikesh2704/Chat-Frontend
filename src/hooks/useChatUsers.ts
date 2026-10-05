@@ -24,7 +24,6 @@ export default function useChatUser() {
         let friendsConversations = c.map((convos: Conversation) => {
           if (!convos.isGroup){
             let participants = convos.participants.filter(parti => parti._id !== currentUser._id) 
-            console.log("Participants: ", participants)
             return {
               _id: participants[0]?._id,
               username:participants[0]?.username,

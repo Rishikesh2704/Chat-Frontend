@@ -108,6 +108,9 @@
   width: 100%;
   position: relative;
   border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  background: white;
 }
 
 #SignIn_Form input {
@@ -131,10 +134,16 @@
   font-weight: 600;
 }
 
+#showPassword_btn{
+  color:black;
+  transform:translateX(-1rem);
+  cursor:pointer;
+}
+
 #Submit_Button {
   height: 10%;
   width: 60%;
-  background-color: var(--primary-color);
+  background: var(--primary-gradient);
   border: none;
   font-weight: 700;
   border-radius: 0.4rem;
@@ -170,8 +179,7 @@
   color: var(--primary-color);
 }
 
-
-@media only screen and (max-width:500px){
+@media only screen and (max-width: 500px) {
   .Auth_Wrapper {
     height: 44%;
     width: 73%;
@@ -181,15 +189,14 @@
     border-radius: 0.7rem;
   }
 
-  #Logo{
-    position:absolute;
-    top:5%;
+  #Logo {
+    position: absolute;
+    top: 5%;
     left: 50%;
-    transform:translateX(-50%);
+    transform: translateX(-50%);
   }
 
-  #SignIn_Form{
-    height:75%
+  #SignIn_Form {
+    height: 75%;
   }
-
 }

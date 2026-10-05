@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import "./AuthStyle.css";
 import axios from "../../lib/axios.js";
 import { useAppDispatch } from "../../redux/hooks.js";
 import { setCurrentUser } from "../../redux/Slicers/AuthSlice.js";
-
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
 
 export default function Login() {
   const dispatch = useAppDispatch();
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const handleLogInSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -32,8 +33,8 @@ export default function Login() {
       dispatch(setCurrentUser(user));
       navigate("/");
     } catch (error: any) {
+      console.log(error.response);
       alert(error.response.data.message || error.response.data);
-      console.log(error.response.data);
     }
   };
 
@@ -62,11 +63,16 @@ export default function Login() {
           <div className="fields">
             <label>Password</label>
             <input
-              type="password"
+              type={showPassword?"text":"password"}
               placeholder="Rajesh1234..."
               onChange={(e) => setPassword(e.target.value)}
               value={password}
               required
+            />
+            <FontAwesomeIcon
+              id="showPassword_btn"
+              icon={showPassword?faEyeSlash:faEye}
+              onClick={() => setShowPassword((prev) => !prev)}
             />
           </div>
 

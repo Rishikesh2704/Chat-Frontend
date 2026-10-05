@@ -11,52 +11,65 @@ import { isGroup } from "../utils/IsGroup";
 
 export default function useChatSocket(setIsTyping: any) {
   const { currentUser } = useAppSelector((state) => state.auth);
-  const { users } = useAppSelector(state => state.chat)
+  const { users } = useAppSelector((state) => state.chat);
 
   const { socket } = useUser();
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (!socket || !currentUser?._id) return;
+    if (!socket || !currentUser) return;
+
+    socket.emit('connected')
 
     const handleIsTyping = (user: any) => {
       if (user.typerId === currentUser._id) return;
       setIsTyping({ id: user.typerId, isTyping: user.isTyping });
     };
 
-    const handleSeenMessage = (message: AllMessageType) => dispatch(updateSeenMessage(message));
+    const handleSeenMessage = (message: AllMessageType) =>
+      dispatch(updateSeenMessage(message));
 
-    const handleGroupSeenMessages = (message: AllMessageType) => dispatch(updateSeenMessage(message));
+    const handleGroupSeenMessages = (message: AllMessageType) =>
+      dispatch(updateSeenMessage(message));
 
-    const handleReaction = (message: AllMessageType) => dispatch(updateReaction(message));
+    const handleReaction = (message: AllMessageType) =>
+      dispatch(updateReaction(message));
 
-    const handleGroupMessageReaction = (message: AllMessageType) => dispatch(updateReaction(message));
+    const handleGroupMessageReaction = (message: AllMessageType) =>
+      dispatch(updateReaction(message));
 
-    const handleDeleteReaction = (message: any) =>  dispatch(updateReaction(message));
+    const handleDeleteReaction = (message: any) =>
+      dispatch(updateReaction(message));
 
-    const handleDeleteGroupReaction = (message: AllMessageType) => dispatch(updateReaction(message));
+    const handleDeleteGroupReaction = (message: AllMessageType) =>
+      dispatch(updateReaction(message));
 
     const groupMessageHandler = (message: AllMessageType, ack: any) => {
       ack(true);
-      console.log("Group Messages: ", message);
       if (message.senderId !== currentUser?._id) {
         dispatch(addNewMessage(message));
       }
     };
 
-    const onlineUsersHandler = (UsersList: any) => dispatch(setOnlineUsers(UsersList));
+    const onlineUsersHandler = (UsersList: any) => {
+      dispatch(setOnlineUsers(UsersList));
+    };
 
-    const privateMessageHandler = (message: {conversation:Conversation,savedMessage:AllMessageType}, ack: any) => {      
-      console.log("New Message: ", message)
+    const privateMessageHandler = (
+      message: { conversation: Conversation; savedMessage: AllMessageType },
+      ack: any,
+    ) => {
       dispatch(addNewMessage(message.savedMessage));
       ack(true);
     };
 
-    const afterDisconnectedUsers = (onlineUsers: any) => dispatch(setOnlineUsers(onlineUsers));
+    const afterDisconnectedUsers = (onlineUsers: any) => {
+      dispatch(setOnlineUsers(onlineUsers));
+    };
 
-    socket.on("groupMessage", groupMessageHandler);
     socket.on("Online_Users", onlineUsersHandler);
+    socket.on("groupMessage", groupMessageHandler);
     socket.on("privateMessage", privateMessageHandler);
     socket.on("AfterDisconnection_Online_Users", afterDisconnectedUsers);
 
@@ -85,12 +98,14 @@ export default function useChatSocket(setIsTyping: any) {
   }, [socket, currentUser?._id]);
 
   useEffect(() => {
-    if(!users) {
+    if (!users) {
       console.log("No Users Found: ");
       return;
     }
 
-    const groupRoomIds = users.filter( user => isGroup(user) ).map(group => group.roomId)
+    const groupRoomIds = users
+      .filter((user) => isGroup(user))
+      .map((group) => group.roomId);
     if (groupRoomIds.length > 0) {
       groupRoomIds.forEach((room) => {
         socket.emit("join_group", room);

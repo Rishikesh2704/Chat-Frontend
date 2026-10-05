@@ -108,7 +108,7 @@ nav {
 .Anchor:hover {
   transition: 0.1s ease-in;
   background-color: var(--primary-color);
-  color: black;
+  color: rgb(255, 255, 255);
 }
 
 .selectedPage {

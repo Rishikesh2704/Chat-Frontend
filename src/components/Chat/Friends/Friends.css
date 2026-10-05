@@ -28,7 +28,7 @@
   border-bottom: 1px solid rgb(230, 230, 230);
 
   &:hover {
-    background-color: var(--primary-color);
+    background: var(--primary-gradient);
     transition: 0.1s ease-out;
     color: white;
   }
@@ -48,7 +48,7 @@
   border-radius: 50%;
   overflow: hidden;
   object-fit: contain;
-  border: 2px solid rgb(45, 44, 44);
+  /* border: 2px solid rgb(45, 44, 44); */
 }
 
 .profile_picture > img {
@@ -59,13 +59,13 @@
 .online {
   height: 0.5rem;
   width: 0.5rem;
-  background-color: green;
+  background-color: rgb(2, 189, 2);
   position: absolute;
   bottom: 0;
   right: 0.3rem;
   z-index: 2;
   border-radius: 50%;
-  border: 1px solid black;
+  border: 1px solid rgb(240, 239, 239);
 }
 
 .User_Details {
@@ -83,8 +83,8 @@
 }
 
 .selectedUser {
-  background-color: var(--primary-color);
-  color: rgb(0, 0, 0);
+  background: var(--primary-gradient);
+  color: rgb(248, 248, 248);
 }
 
 #Last_message {
@@ -135,7 +135,7 @@
   #Last_message {
     font-size: 1rem;
   }
-  .selectedUser{
+  .selectedUser {
     background-color: transparent;
   }
 }

@@ -118,10 +118,10 @@
   right: 1rem;
   bottom: 1rem;
   border: none;
-  background-color: var(--primary-color);
-  padding: 0.7rem 0.5rem;
+  background: var(--primary-gradient);
+  padding: 0.5rem 0.6rem;
   border-radius: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   font-weight: 500;
   cursor: pointer;
 }

@@ -15,9 +15,8 @@
   bottom: 0rem;
 }
 
-
 .Mobile_Back {
- display: none;
+  display: none;
 }
 
 .profile {
@@ -96,7 +95,7 @@
   padding: 0.3rem 0.4rem;
   transition: 0.1s ease-out;
   cursor: pointer;
-  font-family: SF-Bold;
+  font-family: SF-Pro;
   &:hover {
     background-color: rgb(26, 25, 25);
     color: white;
@@ -128,12 +127,15 @@
     font-size: 1.7rem;
   }
 
-  
-.Mobile_Back {
-  display: block;
-  background: none;
-  border: none;
-  padding: 0.3rem 0.5rem;
-  font-size: 1.4em;
-}
+  .Mobile_Back {
+    display: block;
+    background: none;
+    border: none;
+    padding: 0.3rem 0.5rem;
+    font-size: 1.4em;
+  }
+  .options {
+    width: 23%;
+    bottom: 5%;
+  }
 }

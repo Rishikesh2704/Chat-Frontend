@@ -8,6 +8,7 @@ import useGroupMembers from "../../hooks/useGroupMembers";
 import { setShowDetails } from "../../redux/Slicers/ChatSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { setCurrentUser } from "../../redux/Slicers/AuthSlice";
 
 function toLocaleTime(time: string) {
   const date = new Date(time);
@@ -21,7 +22,7 @@ export default function Account() {
   const [file, setFile] = useState<File>();
   const { currentUser } = useAppSelector((state) => state.auth);
   const { selectedUser, showDetails } = useAppSelector((state) => state.chat);
-  const current_user = showDetails.currentUser ? currentUser : selectedUser ;
+  const current_user = showDetails.currentUser ? currentUser : selectedUser;
   const groupMembers = useGroupMembers();
 
   const dispatch = useAppDispatch();
@@ -36,19 +37,15 @@ export default function Account() {
 
         if (file) form.append("profile", file);
         form.append("oldProfile", current_user.profile);
-        const response = await axiosInstance.post(
-          `${import.meta.env.VITE_API}/auth/uploadProfile`,
-          form,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
+        const response = await axiosInstance.post(`/auth/uploadProfile`, form, {
+          headers: {
+            "Content-Type": "multipart/form-data",
           },
-        );
-        setUser(response.data.user);
+        });
+        console.log("Response: ", response)
+        dispatch(setCurrentUser(response.data.user))
         const stringUser = JSON.stringify(response.data.user);
         localStorage.setItem("Current_User", stringUser);
-       
       };
       uploadProfile();
     } catch (error) {
@@ -71,7 +68,9 @@ export default function Account() {
       <div
         className="Close_Details"
         aria-label="close details"
-        onClick={() => dispatch(setShowDetails({currentUser:true, state:false}))}
+        onClick={() =>
+          dispatch(setShowDetails({ currentUser: true, state: false }))
+        }
       >
         <FontAwesomeIcon icon={faXmark} className="Close_Icon" />
       </div>
@@ -106,7 +105,7 @@ export default function Account() {
             onClick={(e) => handleUpdateProfile(e)}
             id="UpdateProfile_Btn"
           >
-            {/* {loading ? <div className="loader"></div> : <p>Update Profile</p>} */}
+            <p>Update Profile</p>
           </button>
         )}
       </div>
@@ -136,9 +135,10 @@ export default function Account() {
           </span>
         </div>
       </div>
-      {groupMembers &&<div className="GroupMembers_Info">
-        <h1 id="Heading">Members</h1>
-        
+      {groupMembers && (
+        <div className="GroupMembers_Info">
+          <h1 id="Heading">Members</h1>
+
           {Array.from(groupMembers.entries()).map(
             ([id, user]: [id: any, user: any]) => {
               if (Object.hasOwn(user, "roomId")) return;
@@ -159,7 +159,8 @@ export default function Account() {
               );
             },
           )}
-      </div>}
+        </div>
+      )}
     </main>
   );
 }

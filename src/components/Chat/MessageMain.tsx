@@ -6,9 +6,10 @@ import useGroupMembers from "../../hooks/useGroupMembers";
 import useChatMessages from "../../hooks/useChatMessages";
 import useMessagesSeen from "../../hooks/useMessagesSeen";
 import { useAppSelector } from "../../redux/hooks";
+import MessageHeader from "./Header/MessageHeader";
+import MessageForm from "./MessageForm/MessageForm";
 
-const MessageForm = lazy(() => import("./MessageForm/MessageForm"))
-const MessageHeader = lazy(() => import("./Header/MessageHeader"))
+
 const Messages = lazy(() => import("./MessageSpace/Messages"))
 
 type MessageSpaceProps = {

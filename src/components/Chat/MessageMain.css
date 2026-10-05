@@ -2,6 +2,7 @@
   flex-shrink: 2;
   height: inherit;
   width: 81.2%;
+  min-width: 60.2%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -147,7 +148,7 @@
 
 .messageStyle {
   width: fit-content;
-  background-color: var(--primary-color);
+  background: var(--primary-gradient);
   word-wrap: break-word;
   border-radius: 0.4rem;
   line-height: 2.2rem;
@@ -200,11 +201,11 @@
 }
 
 .received {
-  background-color: #e1e0e0;
+  background: #e1e0e0;
 }
 
 .Messages_Day {
-  font-size:0.7rem;
+  font-size: 0.7rem;
   text-align: center;
   color: #424141;
 }
@@ -277,7 +278,7 @@
   padding: 0.5rem 0.8rem;
   border: none;
   background: transparent;
-  font-family: SF-Bold;
+  font-family: SF-Pro;
   font-size: 0.8rem;
   display: flex;
   gap: 0.5rem;
@@ -313,7 +314,5 @@
   bottom: -50%;
 }
 
-
-@media only screen and (max-width:500px){
- 
+@media only screen and (max-width: 500px) {
 }
