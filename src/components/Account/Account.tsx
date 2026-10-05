@@ -17,7 +17,6 @@ function toLocaleTime(time: string) {
 }
 
 export default function Account() {
-  const [user, setUser] = useState<User | null>(null);
   const [preview, setPreview] = useState<string>("");
   const [file, setFile] = useState<File>();
   const { currentUser } = useAppSelector((state) => state.auth);
@@ -42,8 +41,8 @@ export default function Account() {
             "Content-Type": "multipart/form-data",
           },
         });
-        console.log("Response: ", response)
-        dispatch(setCurrentUser(response.data.user))
+        console.log("Response: ", response);
+        dispatch(setCurrentUser(response.data.user));
         const stringUser = JSON.stringify(response.data.user);
         localStorage.setItem("Current_User", stringUser);
       };
@@ -97,7 +96,7 @@ export default function Account() {
             </label>
           </div>
           <figcaption id="Profile_Username">
-            {user?.username || current_user.username || current_user?.groupName}
+            {current_user.username || current_user?.groupName}
           </figcaption>
         </figure>
         {preview && (
@@ -121,18 +120,11 @@ export default function Account() {
         )}
         <div className="rows">
           <h2>Created At</h2>
-          <span>
-            {" "}
-            {(user && toLocaleTime(user.createdAt)) ||
-              toLocaleTime(current_user.createdAt)}
-          </span>
+          <span> {toLocaleTime(current_user.createdAt)}</span>
         </div>
         <div className="rows">
           <h2>Updated At</h2>
-          <span>
-            {(user && toLocaleTime(user.updatedAt)) ||
-              toLocaleTime(current_user.updatedAt)}
-          </span>
+          <span>{toLocaleTime(current_user.updatedAt)}</span>
         </div>
       </div>
       {groupMembers && (

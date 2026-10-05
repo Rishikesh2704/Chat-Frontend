@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import "./AuthStyle.css";
 import axios from "../../lib/axios.js";
