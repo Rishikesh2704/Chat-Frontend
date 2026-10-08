@@ -104,7 +104,7 @@
 }
 
 #SignIn_Form .fields {
-  height: calc(30% / 3);
+  height: calc(30% / 4);
   width: 100%;
   position: relative;
   border-radius: 0.5rem;
@@ -134,10 +134,10 @@
   font-weight: 600;
 }
 
-#showPassword_btn{
-  color:black;
-  transform:translateX(-1rem);
-  cursor:pointer;
+#showPassword_btn {
+  color: black;
+  transform: translateX(-1rem);
+  cursor: pointer;
 }
 
 #Submit_Button {
@@ -149,6 +149,7 @@
   border-radius: 0.4rem;
   cursor: pointer;
   transition: 0.1s ease-out;
+  font-family: SF-Pro;
 }
 
 #Submit_Button:hover {
@@ -181,12 +182,21 @@
 
 @media only screen and (max-width: 500px) {
   .Auth_Wrapper {
-    height: 44%;
-    width: 73%;
+    height: 80%;
+    width: 100%;
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
     border-radius: 0.7rem;
+    left: 0;
+    bottom: 0;
+  }
+
+  .Auth {
+    font-family: Beverage;
+    font-size: 4vmax;
+    letter-spacing: 0.2rem;
+    color: black !important;
+    position: relative;
+    bottom: 1rem;
   }
 
   #Logo {
@@ -198,10 +208,14 @@
 
   #SignIn_Form {
     height: 75%;
-    gap:0rem;
+    gap: 0rem;
   }
 
   .fields label {
     font-size: 0.7rem;
+  }
+
+  #CreateAccount {
+    font-size: 3.8vmin;
   }
 }

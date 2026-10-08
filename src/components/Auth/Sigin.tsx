@@ -91,7 +91,7 @@ export default function SignIn() {
             </a>
           </p>
           <button id="Submit_Button" type="submit">
-            SignIn
+            Sign In
           </button>
         </form>
       </div>
