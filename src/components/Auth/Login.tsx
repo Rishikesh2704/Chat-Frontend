@@ -63,7 +63,7 @@ export default function Login() {
           <div className="fields">
             <label>Password</label>
             <input
-              type={showPassword?"text":"password"}
+              type={showPassword ? "text" : "password"}
               placeholder="Rajesh1234..."
               onChange={(e) => setPassword(e.target.value)}
               value={password}
@@ -71,7 +71,7 @@ export default function Login() {
             />
             <FontAwesomeIcon
               id="showPassword_btn"
-              icon={showPassword?faEyeSlash:faEye}
+              icon={showPassword ? faEyeSlash : faEye}
               onClick={() => setShowPassword((prev) => !prev)}
             />
           </div>
@@ -82,6 +82,7 @@ export default function Login() {
               Sign In{" "}
             </a>
           </p>
+
           <button id="Submit_Button" type="submit">
             Login
           </button>
