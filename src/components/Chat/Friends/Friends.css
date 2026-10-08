@@ -118,22 +118,22 @@
 
 @media only screen and (max-width: 500px) {
   .User_Wrapper {
-    height: 19vmin;
+    height: 7vmax;
     width: 96%;
     padding-bottom: 0;
   }
 
   .profile_picture {
-    height: 3.5rem;
-    width: 3.5rem;
+    height: 2.5rem;
+    width: 2.5rem;
   }
 
   .User_Details > h2 {
-    font-size: 1rem;
+    font-size: 0.8rem;
   }
 
   #Last_message {
-    font-size: 1rem;
+    font-size: 0.65rem;
   }
   .selectedUser {
     background-color: transparent;

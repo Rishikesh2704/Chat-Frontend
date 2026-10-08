@@ -10,6 +10,7 @@
   z-index: 1;
   gap: 0.2rem;
   background-color: var(--secondary-color);
+  overflow:hidden;
 }
 
 /* Message Style */
@@ -312,7 +313,4 @@
   position: absolute;
   right: 0;
   bottom: -50%;
-}
-
-@media only screen and (max-width: 500px) {
 }

@@ -63,7 +63,7 @@
   transition: 0.1s ease-out;
   background-color: transparent;
   border: none;
-  color:rgb(44, 44, 44)
+  color: rgb(44, 44, 44);
 }
 #ImageIcon:hover {
   color: var(--primary-color);
@@ -74,7 +74,7 @@
 #sendMessage_button {
   height: 70%;
   width: 5%;
-  color:white;
+  color: white;
   transform: scale(1.1);
   position: relative;
   right: 0.1rem;
@@ -164,7 +164,7 @@
   border: none;
   font-size: 1.3vmax;
   cursor: pointer;
-  color:rgb(44, 44, 44);
+  color: rgb(44, 44, 44);
 
   &:hover {
     color: var(--primary-hover-color);
@@ -216,26 +216,20 @@
   }
 }
 
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 1200px) {
   .message_form {
-    width: 100%;
+    width: 75%;
+    height: 85%;
+  }
+
+  #sendMessage_button {
+    height: 75%;
+    width: 15%;
+    font-size: 1.2vmax;
   }
 
   #message_input {
-    width: 50%;
-  }
-  #sendMessage_button {
-    width: 13%;
-    font-size: 2.1vmax;
-  }
-  #ImageInputFor {
-    width: 7%;
-  }
-  #ImageIcon {
-    font-size: 1.5rem;
-  }
-  #Emojis {
-    font-size: 2.3vmax;
+    height: 70%;
   }
 }
 
@@ -255,19 +249,37 @@
     height: 70%;
   }
 }
-@media only screen and (max-width: 1200px) {
-  .message_form {
-    width: 75%;
-    height: 85%;
-  }
 
-  #sendMessage_button {
-    height: 75%;
-    width: 15%;
-    font-size: 1.2vmax;
+@media only screen and (max-width: 500px) {
+  .message_form {
+    width: 95%;
   }
 
   #message_input {
-    height: 70%;
+    width: 100%;
+  }
+
+  #sendMessage_button {
+    width: 16%;
+    font-size: 1.5vmax;
+  }
+
+  #ImageInputFor {
+    width: 5%;
+  }
+
+  #ImageIcon {
+    font-size: 1rem;
+  }
+
+  #Emojis {
+    font-size: 2.3vmax;
+  }
+
+  #Seen_Message {
+    font-size: 1.5vmax;
+    position: absolute;
+    bottom: -0.5rem;
+    right: -100%;
   }
 }
