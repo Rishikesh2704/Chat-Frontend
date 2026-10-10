@@ -2,7 +2,6 @@ import "./AuthStyle.css";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-import axios from "../../lib/axios.js";
 import { setCurrentUser } from "../../redux/Auth/AuthSlice.js";
 import { useAppDispatch } from "../../redux/hooks.js";
 import { useSignUpQuery } from "../../redux/AuthQuery/authQuerySlice.js";
