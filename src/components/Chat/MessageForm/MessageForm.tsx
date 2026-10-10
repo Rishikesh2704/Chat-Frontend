@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import {
   addNewMessage,
   updateUserConversation,
-} from "../../../redux/Slicers/ChatSlice";
+} from "../../../redux/Chat/ChatSlice";
 import { isGroup } from "../../../utils/IsGroup";
 import { useOutsideElement } from "../../../hooks/useOutsideElement";
 

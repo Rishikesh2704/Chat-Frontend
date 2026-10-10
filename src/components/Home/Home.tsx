@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMessage } from '@fortawesome/free-solid-svg-icons'
 
 import { useAppDispatch, useAppSelector } from "../../redux/hooks.js";
-import { setModalType, setViewModal } from "../../redux/Slicers/ModalSlice.js";
+import { setModalType, setViewModal } from "../../redux/Modal/ModalSlice.js";
 import useChatUsers from "../../hooks/useChatUsers.js";
 import useChatSocket from "../../hooks/useChatSocket.js";
 

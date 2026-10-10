@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import "./AuthStyle.css";
-import axios from "../../lib/axios.js";
 import { useAppDispatch } from "../../redux/hooks.js";
-import { setCurrentUser } from "../../redux/Slicers/AuthSlice.js";
+import { setCurrentUser } from "../../redux/Auth/AuthSlice.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
+import { useLoginQuery } from "../../redux/AuthQuery/authQuerySlice.js";
 
 export default function Login() {
   const dispatch = useAppDispatch();
@@ -13,29 +13,27 @@ export default function Login() {
   const [password, setPassword] = useState<string>();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const navigate = useNavigate();
+  const [user, setUser] = useState<{
+    email: string | null;
+    password: string | null;
+  }>({ email: null, password: null });
+
+  const { data, isLoading, isSuccess } = useLoginQuery(user, {
+    skip: !user.email,
+  });
+
+  if (isSuccess) {
+    const user = data.user;
+    dispatch(setCurrentUser(user));
+    navigate("/");
+  }
 
   const handleLogInSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const User = {
-      email,
-      password,
-    };
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API}/auth/login`,
-        User,
-        {
-          withCredentials: true,
-        },
-      );
-      console.log(res.data);
-      const user = res.data.user;
-      dispatch(setCurrentUser(user));
-      navigate("/");
-    } catch (error: any) {
-      console.log(error.response);
-      alert(error.response.data.message || error.response.data);
-    }
+    setUser({
+      email: email || null,
+      password: password || null,
+    });
   };
 
   return (
@@ -78,13 +76,13 @@ export default function Login() {
 
           <p id="CreateAccount">
             Create an Account.{" "}
-            <a id="CreateAccount_Link" href="/Authentication/signin">
-              Sign In{" "}
+            <a id="CreateAccount_Link" href="/Authentication/signUp">
+              Sign Up{" "}
             </a>
           </p>
 
           <button id="Submit_Button" type="submit">
-            Login
+            {isLoading ? <div className="loader"></div> : <p>Login</p>}
           </button>
         </form>
       </div>

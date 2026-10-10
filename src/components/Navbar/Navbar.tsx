@@ -5,9 +5,9 @@ import { faCircleUser, faArrowRightFromBracket } from "@fortawesome/free-solid-s
 
 import axios from "../../lib/axios";
 import { useUser } from "../../lib/context";
-import { removeCurrentUser } from "../../redux/Slicers/AuthSlice";
+import { removeCurrentUser } from "../../redux/Auth/AuthSlice";
 import { useAppDispatch } from "../../redux/hooks";
-import { setShowDetails } from "../../redux/Slicers/ChatSlice";
+import { setShowDetails } from "../../redux/Chat/ChatSlice";
 
 export default function Navbar() {
   const {  socket } = useUser();

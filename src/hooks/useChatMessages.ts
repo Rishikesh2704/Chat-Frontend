@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import axios from "../lib/axios";
-import { prependMessages, setAllMessages } from "../redux/Slicers/ChatSlice";
+import { prependMessages, setAllMessages } from "../redux/Chat/ChatSlice";
 
 export default function useChatMessages(
   MessageSpaceRef: React.RefObject<HTMLDivElement | null>,

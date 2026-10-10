@@ -1,7 +1,7 @@
 import "./Modal.css";
 
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { setViewModal } from "../../redux/Slicers/ModalSlice";
+import { setViewModal } from "../../redux/Modal/ModalSlice";
 
 import { AddMembersModal } from "./AddMembersModal";
 import { RemoveMemberModal } from "./RemoveMemberModal";

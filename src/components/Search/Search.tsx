@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "../../lib/axios";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useAppDispatch } from "../../redux/hooks";
-import { setSearchResults } from "../../redux/Slicers/ModalSlice";
+import { setSearchResults } from "../../redux/Modal/ModalSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 

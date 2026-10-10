@@ -6,11 +6,11 @@ import { faArrowLeft, faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { setModalType, setViewModal } from "../../../redux/Slicers/ModalSlice";
+import { setModalType, setViewModal } from "../../../redux/Modal/ModalSlice";
 import {
   setSelectedUser,
   setShowDetails,
-} from "../../../redux/Slicers/ChatSlice";
+} from "../../../redux/Chat/ChatSlice";
 import { useOutsideElement } from "../../../hooks/useOutsideElement";
 import { isGroup } from "../../../utils/IsGroup";
 

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import axios from "../lib/axios";
-import { setUsers } from "../redux/Slicers/ChatSlice";
+import { setUsers } from "../redux/Chat/ChatSlice";
 
 export default function useChatUser() {
   const dispatch = useAppDispatch();

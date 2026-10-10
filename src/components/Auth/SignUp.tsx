@@ -3,42 +3,45 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 
 import axios from "../../lib/axios.js";
-import { setCurrentUser } from "../../redux/Slicers/AuthSlice.js";
+import { setCurrentUser } from "../../redux/Auth/AuthSlice.js";
 import { useAppDispatch } from "../../redux/hooks.js";
+import { useSignUpQuery } from "../../redux/AuthQuery/authQuerySlice.js";
 
-
-export default function SignIn() {
+export default function SignUp() {
   const dispatch = useAppDispatch();
   const [email, setEmail] = useState<string>();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
+
+  const [user, setUser] = useState<{
+    email: string | null;
+    username: string | null;
+    password: string | null;
+  }>({ email: null, username: null, password: null });
+
   const navigate = useNavigate();
 
-  const handleSignInSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const User = {
-      email: email,
-      username: username,
-      password: password,
-    };
+  const { data, isLoading, isSuccess, error } = useSignUpQuery(user, {
+    skip: !user.email,
+  });
 
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API}/auth/signup`,
-        User,
-        {
-          withCredentials: true,
-        },
-      );
-      const user = res.data.User;
-      dispatch(setCurrentUser(user));
-      navigate("/");
-    } catch (error: any) {
-      setEmail("");
-      setPassword("");
-      alert(error.response.data[0].msg);
-      console.log(error);
-    }
+  if (isSuccess) {
+    const user = data.user;
+    dispatch(setCurrentUser(user));
+    navigate("/");
+  }
+
+  if(error){
+    console.log('Failed to SignUp: ', error);
+  }
+
+  const handleSignUpSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setUser({
+      email: email || null,
+      username: username || null,
+      password: password || null,
+    });
   };
 
   return (
@@ -48,7 +51,7 @@ export default function SignIn() {
         <form
           id="SignIn_Form"
           onSubmit={(e) => {
-            handleSignInSubmit(e);
+            handleSignUpSubmit(e);
           }}
         >
           <div className="fields">
@@ -91,7 +94,7 @@ export default function SignIn() {
             </a>
           </p>
           <button id="Submit_Button" type="submit">
-            Sign In
+            {isLoading ? <div className="loader"></div> : <p>Sign Up</p>}
           </button>
         </form>
       </div>

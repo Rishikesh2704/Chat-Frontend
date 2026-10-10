@@ -5,10 +5,10 @@ import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { isGroup } from "../../utils/IsGroup";
 import useGroupMembers from "../../hooks/useGroupMembers";
-import { setShowDetails } from "../../redux/Slicers/ChatSlice";
+import { setShowDetails } from "../../redux/Chat/ChatSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { setCurrentUser } from "../../redux/Slicers/AuthSlice";
+import { setCurrentUser } from "../../redux/Auth/AuthSlice";
 
 function toLocaleTime(time: string) {
   const date = new Date(time);

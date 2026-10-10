@@ -5,7 +5,7 @@ import { lazy } from "react";
 
 const Home = lazy(() => import("./components/Home/Home.tsx"));
 const Login = lazy(() => import("./components/Auth/Login.tsx"));
-const SignIn = lazy(() => import("./components/Auth/Sigin.tsx"));
+const SignUp = lazy(() => import("./components/Auth/SignUp.tsx"));
 const Account = lazy(() => import("./components/Account/Account.tsx"));
 
 function App() {
@@ -25,8 +25,8 @@ function App() {
       ],
     },
     {
-      path: "/authentication/signin",
-      element: <SignIn />,
+      path: "/authentication/signUp",
+      element: <SignUp />,
     },
     {
       path: "/authentication/login",

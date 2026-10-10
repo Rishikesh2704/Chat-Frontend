@@ -157,6 +157,9 @@
   cursor: pointer;
   transition: 0.1s ease-out;
   font-family: SF-Pro;
+  display:flex;
+  justify-content: center;
+  align-items:center;
 }
 
 #Submit_Button:hover {
@@ -186,6 +189,7 @@
   margin: 0;
   color: var(--primary-color);
 }
+
 
 @media only screen and (max-width: 500px) {
   .Auth_Wrapper {
@@ -245,3 +249,4 @@
     width: 90%;
   }
 }
+
