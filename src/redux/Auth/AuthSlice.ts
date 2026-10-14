@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 type initialStateType = {
-  currentUser: any;
+  currentUser: User | null;
 };
 
 const getStoredUser = () => {

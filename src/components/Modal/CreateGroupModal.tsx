@@ -1,9 +1,10 @@
 import "./Modal.css";
 import { useEffect, useState } from "react";
 
-import axios from "../../lib/axios";
 
 import { useDebounce } from "../../hooks/useDebounce";
+import { useSearchMutation } from "../../redux/Modal/modalQuerySlice";
+import { useCreateGroupMutation } from "../../redux/Group/groupQuerySlice";
 
 export const CreateGroupModal = () => {
   const [groupName, setGroupName] = useState<string>("");
@@ -15,14 +16,15 @@ export const CreateGroupModal = () => {
   // );
   const searchQuery = useDebounce(query, 500);
 
+  const [ createGroup ] = useCreateGroupMutation();
+  const [ search ] = useSearchMutation();
+
   useEffect(() => {
     if (!searchQuery) return;
     const fetch = async () => {
       try {
-        const request = await axios.get(
-          `${import.meta.env.VITE_API}/search?u=${searchQuery}&page=1`,
-        );
-        setSearchResults(request.data.users);
+        const request = await search(searchQuery).unwrap();
+        setSearchResults(request.users);
       } catch (error) {
         console.log("Failed fetch user: ", error);
       }
@@ -47,10 +49,10 @@ export const CreateGroupModal = () => {
         setSelected(afterRemovingGroupMember);
       }
     } else {
+      console.log("Selected: ", user)
       selectedMember.style.backgroundColor = "#ff6a0d";
       setSelected((prev: any) => [...prev, user]);
     }
-    console.log();
   };
 
   const handleCreateGroup = async () => {
@@ -60,13 +62,14 @@ export const CreateGroupModal = () => {
       )._id;
       const group = {
         groupName: groupName,
-        selected,
+        members:selected,
         admin: userId,
       };
-      const request = await axios.post(
-        `${import.meta.env.VITE_API}/group/createGroup`,
-        group,
-      );
+      // const request = await axios.post(
+      //   `${import.meta.env.VITE_API}/group/createGroup`,
+      //   group,
+      // );
+      const request = await createGroup(group).unwrap()
       console.log("Request", request);
     } catch (error) {
       console.log(error);

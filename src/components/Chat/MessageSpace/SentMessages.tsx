@@ -40,7 +40,6 @@ export default function SentMessages(props: propsType) {
   const handleOptions = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     setIsVisible(true);
     const options = e.currentTarget.nextElementSibling as HTMLDivElement;
-    console.log("Current Target", options);
     optionElementRef.current = e.target;
     options?.classList.add("DisplayOptions");
   };
@@ -102,6 +101,7 @@ export default function SentMessages(props: propsType) {
             {Array.isArray(messages.seen) && (
               <div className="Seen_GroupMembers">
                 {groupMembers &&
+                  currentUser &&
                   getGroupSeenMembers(
                     messages,
                     currentUser,

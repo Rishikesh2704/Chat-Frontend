@@ -156,10 +156,10 @@ export default function ReceivedMessages(props: propsType) {
         <div className="Message_details">
           {Array.isArray(messages.seen) && (
             <div className="Seen_GroupMembers">
-              {groupMembers &&
+              {groupMembers && currentUser&&
                 getGroupSeenMembers(
                   messages,
-                  currentUser,
+                  currentUser ,
                   allMessages,
                   groupMembers,
                 )?.map((id: any) => (

@@ -6,11 +6,8 @@ import { faArrowLeft, faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { setModalType, setViewModal } from "../../../redux/Modal/ModalSlice";
-import {
-  setSelectedUser,
-  setShowDetails,
-} from "../../../redux/Chat/ChatSlice";
+import { setModalType, setViewModal } from "../../../redux/Modal/modalSlice";
+import { setSelectedUser, setShowDetails } from "../../../redux/Chat/chatSlice";
 import { useOutsideElement } from "../../../hooks/useOutsideElement";
 import { isGroup } from "../../../utils/IsGroup";
 
@@ -60,9 +57,9 @@ export default function MessageHeader() {
   return (
     <div className="Chat_header">
       <div className="profile">
-      <button className="Mobile_Back" onClick={() => handleMobileBackBtn()}>
-        <FontAwesomeIcon icon={faArrowLeft} />
-      </button>
+        <button className="Mobile_Back" onClick={() => handleMobileBackBtn()}>
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </button>
         <img
           height={30}
           width={30}
@@ -94,6 +91,7 @@ export default function MessageHeader() {
               Details
             </button>
             {isGroup(selectedUser) &&
+              currentUser &&
               selectedUser.admins.includes(currentUser?._id) && (
                 <>
                   <button onClick={() => handleAddMember()}>Add Member</button>

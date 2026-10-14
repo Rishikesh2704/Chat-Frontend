@@ -8,21 +8,22 @@ import { faX } from "@fortawesome/free-solid-svg-icons";
 
 import "./MessageForm.css";
 
-import axios from "../../../lib/axios";
 import { useUser } from "../../../lib/context";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import {
   addNewMessage,
   updateUserConversation,
-} from "../../../redux/Chat/ChatSlice";
+} from "../../../redux/Chat/chatSlice";
 import { isGroup } from "../../../utils/IsGroup";
 import { useOutsideElement } from "../../../hooks/useOutsideElement";
+import {
+  useSendGroupMessageMutation,
+  useSendMessageMutation,
+} from "../../../redux/Chat/chatQuerySlice";
 
 type propsType = {
   message: string | undefined;
   setMessage: (message: any) => void;
-  // setAllMessages: React.Dispatch<React.SetStateAction<AllMessageType[]>>;
-  // selectedUser: User | Group;
 };
 
 function getSelectedUserSocketId(onlineUsers: any[] | null, selectedUser: any) {
@@ -35,56 +36,6 @@ function getSelectedUserSocketId(onlineUsers: any[] | null, selectedUser: any) {
   } else {
     return null;
   }
-}
-
-async function messageFriendRequest(
-  onlineUsers: any[] | null,
-  selectedUser: User,
-  file: File | null,
-  message: string | undefined,
-  conversationId: string | "",
-) {
-  if (!onlineUsers || !selectedUser) {
-    console.log("One of the args is missing");
-    return;
-  }
-  if (!file && !message) {
-    console.log("NO Message and File Provided");
-  }
-  const userSocketId = onlineUsers ? onlineUsers[selectedUser._id as any] : "";
-
-  const form = new FormData();
-  form.append("image", file || "");
-  form.append("message", message || "");
-  form.append("conversationId", conversationId);
-  form.append("receiverSocketId", userSocketId);
-  return await axios.post(`/messages/sendMessage/${selectedUser._id}`, form, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-}
-
-async function groupMessageRequest(
-  group: Group,
-  message: string | undefined,
-  file: File | null,
-  conversationId: string | "",
-) {
-  if (!file && !message) {
-    console.log("NO Messag and File Provided");
-  }
-
-  const form = new FormData();
-  form.append("message", message || "");
-  form.append("image", file || "");
-  form.append("conversationId", conversationId);
-  form.append("room", group.roomId);
-  return await axios.post(`/group/${group._id}/message`, form, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
 }
 
 export default function MessageForm(props: propsType) {
@@ -104,6 +55,9 @@ export default function MessageForm(props: propsType) {
   const emojiBtnRef = useRef<any>(null);
   const lastMessage = allMessages.at(-1);
 
+  const [sendMessageRequest] = useSendMessageMutation();
+  const [sendGroupMessage] = useSendGroupMessageMutation();
+
   function closeEmojiBtn() {
     setEmojiVisible(false);
   }
@@ -118,6 +72,53 @@ export default function MessageForm(props: propsType) {
   if (!selectedUser) {
     console.log("No SelectedUser");
     return;
+  }
+
+  async function messageFriendRequest(
+    onlineUsers: any[] | null,
+    selectedUser: User,
+    file: File | null,
+    message: string | undefined,
+    conversationId: string | "",
+  ) {
+    if (!onlineUsers || !selectedUser) {
+      console.log("One of the args is missing");
+      return;
+    }
+    if (!file && !message) {
+      console.log("NO Message and File Provided");
+    }
+    const userSocketId = onlineUsers
+      ? onlineUsers[selectedUser._id as any]
+      : "";
+
+    const form = new FormData();
+    form.append("image", file || "");
+    form.append("message", message || "");
+    form.append("conversationId", conversationId);
+    form.append("receiverSocketId", userSocketId);
+    return await sendMessageRequest({
+      selectedUserId: selectedUser?._id,
+      data: form,
+    }).unwrap();
+  }
+
+  async function groupMessageRequest(
+    group: Group,
+    message: string | undefined,
+    file: File | null,
+    conversationId: string | "",
+  ) {
+    if (!file && !message) {
+      console.log("NO Messag and File Provided");
+    }
+
+    const form = new FormData();
+    form.append("message", message || "");
+    form.append("image", file || "");
+    form.append("conversationId", conversationId);
+    form.append("room", group.roomId);
+    return await sendGroupMessage({ groupId: group?._id, data: form }).unwrap();
   }
 
   const handleImageUploadChange = (
@@ -149,22 +150,20 @@ export default function MessageForm(props: propsType) {
             file,
             lastMessage?.conversationId || "",
           );
-      console.log("Message Request : ", messageRequest);
-      if (messageRequest?.status === 201) {
-        console.log(messageRequest.data);
-        !isGroup(selectedUser) &&
-          dispatch(updateUserConversation(messageRequest.data.conversation));
-        dispatch(addNewMessage(messageRequest.data.newMessage));
-        setMessage("");
-        messageSpaceDiv.scrollTo({
-          top: messageSpaceDiv.scrollHeight,
-          behavior: "smooth",
-        });
-      }
+      !isGroup(selectedUser) &&
+        dispatch(updateUserConversation(messageRequest.conversation));
+      dispatch(addNewMessage(messageRequest.newMessage));
+
+      setMessage("");
+      messageSpaceDiv.scrollTo({
+        top: messageSpaceDiv.scrollHeight,
+        behavior: "smooth",
+      });
+
       setFile(null);
       setPreview("");
     } catch (error: any) {
-      console.log(error);
+      console.log("Failed to send message: ", error);
     }
   };
 
@@ -181,7 +180,7 @@ export default function MessageForm(props: propsType) {
         : selectedUserSocketId;
       socket.emit("Typing", {
         roomId: roomId,
-        typerId: currentUser._id,
+        typerId: currentUser && currentUser._id,
         isTyping: true,
       });
     }
@@ -194,7 +193,7 @@ export default function MessageForm(props: propsType) {
         : selectedUserSocketId;
       socket.emit("Typing", {
         roomId: roomId,
-        typerId: currentUser._id,
+        typerId: currentUser && currentUser._id,
         isTyping: false,
       });
     }

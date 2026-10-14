@@ -1,7 +1,8 @@
-import axios from "../../lib/axios";
 import { useEffect, useState } from "react";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useAppSelector } from "../../redux/hooks";
+import { useSearchMutation } from "../../redux/Modal/modalQuerySlice";
+import { useAddMemberMutation } from "../../redux/Group/groupQuerySlice";
 
 export const AddMembersModal = () => {
   const { selectedUser } = useAppSelector((state) => state.chat);
@@ -11,13 +12,19 @@ export const AddMembersModal = () => {
   const searchQuery = useDebounce(query, 500);
   const [selected, setSelected] = useState<User[]>([]);
 
+  const [ search ] = useSearchMutation();
+  const [ addMember ] = useAddMemberMutation();
+
+  if(!selectedUser){
+    console.log("No selected user");
+    return;
+  }  
+
   useEffect(() => {
     if (!searchQuery) return;
     const fetch = async () => {
       try {
-        const request = await axios.get(
-          `${import.meta.env.VITE_API}/search?u=${searchQuery}&page=1`,
-        );
+        const request = await search(searchQuery).unwrap();
         setSearchResults(request.data.users);
       } catch (error) {
         console.log("Failed fetch user: ", error);
@@ -51,10 +58,11 @@ export const AddMembersModal = () => {
   const handleAddMember = async () => {
     const selectedIds = selected.map((u) => u._id)
     try {
-      const response = await axios.put("/group/addMember", {
+      
+      const response = addMember({
         groupId: selectedUser?._id,
         members: selectedIds,
-      });
+      }).unwrap();
       console.log("Response : ", response);
     } catch (error) {
       console.log("Failed To Add Member: ", error);

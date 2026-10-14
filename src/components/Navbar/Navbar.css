@@ -131,6 +131,12 @@ nav {
   }
 }
 
+#navbar_profileImg{
+  height:60%;
+  width:60%;
+  border-radius: 50%;
+}
+
 @media only screen and (max-width: 500px) {
   .App_Symbol {
     font-size: 2rem;

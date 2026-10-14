@@ -1,14 +1,14 @@
 import "./Account.css";
-import axiosInstance from "../../lib/axios";
 import profile from "../../assets/profile.jpg";
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { isGroup } from "../../utils/IsGroup";
 import useGroupMembers from "../../hooks/useGroupMembers";
-import { setShowDetails } from "../../redux/Chat/ChatSlice";
+import { setShowDetails } from "../../redux/Chat/chatSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { setCurrentUser } from "../../redux/Auth/AuthSlice";
+import { setCurrentUser } from "../../redux/Auth/authSlice";
+import { useSetProfileMutation } from "../../redux/Chat/chatQuerySlice";
 
 function toLocaleTime(time: string) {
   const date = new Date(time);
@@ -25,6 +25,7 @@ export default function Account() {
   const groupMembers = useGroupMembers();
 
   const dispatch = useAppDispatch();
+  const [ setProfile ] = useSetProfileMutation();
 
   const handleUpdateProfile = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -35,15 +36,12 @@ export default function Account() {
         const form = new FormData();
 
         if (file) form.append("profile", file);
-        form.append("oldProfile", current_user.profile);
-        const response = await axiosInstance.post(`/auth/uploadProfile`, form, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        current_user && form.append("oldProfile", current_user.profile);
+     
+        const response = await setProfile(form).unwrap();
         console.log("Response: ", response);
-        dispatch(setCurrentUser(response.data.user));
-        const stringUser = JSON.stringify(response.data.user);
+        dispatch(setCurrentUser(response.user));
+        const stringUser = JSON.stringify(response.user);
         localStorage.setItem("Current_User", stringUser);
       };
       uploadProfile();
@@ -96,7 +94,7 @@ export default function Account() {
             </label>
           </div>
           <figcaption id="Profile_Username">
-            {current_user.username || current_user?.groupName}
+            {current_user &&( !isGroup(current_user) ? current_user.username : current_user?.groupName)}
           </figcaption>
         </figure>
         {preview && (
@@ -112,19 +110,19 @@ export default function Account() {
       <div className="Account_Info">
         <h1 id="Heading">Account Details</h1>
 
-        {!isGroup(currentUser) && (
+        {currentUser && !isGroup(currentUser) && (
           <div className="rows">
             <h2>Email</h2>
-            <span> {current_user.email}</span>
+            <span> {current_user && (!isGroup(current_user) && current_user.email)}</span>
           </div>
         )}
         <div className="rows">
           <h2>Created At</h2>
-          <span> {toLocaleTime(current_user.createdAt)}</span>
+          <span> {current_user && toLocaleTime(current_user.createdAt)}</span>
         </div>
         <div className="rows">
           <h2>Updated At</h2>
-          <span>{toLocaleTime(current_user.updatedAt)}</span>
+          <span>{current_user && toLocaleTime(current_user.updatedAt)}</span>
         </div>
       </div>
       {groupMembers && (

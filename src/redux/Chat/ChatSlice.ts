@@ -66,7 +66,6 @@ const chatSlicer = createSlice({
 
     deleteMessage: (state, action: PayloadAction<AllMessageType>) => {
       const message = action.payload;
-      console.log("Redux - deleted message: ", message)
       const filteredMessages = state.allMessages.filter(
         (messages) => messages._id !== message._id,
       );

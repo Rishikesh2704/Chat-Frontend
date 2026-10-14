@@ -4,7 +4,7 @@ import {
   setOnlineUsers,
   updateReaction,
   updateSeenMessage,
-} from "../redux/Chat/ChatSlice";
+} from "../redux/Chat/chatSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { useUser } from "../lib/context";
 import { isGroup } from "../utils/IsGroup";

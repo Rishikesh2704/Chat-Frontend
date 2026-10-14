@@ -1,26 +1,21 @@
 import { memo, useRef } from "react";
 
-import axios from "../../../lib/axios";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { deleteMessage, updateUserConversation } from "../../../redux/Chat/ChatSlice";
+import {
+  deleteMessage,
+  updateUserConversation,
+} from "../../../redux/Chat/chatSlice";
 
 import ReceivedMessages from "./ReceivedMessages";
 import SentMessages from "./SentMessages";
 import { useUser } from "../../../lib/context";
 import { isGroup } from "../../../utils/IsGroup";
 import type { EmojiClickData } from "emoji-picker-react";
+import { useDeleteMessagesMutation } from "../../../redux/Chat/chatQuerySlice";
 
 type propsType = {
   lastMessageRef: React.RefObject<HTMLDivElement | null>;
   groupMembers: Map<string, { username: string; profile: string }> | undefined;
-};
-
-const deleteMessageRequest = async (message: AllMessageType) => {
-  const groupOrPrivate = Object.hasOwn(message, "groupId")
-    ? "group"
-    : "messages";
-  const API = `${import.meta.env.VITE_API}/${groupOrPrivate}/deleteMessage/${message._id}`;
-  return await axios.delete(API);
 };
 
 export default memo(function Messages(props: propsType) {
@@ -39,13 +34,19 @@ export default memo(function Messages(props: propsType) {
     return;
   }
 
+  const [deleteMessageRequest] = useDeleteMessagesMutation();
+
   const handleDeleteMessage = async (message: AllMessageType) => {
     try {
-      const response = await deleteMessageRequest(message);
-      if (response.status === 200) {
-        dispatch(updateUserConversation(response.data?.conversation))
-        dispatch(deleteMessage(message));
-      }
+      const groupOrPrivate = Object.hasOwn(message, "groupId")
+        ? "group"
+        : "messages";
+      const response = await deleteMessageRequest({
+        type: groupOrPrivate,
+        messageId: message._id,
+      }).unwrap();
+      dispatch(updateUserConversation(response?.conversation));
+      dispatch(deleteMessage(message));
     } catch (error) {
       console.log(error);
     }
@@ -58,7 +59,7 @@ export default memo(function Messages(props: propsType) {
           messageId,
           reaction: emojiObject.emoji,
           roomId: selectedUser.roomId,
-          userId: currentUser._id,
+          userId: currentUser && currentUser._id,
         });
         return;
       }
@@ -78,7 +79,7 @@ export default memo(function Messages(props: propsType) {
     if (selectedUser && isGroup(selectedUser)) {
       socket?.emit("Delete_GroupMessage_Reaction", {
         messageId,
-        userId: currentUser._id,
+        userId: currentUser && currentUser._id,
         roomId: selectedUser.roomId,
       });
     }
@@ -88,7 +89,6 @@ export default memo(function Messages(props: propsType) {
   const isReceiver = (message: any) => {
     return message.senderId !== currentUser?._id;
   };
-
 
   return (
     <>

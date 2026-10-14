@@ -1,12 +1,19 @@
 import { useState } from "react";
 import { useAppSelector } from "../../redux/hooks";
-import axios from "../../lib/axios";
 import useGroupMembers from "../../hooks/useGroupMembers";
+import { useRemoveMemberMutation } from "../../redux/Group/groupQuerySlice";
 
 export const RemoveMemberModal = () => {
   const { selectedUser } = useAppSelector((state) => state.chat);
   const groupMembers = useGroupMembers();
   const [selected, setSelected] = useState<string[]>([]);
+
+  const [ removeMember ] = useRemoveMemberMutation();
+
+  if(!selectedUser) {
+    console.log("No selected user")
+    return;
+  }
 
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -32,13 +39,14 @@ export const RemoveMemberModal = () => {
 
   const handleRemoveMember = async () => {
     try {
-      const response = await axios.put(
-        `${import.meta.env.VITE_API}/group/removeMember`,
-        {
-          groupId: selectedUser?._id,
-          memberId: selected,
-        },
-      );
+      // const response = await axios.put(
+      //   `${import.meta.env.VITE_API}/group/removeMember`,
+      //   {
+      //     groupId: selectedUser?._id,
+      //     memberId: selected,
+      //   },
+      // );
+      const response = await removeMember({groupId:selectedUser?._id, members: selected}).unwrap();
       console.log("Response : ", response);
     } catch (error) {
       console.log("Failed To Add Member: ", error);

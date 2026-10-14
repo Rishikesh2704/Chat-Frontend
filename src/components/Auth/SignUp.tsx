@@ -2,45 +2,40 @@ import "./AuthStyle.css";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-import { setCurrentUser } from "../../redux/Auth/AuthSlice.js";
+import { setCurrentUser } from "../../redux/Auth/authSlice.js";
 import { useAppDispatch } from "../../redux/hooks.js";
-import { useSignUpQuery } from "../../redux/AuthQuery/authQuerySlice.js";
+import {
+  useSignUpMutation,
+} from "../../redux/Auth/authQuerySlice.js";
 
 export default function SignUp() {
   const dispatch = useAppDispatch();
   const [email, setEmail] = useState<string>();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
-
-  const [user, setUser] = useState<{
-    email: string | null;
-    username: string | null;
-    password: string | null;
-  }>({ email: null, username: null, password: null });
-
+  
   const navigate = useNavigate();
 
-  const { data, isLoading, isSuccess, error } = useSignUpQuery(user, {
-    skip: !user.email,
-  });
+  const [signup, { isLoading, error }] = useSignUpMutation();
 
-  if (isSuccess) {
-    const user = data.user;
-    dispatch(setCurrentUser(user));
-    navigate("/");
-  }
-
-  if(error){
-    console.log('Failed to SignUp: ', error);
+  if (error) {
+    console.log("Failed to SignUp: ", error);
   }
 
   const handleSignUpSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setUser({
-      email: email || null,
-      username: username || null,
-      password: password || null,
-    });
+    try {
+      const response = await signup({
+        email: email || null,
+        username: username || null,
+        password: password || null,
+      }).unwrap();
+      const user = response.user;
+      dispatch(setCurrentUser(user));
+      navigate("/");
+    } catch (error) {
+      console.log("Failed to SignUp: ", error);
+    }
   };
 
   return (

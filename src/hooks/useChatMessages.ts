@@ -1,61 +1,54 @@
 import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import axios from "../lib/axios";
-import { prependMessages, setAllMessages } from "../redux/Chat/ChatSlice";
+import { prependMessages, setAllMessages } from "../redux/Chat/chatSlice";
+import { useGetMessagesMutation } from "../redux/Chat/chatQuerySlice";
 
 export default function useChatMessages(
   MessageSpaceRef: React.RefObject<HTMLDivElement | null>,
   scrollPosRef: React.RefObject<number | null>,
   setIsTop: React.Dispatch<React.SetStateAction<boolean>>,
 ) {
-  const { currentUser } = useAppSelector((state) => state.auth);
   const { selectedUser, allMessages } = useAppSelector((state) => state.chat);
   const dispatch = useAppDispatch();
 
   const skipMessages = useRef(0);
   const loadingRef = useRef(false);
 
+  // const fetchMessages = async (
+  //   selectedUser: User | Group,
+  //   skipMessages: number,
+  // ) => {
+  //   if (!selectedUser) {
+  //     console.log(" Selected User:", selectedUser);
+  //     return;
+  //   }
+  //   // const isGroup = Object.hasOwn(selectedUser, "roomId");
+  //   const UserMessageAPI = `${import.meta.env.VITE_API}/messages/${selectedUser._id}/${skipMessages}`;
+  //   const response = await axiosInstance.get(UserMessageAPI);
+  //   // const reversed = isGroup
+  //   //   ? response.data.groupMessages.toReversed()
+  //   //   : response.data.messages.toReversed();
+  //   const reversed = response.data.messages.toReversed();
+  //   return reversed;
+  // };
 
-  const fetchMessages = async (
-    selectedUser: User | Group,
-    skipMessages: number,
-    currentUser: User | null,
-  ) => {
-    if (!currentUser || !selectedUser) {
-      console.log(
-        "Current User:",
-        currentUser,
-        "\n Selected User:",
-        selectedUser,
-      );
-      return;
-    }
-    const isGroup = Object.hasOwn(selectedUser, "roomId");
-    const UserMessageAPI = `${import.meta.env.VITE_API}/messages/${selectedUser._id}/${skipMessages}`;
-    const response = await axios.get(UserMessageAPI);
-    const reversed = isGroup
-      ? response.data.groupMessages.toReversed()
-      : response.data.messages.toReversed();
-    return reversed;
-  };
+  const [getMessages] = useGetMessagesMutation();
 
   useEffect(() => {
     if (!selectedUser) return;
-
-    const setRecentMessages = async () => {
+    const fetch = async () => {
       try {
-        const messages = await fetchMessages(
-          selectedUser,
-          skipMessages.current,
-          currentUser,
-        );
-        dispatch(setAllMessages(messages));
+        const data = await getMessages({
+          selectedUserId: selectedUser._id,
+          skipMessages: skipMessages.current,
+        }).unwrap();
+        dispatch(setAllMessages(data));
       } catch (error) {
-        console.log(error);
+        console.log("Failed to fetch recent messages: ", error);
       }
     };
+    fetch();
 
-    setRecentMessages();
     return () => {
       dispatch(setAllMessages([]));
       skipMessages.current = 0;
@@ -73,12 +66,11 @@ export default function useChatMessages(
     const MoreRecentMessages = async () => {
       loadingRef.current = true;
       try {
-        const messages1 = await fetchMessages(
-          selectedUser,
-          skipMessages.current,
-          currentUser,
-        );
-        dispatch(prependMessages(messages1));
+        const data = await getMessages({
+          selectedUserId: selectedUser._id,
+          skipMessages: skipMessages.current,
+        }).unwrap();
+        dispatch(prependMessages(data));
       } catch (error) {
         console.log(error);
       } finally {
@@ -90,6 +82,7 @@ export default function useChatMessages(
       if (
         Math.floor(messageSpaceDiv.scrollTop) >= 1 &&
         Math.floor(messageSpaceDiv.scrollTop) <= 5 &&
+        allMessages.length >15 &&
         !loadingRef.current
       ) {
         setIsTop(true);

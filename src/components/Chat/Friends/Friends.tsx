@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import {
   setAllMessages,
   setSelectedUser,
-} from "../../../redux/Chat/ChatSlice";
+} from "../../../redux/Chat/chatSlice";
 
 import { toLocaleTime } from "../../../utils/MessagesTime";
 

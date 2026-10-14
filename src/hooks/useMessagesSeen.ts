@@ -15,7 +15,7 @@ export default function useMessagesSeen(lastMessageRef:React.RefObject<null>) {
     const messages = document.querySelectorAll(".ReceivedText_Wrapper");
     const groupMessageSeenHandler = (message: AllMessageType | undefined) => {
       const seen = message?.seen as string[];
-      if (seen.includes(currentUser._id)) return;
+      if (currentUser && seen.includes(currentUser._id)) return;
       socket.emit(
         "groupMessage_Seen",
         message,

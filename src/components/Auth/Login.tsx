@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import "./AuthStyle.css";
 import { useAppDispatch } from "../../redux/hooks.js";
-import { setCurrentUser } from "../../redux/Auth/AuthSlice.js";
+import { setCurrentUser } from "../../redux/Auth/authSlice.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
-import { useLoginQuery } from "../../redux/AuthQuery/authQuerySlice.js";
+import { useLoginMutation } from "../../redux/Auth/authQuerySlice.js";
 
 export default function Login() {
   const dispatch = useAppDispatch();
@@ -13,27 +13,29 @@ export default function Login() {
   const [password, setPassword] = useState<string>();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const navigate = useNavigate();
-  const [user, setUser] = useState<{
-    email: string | null;
-    password: string | null;
-  }>({ email: null, password: null });
 
-  const { data, isLoading, isSuccess } = useLoginQuery(user, {
-    skip: !user.email,
-  });
+  const [login, { isLoading }] = useLoginMutation();
 
-  if (isSuccess) {
-    const user = data.user;
-    dispatch(setCurrentUser(user));
-    navigate("/");
-  }
+  // if (isSuccess) {
+  //   const user = data.user;
+  //   dispatch(setCurrentUser(user));
+  //   navigate("/");
+  // }
 
   const handleLogInSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setUser({
-      email: email || null,
-      password: password || null,
-    });
+    if(!email || !password) return 
+    try {
+      const response = await login({
+        email: email,
+        password: password,
+      }).unwrap();
+      const user = response.user;
+      dispatch(setCurrentUser(user));
+      navigate("/");
+    } catch (err) {
+      console.log("Error while login: ", err);
+    }
   };
 
   return (
