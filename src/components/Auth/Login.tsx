@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import "./AuthStyle.css";
 import { useAppDispatch } from "../../redux/hooks.js";
-import { setCurrentUser } from "../../redux/Auth/authSlice.js";
+import { setCurrentUser } from "../../redux/Auth/AuthSlice.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
 import { useLoginMutation } from "../../redux/Auth/authQuerySlice.js";

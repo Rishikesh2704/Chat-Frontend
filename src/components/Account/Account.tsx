@@ -4,10 +4,10 @@ import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { isGroup } from "../../utils/IsGroup";
 import useGroupMembers from "../../hooks/useGroupMembers";
-import { setShowDetails } from "../../redux/Chat/chatSlice";
+import { setShowDetails } from "../../redux/Chat/ChatSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { setCurrentUser } from "../../redux/Auth/authSlice";
+import { setCurrentUser } from "../../redux/Auth/AuthSlice";
 import { useSetProfileMutation } from "../../redux/Chat/chatQuerySlice";
 
 function toLocaleTime(time: string) {

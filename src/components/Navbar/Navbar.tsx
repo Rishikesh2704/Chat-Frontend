@@ -7,9 +7,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { useUser } from "../../lib/context";
-import { removeCurrentUser } from "../../redux/Auth/authSlice";
+import { removeCurrentUser } from "../../redux/Auth/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { setShowDetails } from "../../redux/Chat/chatSlice";
+import { setShowDetails } from "../../redux/Chat/ChatSlice";
 import { useLogoutMutation } from "../../redux/Auth/authQuerySlice";
 
 export default function Navbar() {

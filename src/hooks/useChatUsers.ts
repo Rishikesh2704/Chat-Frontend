@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { setUsers } from "../redux/Chat/chatSlice";
+import { setUsers } from "../redux/Chat/ChatSlice";
 import { useGetUsersQuery } from "../redux/Chat/chatQuerySlice";
 
 export default function useChatUser() {

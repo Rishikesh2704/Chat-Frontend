@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "./Auth/authSlice.ts";
-import chatReducer from "./Chat/chatSlice.ts";
-import modalReducer from "./Modal/modalSlice.ts";
+import authReducer from "./Auth/AuthSlice.ts";
+import chatReducer from "./Chat/ChatSlice.ts";
+import modalReducer from "./Modal/ModalSlice.ts";
 import { authApi } from "./Auth/authQuerySlice.ts";
 import { chatApi } from "./Chat/chatQuerySlice.ts";
 import { modalApi } from "./Modal/modalQuerySlice.ts";

@@ -2,7 +2,7 @@ import './Search.css'
 import { useEffect, useState } from "react";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useAppDispatch } from "../../redux/hooks";
-import { setSearchResults } from "../../redux/Modal/modalSlice";
+import { setSearchResults } from "../../redux/Modal/ModalSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { useSearchMutation } from '../../redux/Modal/modalQuerySlice';

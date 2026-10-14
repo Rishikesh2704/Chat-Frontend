@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { prependMessages, setAllMessages } from "../redux/Chat/chatSlice";
+import { prependMessages, setAllMessages } from "../redux/Chat/ChatSlice";
 import { useGetMessagesMutation } from "../redux/Chat/chatQuerySlice";
 
 export default function useChatMessages(
