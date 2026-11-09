@@ -1,6 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 
-import ProtectedRoute from "./lib/ProtectedRoute.tsx";
+import ProtectedRoute from "./lib/protectedRoute.tsx";
 import { lazy } from "react";
 
 const Home = lazy(() => import("./components/Home/Home.tsx"));
