@@ -20,6 +20,11 @@ import {
   useSendGroupMessageMutation,
   useSendMessageMutation,
 } from "../../../redux/Chat/chatQuerySlice";
+import {
+  decryptMessage,
+  encryptMessage,
+  getSharedKey,
+} from "../../../utils/End2End";
 
 type propsType = {
   message: string | undefined;
@@ -55,7 +60,8 @@ export default function MessageForm(props: propsType) {
   const emojiBtnRef = useRef<any>(null);
   const lastMessage = allMessages.at(-1);
 
-  const [sendMessageRequest] = useSendMessageMutation();
+  const [sendMessageRequest, { isLoading: SendingMessage }] =
+    useSendMessageMutation();
   const [sendGroupMessage] = useSendGroupMessageMutation();
 
   function closeEmojiBtn() {
@@ -78,7 +84,8 @@ export default function MessageForm(props: propsType) {
     onlineUsers: any[] | null,
     selectedUser: User,
     file: File | null,
-    message: string | undefined,
+    message: any,
+    iv: any,
     conversationId: string | "",
   ) {
     if (!onlineUsers || !selectedUser) {
@@ -91,10 +98,11 @@ export default function MessageForm(props: propsType) {
     const userSocketId = onlineUsers
       ? onlineUsers[selectedUser._id as any]
       : "";
-
     const form = new FormData();
     form.append("image", file || "");
-    form.append("message", message || "");
+    form.append("message", message);
+    form.append("key", selectedUser.encryptedSharedKey);
+    form.append("iv", iv);
     form.append("conversationId", conversationId);
     form.append("receiverSocketId", userSocketId);
     return await sendMessageRequest({
@@ -110,9 +118,8 @@ export default function MessageForm(props: propsType) {
     conversationId: string | "",
   ) {
     if (!file && !message) {
-      console.log("NO Messag and File Provided");
+      console.log("NO Message and File Provided");
     }
-
     const form = new FormData();
     form.append("message", message || "");
     form.append("image", file || "");
@@ -133,15 +140,21 @@ export default function MessageForm(props: propsType) {
 
   const sendMessage = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (message == undefined) return;
     const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
+    let encryptedData;
 
+    if (!isGroup(selectedUser)) {
+      encryptedData = await encryptMessage(message, selectedUser?._id);
+    }
     try {
       const messageRequest = !isGroup(selectedUser)
         ? await messageFriendRequest(
             onlineUsers,
             selectedUser as User,
             file,
-            message,
+            encryptedData?.encryptedMessage,
+            encryptedData?.iv,
             lastMessage?.conversationId || "",
           )
         : await groupMessageRequest(
@@ -150,9 +163,27 @@ export default function MessageForm(props: propsType) {
             file,
             lastMessage?.conversationId || "",
           );
+
+      const decryptedConversationMessage = await decryptConversationObject(
+        messageRequest.conversation,
+        selectedUser._id,
+      );
+
       !isGroup(selectedUser) &&
-        dispatch(updateUserConversation(messageRequest.conversation));
-      dispatch(addNewMessage(messageRequest.newMessage));
+        decryptedConversationMessage &&
+        currentUser &&
+        dispatch(
+          updateUserConversation({
+            conversation: decryptedConversationMessage,
+            currentUser,
+          }),
+        );
+
+      const newMessageObject = {
+        ...messageRequest.newMessage,
+        messageContent: message,
+      };
+      dispatch(addNewMessage(newMessageObject));
 
       setMessage("");
       messageSpaceDiv.scrollTo({
@@ -165,6 +196,30 @@ export default function MessageForm(props: propsType) {
     } catch (error: any) {
       console.log("Failed to send message: ", error);
     }
+  };
+
+  const decryptConversationObject = async (
+    Conversation: Conversation,
+    userId: string,
+  ) => {
+    if (!Conversation) {
+      console.log("Conversation is undefined");
+      return null;
+    }
+    const sharedKey = await getSharedKey(userId);
+    const { lastMessage } = Conversation;
+    const decryptedMessage = await decryptMessage(
+      lastMessage.message,
+      sharedKey,
+      lastMessage.messageIv,
+      userId,
+    );
+    const updatedLastMessage = { ...lastMessage, message: decryptedMessage|| "" };
+    const updatedConversation = {
+      ...Conversation,
+      lastMessage: updatedLastMessage,
+    };
+    return updatedConversation;
   };
 
   const handleTextOnChange = (
@@ -243,7 +298,11 @@ export default function MessageForm(props: propsType) {
         </button>
 
         <button type="submit" id="sendMessage_button" aria-label="send message">
-          <FontAwesomeIcon icon={faPaperPlane} />
+          {!SendingMessage ? (
+            <FontAwesomeIcon icon={faPaperPlane} />
+          ) : (
+            <div className="SendMessageLoader blackloader"></div>
+          )}
         </button>
 
         {preview && (

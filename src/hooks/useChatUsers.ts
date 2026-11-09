@@ -2,13 +2,14 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { setUsers } from "../redux/Chat/ChatSlice";
 import { useGetUsersQuery } from "../redux/Chat/chatQuerySlice";
+import { decryptMessage, getSharedKey } from "../utils/End2End";
 
 export default function useChatUser() {
   const dispatch = useAppDispatch();
   const { currentUser } = useAppSelector((state) => state.auth);
-  const { data, isSuccess } = useGetUsersQuery();
+  const { data, isSuccess, refetch } = useGetUsersQuery();
 
-  function transformConversation(
+  async function transformConversation(
     friendsConvos: Conversation[],
     groupConvos: Conversation[],
     groups: Group[],
@@ -22,11 +23,18 @@ export default function useChatUser() {
           _id: participants[0]?._id,
           username: participants[0]?.username,
           profile: participants[0]?.profile,
+          messagesCount: convos.unreadMessagesCount[currentUser._id],
           lastMessage: convos.lastMessage,
           updatedAt: convos.updatedAt,
         };
       }
     });
+    const decryptFriendsConversations = await Promise.all(
+      friendsConversations.map(
+        async (convos) => await decryptConversationObject(convos),
+      ),
+    );
+
     let groupConversations = groupConvos.map((convos: Conversation) => {
       return {
         _id: convos.group?._id,
@@ -46,16 +54,39 @@ export default function useChatUser() {
       return k.length > 0 ? k : g;
     });
     // let conversations = [...data?.data?.Friends, ...data?.data?.Groups]
-    return [...friendsConversations, ...filtered];
+    return [...decryptFriendsConversations, ...filtered];
   }
+
+  const decryptConversationObject  = async(conversation:any) => {
+      if(!conversation) {
+          console.log("Conversation is undefined");
+          return;
+      }
+      const sharedKey = await getSharedKey(conversation._id)
+      const {lastMessage} = conversation
+      console.log("conversation: ", conversation,"\n sharedKey:", sharedKey)
+      const decryptedMessage = await decryptMessage(lastMessage.message, sharedKey, lastMessage.messageIv, conversation._id)
+      const updatedLastMessage = {...lastMessage, message:decryptedMessage}
+      const updatedConversation = {...conversation, lastMessage:updatedLastMessage}
+      return updatedConversation
+  }
+
   useEffect(() => {
     const friendsConvo =
       data?.Conversations.filter((u: Conversation) => !u.isGroup) || [];
     const groupsConvo =
       data?.Conversations.filter((u: Conversation) => u.isGroup) || [];
     const groups = data?.Groups || [];
-
-    const userList = transformConversation(friendsConvo, groupsConvo, groups);
-    dispatch(setUsers(userList));
+    const Users = async () => {
+      const userList = await transformConversation(
+        friendsConvo,
+        groupsConvo,
+        groups,
+      );
+      dispatch(setUsers(userList));
+    };
+    Users();
   }, [isSuccess]);
+
+  return { refetch };
 }

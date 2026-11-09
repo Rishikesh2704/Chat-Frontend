@@ -35,6 +35,7 @@ export default function useMessagesSeen(lastMessageRef:React.RefObject<null>) {
           const id = entry.target.getAttribute("id");
           const isGroup = Object.hasOwn(selectedUser, "roomId");
           const message = allMessages.find((message) => message._id == id);
+          
           if (isGroup) groupMessageSeenHandler(message);
           else privateMessageSeenHandler(message);
         }

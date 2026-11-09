@@ -7,6 +7,7 @@ type stateType = {
   showDetails: { currentUser: boolean; state: boolean };
   onlineUsers: any;
   selectedUser: User | Group | null;
+  selectedUserPublicKey: string | null;
   allMessages: AllMessageType[] | [];
 };
 
@@ -15,6 +16,7 @@ const initialState: stateType = {
   showDetails: { currentUser: true, state: false },
   onlineUsers: {},
   selectedUser: null,
+  selectedUserPublicKey: null,
   allMessages: [],
 };
 
@@ -58,6 +60,7 @@ const chatSlicer = createSlice({
     },
 
     addNewMessage: (state, action: PayloadAction<any>) => {
+      
       return {
         ...state,
         allMessages: [...state.allMessages, action.payload],
@@ -71,21 +74,33 @@ const chatSlicer = createSlice({
       );
       return {
         ...state,
-        allMessages:filteredMessages
-      }
+        allMessages: filteredMessages,
+      };
     },
 
-    updateUserConversation: (state, action: PayloadAction<Conversation>) => {
-      const conversation = action.payload;
-      
+    updateUserConversation: (
+      state,
+      action: PayloadAction<{ conversation: Conversation; currentUser: User }>,
+    ) => {
+      const { conversation, currentUser } = action.payload;
+      let sender;
+      if (!conversation.isGroup) {
+        sender = conversation.participants.find(
+          (p) => p._id !== currentUser?._id,
+        );
+      } else {
+        sender = conversation.participants[1];
+      }
+
       let transformedConversation = {
-        _id: conversation.participants[1]?._id,
-        username: conversation.participants[1]?.username,
-        profile: conversation.participants[1]?.profile,
+        _id: sender?._id,
+        username: sender?.username,
+        profile: sender?.profile,
+        messagesCount: conversation.unreadMessagesCount[currentUser._id],
         lastMessage: conversation.lastMessage,
         updatedAt: conversation.updatedAt,
       };
-     
+
       const updatedUserConversation = state.users.map((u: any) => {
         if (u._id === transformedConversation._id) {
           return transformedConversation;

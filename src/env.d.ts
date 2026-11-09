@@ -5,6 +5,12 @@ type User = {
   GroupName?: string;
   password: null;
   profile: string;
+  encryptedSharedKey:string,
+  publicKey?:{
+    user:string,
+    publicKey:string,
+    algorithm:string, 
+  };
   createdAt: string;
   updatedAt: string;
 };
@@ -32,6 +38,7 @@ type AllMessageType = {
   receiverId: string;
   text: string;
   messageContent: string;
+  iv:string,
   seen: boolean | string[];
   image: string;
   createdAt: string;
@@ -49,6 +56,9 @@ type Conversation = {
   _id: string;
   participants: { _id: string; username: string; profile: string }[];
   isGroup: boolean;
+  unreadMessagesCount:{
+    [key in User['_id']]: Number
+  }
   group?: {
     _id: string;
     groupName: string;
@@ -61,6 +71,7 @@ type Conversation = {
     message: string;
     senderId: string;
     messageType: string;
+    messageIv:string,
   };
   updatedAt: string;
   createdAt: string;

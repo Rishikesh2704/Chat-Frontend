@@ -10,7 +10,7 @@
   z-index: 1;
   gap: 0.2rem;
   background-color: var(--secondary-color);
-  overflow:hidden;
+  overflow: hidden;
 }
 
 /* Message Style */
@@ -22,10 +22,15 @@
   gap: 1.9rem;
   overflow-y: auto;
   overflow-anchor: auto;
+  align-items: center;
 }
 
 .Messages::-webkit-scrollbar {
   display: none;
+}
+
+.ReceivedDiv{
+  width: 100%;
 }
 
 .ReceivedMessages_Wrapper {
@@ -36,11 +41,12 @@
   align-items: center;
   gap: 0.3rem;
   position: relative;
+
   --displayReactionEmojiButton: none;
 }
 
 .SentMessages_Wrapper {
-  width: 100%;
+  width: 100%;  
   display: flex;
   flex-direction: row-reverse;
   justify-content: end;
@@ -313,4 +319,8 @@
   position: absolute;
   right: 0;
   bottom: -50%;
+}
+
+.MessagesLoader {
+  /* position:absolute; */
 }

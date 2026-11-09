@@ -2,16 +2,17 @@ import { useState } from "react";
 import { useAppSelector } from "../../redux/hooks";
 import useGroupMembers from "../../hooks/useGroupMembers";
 import { useRemoveMemberMutation } from "../../redux/Group/groupQuerySlice";
+import { toast } from "react-toastify";
 
 export const RemoveMemberModal = () => {
   const { selectedUser } = useAppSelector((state) => state.chat);
   const groupMembers = useGroupMembers();
   const [selected, setSelected] = useState<string[]>([]);
 
-  const [ removeMember ] = useRemoveMemberMutation();
+  const [removeMember] = useRemoveMemberMutation();
 
-  if(!selectedUser) {
-    console.log("No selected user")
+  if (!selectedUser) {
+    console.log("No selected user");
     return;
   }
 
@@ -46,7 +47,18 @@ export const RemoveMemberModal = () => {
       //     memberId: selected,
       //   },
       // );
-      const response = await removeMember({groupId:selectedUser?._id, members: selected}).unwrap();
+
+      const response = await toast.promise(
+        removeMember({
+          groupId: selectedUser?._id,
+          members: selected,
+        }).unwrap(),
+        {
+          pending: "Removing Member",
+          success: "Removed Member",
+          error: "Failed to remove Member",
+        },
+      );
       console.log("Response : ", response);
     } catch (error) {
       console.log("Failed To Add Member: ", error);
@@ -57,7 +69,9 @@ export const RemoveMemberModal = () => {
     <>
       <div className="Search_Results">
         <h3>Group Members</h3>
-        {groupMembers && Array.from(groupMembers.entries()).map(([id,user]:[id:any, user:any]) => {
+        {groupMembers &&
+          Array.from(groupMembers.entries()).map(
+            ([id, user]: [id: any, user: any]) => {
               if (Object.hasOwn(user, "roomId")) return;
               return (
                 <div
@@ -78,7 +92,8 @@ export const RemoveMemberModal = () => {
                   </div>
                 </div>
               );
-            })}
+            },
+          )}
       </div>
       <button onClick={handleRemoveMember}>Remove Member</button>
     </>

@@ -4,14 +4,16 @@ import {
   setOnlineUsers,
   updateReaction,
   updateSeenMessage,
+  updateUserConversation,
 } from "../redux/Chat/ChatSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { useUser } from "../lib/context";
 import { isGroup } from "../utils/IsGroup";
+import { decryptMessage } from "../utils/End2End";
 
 export default function useChatSocket(setIsTyping: any) {
   const { currentUser } = useAppSelector((state) => state.auth);
-  const { users } = useAppSelector((state) => state.chat);
+  const { users, selectedUser } = useAppSelector((state) => state.chat);
 
   const { socket } = useUser();
 
@@ -20,7 +22,7 @@ export default function useChatSocket(setIsTyping: any) {
   useEffect(() => {
     if (!socket || !currentUser) return;
 
-    socket.emit('connected')
+    socket.emit("connected");
 
     const handleIsTyping = (user: any) => {
       if (user.typerId === currentUser._id) return;
@@ -56,12 +58,54 @@ export default function useChatSocket(setIsTyping: any) {
       dispatch(setOnlineUsers(UsersList));
     };
 
-    const privateMessageHandler = (
-      message: { conversation: Conversation; savedMessage: AllMessageType },
+    const privateMessageHandler = async (
+      message: {
+        conversation: Conversation;
+        savedMessage: AllMessageType;
+        key: string;
+        iv: any;
+      },
       ack: any,
     ) => {
-      dispatch(addNewMessage(message.savedMessage));
       ack(true);
+
+      const decryptedMessage = await decryptMessage(
+        message.savedMessage.messageContent,
+        message.key,
+        message.iv,
+        message.savedMessage.senderId,
+      );
+      if (!decryptedMessage) return;
+      const decryptedMessagObject = {
+        ...message.savedMessage,
+        messageContent: decryptedMessage,
+      };
+
+      const lastMessage = {
+        ...message.conversation.lastMessage,
+        message: decryptedMessage,
+      };
+      const decryptedMessageConversation = {
+        ...message.conversation,
+        lastMessage,
+      };
+
+      if (message.savedMessage.senderId !== selectedUser?._id) {
+        dispatch(
+          updateUserConversation({
+            conversation: decryptedMessageConversation,
+            currentUser,
+          }),
+        );
+        return;
+      }
+      dispatch(addNewMessage(decryptedMessagObject));
+      dispatch(
+        updateUserConversation({
+          conversation: decryptedMessageConversation,
+          currentUser,
+        }),
+      );
     };
 
     const afterDisconnectedUsers = (onlineUsers: any) => {
@@ -95,7 +139,7 @@ export default function useChatSocket(setIsTyping: any) {
       socket.off("Deleted_Reaction", handleDeleteReaction);
       socket.off("Deleted_GroupMessage_Reaction", handleDeleteGroupReaction);
     };
-  }, [socket, currentUser?._id]);
+  }, [socket, currentUser?._id, selectedUser?._id]);
 
   useEffect(() => {
     if (!users) {

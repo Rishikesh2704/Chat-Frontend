@@ -3,7 +3,7 @@ import { getDayOfMessages } from "../../../utils/MessagesDay";
 import { toLocaleTime } from "../../../utils/MessagesTime";
 import { useAppSelector } from "../../../redux/hooks";
 import { getGroupSeenMembers } from "../../../utils/getGroupSeenMembers";
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { useOutsideElement } from "../../../hooks/useOutsideElement";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
@@ -14,7 +14,7 @@ type propsType = {
   previousMessageTime: React.RefObject<string>;
   handleDeleteMessage: (message: AllMessageType) => void;
 };
-export default function SentMessages(props: propsType) {
+export default memo (function SentMessages(props: propsType) {
   const { messages, groupMembers, previousMessageTime, handleDeleteMessage } =
     props;
   const { currentUser } = useAppSelector((state) => state.auth);
@@ -138,4 +138,4 @@ export default function SentMessages(props: propsType) {
       </div>
     </>
   );
-}
+})

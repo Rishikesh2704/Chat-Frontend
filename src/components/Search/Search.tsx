@@ -11,7 +11,7 @@ export const Search = () => {
   const [query, setQuery] = useState<string>();
   const dispatch = useAppDispatch();
 
-  const [ search ] = useSearchMutation();
+  const [ search] = useSearchMutation();
 
   const searchQuery = useDebounce(query, 500);
   if(searchQuery == "") dispatch(setSearchResults([]));

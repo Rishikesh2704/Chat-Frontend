@@ -2,13 +2,14 @@ import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { prependMessages, setAllMessages } from "../redux/Chat/ChatSlice";
 import { useGetMessagesMutation } from "../redux/Chat/chatQuerySlice";
+import { decryptMessage, getSharedKey } from "../utils/End2End";
 
 export default function useChatMessages(
   MessageSpaceRef: React.RefObject<HTMLDivElement | null>,
   scrollPosRef: React.RefObject<number | null>,
   setIsTop: React.Dispatch<React.SetStateAction<boolean>>,
 ) {
-  const { selectedUser, allMessages } = useAppSelector((state) => state.chat);
+  const { selectedUser } = useAppSelector((state) => state.chat);
   const dispatch = useAppDispatch();
 
   const skipMessages = useRef(0);
@@ -32,7 +33,7 @@ export default function useChatMessages(
   //   return reversed;
   // };
 
-  const [getMessages] = useGetMessagesMutation();
+  const [getMessages, { isLoading, isError }] = useGetMessagesMutation();
 
   useEffect(() => {
     if (!selectedUser) return;
@@ -42,7 +43,25 @@ export default function useChatMessages(
           selectedUserId: selectedUser._id,
           skipMessages: skipMessages.current,
         }).unwrap();
-        dispatch(setAllMessages(data));
+        [];
+        const sharedKey= await getSharedKey(selectedUser._id)
+        let decryptedMessages = data.map(
+          async (encryptedMessage: AllMessageType) => {
+            const decryptedMessage = await decryptMessage(
+              encryptedMessage.messageContent,
+              sharedKey,
+              encryptedMessage.iv,
+              selectedUser._id
+            );
+            const decryptedMessageObject = {
+              ...encryptedMessage,
+              messageContent: decryptedMessage,
+            };
+            return decryptedMessageObject;
+          },
+        );
+        const messages = await Promise.all(decryptedMessages);
+        dispatch(setAllMessages(messages));
       } catch (error) {
         console.log("Failed to fetch recent messages: ", error);
       }
@@ -82,12 +101,10 @@ export default function useChatMessages(
       if (
         Math.floor(messageSpaceDiv.scrollTop) >= 1 &&
         Math.floor(messageSpaceDiv.scrollTop) <= 5 &&
-        allMessages.length >15 &&
+        // allMessages.length > 15 &&
         !loadingRef.current
       ) {
         setIsTop(true);
-        console.log("Messages Length", allMessages);
-        console.log("Fetch More Recent Messages");
 
         scrollPosRef.current = messageSpaceDiv.scrollHeight;
         skipMessages.current += 15;
@@ -104,4 +121,6 @@ export default function useChatMessages(
       skipMessages.current = 0;
     };
   }, [selectedUser]);
+
+  return { isLoading, isError };
 }

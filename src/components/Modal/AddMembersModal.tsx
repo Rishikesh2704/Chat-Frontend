@@ -3,6 +3,7 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { useAppSelector } from "../../redux/hooks";
 import { useSearchMutation } from "../../redux/Modal/modalQuerySlice";
 import { useAddMemberMutation } from "../../redux/Group/groupQuerySlice";
+import { toast } from "react-toastify";
 
 export const AddMembersModal = () => {
   const { selectedUser } = useAppSelector((state) => state.chat);
@@ -12,20 +13,24 @@ export const AddMembersModal = () => {
   const searchQuery = useDebounce(query, 500);
   const [selected, setSelected] = useState<User[]>([]);
 
-  const [ search ] = useSearchMutation();
-  const [ addMember ] = useAddMemberMutation();
+  const [search, { isLoading }] = useSearchMutation();
+  const [addMember] = useAddMemberMutation();
 
-  if(!selectedUser){
+  if (!selectedUser) {
     console.log("No selected user");
     return;
-  }  
+  }
 
   useEffect(() => {
     if (!searchQuery) return;
     const fetch = async () => {
       try {
-        const request = await search(searchQuery).unwrap();
-        setSearchResults(request.data.users);
+        const request = await toast.promise(search(searchQuery).unwrap(),{
+          pending:"Adding Member",
+          success:'Added Member',
+          error:"Failed to add Member"
+        });
+        setSearchResults(request.users);
       } catch (error) {
         console.log("Failed fetch user: ", error);
       }
@@ -56,9 +61,8 @@ export const AddMembersModal = () => {
   };
 
   const handleAddMember = async () => {
-    const selectedIds = selected.map((u) => u._id)
+    const selectedIds = selected.map((u) => u._id);
     try {
-      
       const response = addMember({
         groupId: selectedUser?._id,
         members: selectedIds,
@@ -112,7 +116,8 @@ export const AddMembersModal = () => {
               </div>
             );
           })}
-        {searchResults &&
+        {isLoading && <div className="blackloader"></div>}
+        {searchResults.length > 0 ? (
           searchResults
             .filter(
               (users: User) =>
@@ -139,7 +144,10 @@ export const AddMembersModal = () => {
                   </div>
                 </div>
               );
-            })}
+            })
+        ) : (
+          <h2>No results found</h2>
+        )}
       </div>
       <button onClick={handleAddMember}>Add Member</button>
     </>

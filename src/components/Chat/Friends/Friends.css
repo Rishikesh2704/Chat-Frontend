@@ -75,11 +75,6 @@
   align-items: start;
   justify-content: center;
   gap: 0.3rem;
-
-  & > h2 {
-    font-size: 0.8vmax;
-    font-weight: 700;
-  }
 }
 
 .selectedUser {
@@ -87,14 +82,37 @@
   color: rgb(248, 248, 248);
 }
 
-#Last_message {
+.User_Details_Username {
   width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.7vmax;
+}
+
+.User_Details_Username > h2 {
+  font-size: 0.8vmax;
+  font-weight: 700;
+}
+
+#Last_message {
+  width: 95%;
   height: 10%;
   display: flex;
   font-size: 0.82vmax;
   color: #3d3d3d;
   align-items: center;
-  justify-content: space-between;
+  justify-content:space-between
+}
+
+.MessageCount {
+  height: 1.1rem;
+  width: 1.1rem;
+  font-size: 0.8rem;
+  color: black;
+  background: var(--primary-gradient);
+  border-radius: 50%;
+  line-height: 1.1rem;
 }
 
 .Unseen {
@@ -103,17 +121,10 @@
   position: relative;
 }
 
-.Unseen::after {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
+.FriendsLoader {
   position: absolute;
-  z-index: 2;
-  transform: translateY(-50%);
   top: 50%;
-  right: -150%;
-  background-color: rgb(74, 247, 74);
+  left: 43%;
 }
 
 @media only screen and (max-width: 500px) {

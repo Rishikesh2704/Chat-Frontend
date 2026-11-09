@@ -6,6 +6,7 @@ import App from "./App.tsx";
 import { User } from "./lib/context.tsx";
 import { store } from './redux/store.ts'
 import { Provider } from 'react-redux'
+import ToastWrapper from "./utils/ToastWrapper.tsx";
 
 
 createRoot(document.getElementById("root")!).render(
@@ -13,6 +14,7 @@ createRoot(document.getElementById("root")!).render(
     <Provider store={store}>
     <User>
       <App />
+      <ToastWrapper/>
     </User>
     </Provider>
   </StrictMode>,

@@ -16,10 +16,12 @@ import { useDeleteMessagesMutation } from "../../../redux/Chat/chatQuerySlice";
 type propsType = {
   lastMessageRef: React.RefObject<HTMLDivElement | null>;
   groupMembers: Map<string, { username: string; profile: string }> | undefined;
+  isLoading:boolean,
+  isError:boolean,
 };
 
 export default memo(function Messages(props: propsType) {
-  const { lastMessageRef, groupMembers } = props;
+  const { lastMessageRef, groupMembers, isLoading } = props;
 
   const { socket } = useUser();
   const { currentUser } = useAppSelector((state) => state.auth);
@@ -87,11 +89,12 @@ export default memo(function Messages(props: propsType) {
   };
 
   const isReceiver = (message: any) => {
-    return message.senderId !== currentUser?._id;
+    return message.senderId !== currentUser?._id  ;
   };
-
   return (
     <>
+           
+    {isLoading &&  <div className="MessagesLoader blackloader"></div> }
       {allMessages.map((messages: AllMessageType) => {
         if (currentUser && isReceiver(messages)) {
           return (

@@ -1,8 +1,8 @@
 import "./Home.css";
 
-import { lazy, useState } from "react";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMessage } from '@fortawesome/free-solid-svg-icons'
+import { lazy, useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMessage } from "@fortawesome/free-solid-svg-icons";
 
 import { useAppDispatch, useAppSelector } from "../../redux/hooks.js";
 import { setModalType, setViewModal } from "../../redux/Modal/ModalSlice.js";
@@ -14,7 +14,13 @@ import MessageMain from "../Chat/MessageMain.js";
 import Account from "../Account/Account.js";
 import { Search } from "../Search/Search.js";
 
-const Modal = lazy(() => import("../Modal/Modal.js").then((m) => ({default:m.Modal})))
+import BoundaryWrapper from "../../lib/BoundaryWrapper.js";
+import axiosInstance from "../../lib/axios.js";
+import { generateUserKeyPairs, storePrivateKey } from "../../utils/End2End.js";
+
+const Modal = lazy(() =>
+  import("../Modal/Modal.js").then((m) => ({ default: m.Modal })),
+);
 
 export default function Home() {
   const dispatch = useAppDispatch();
@@ -23,6 +29,20 @@ export default function Home() {
   const { viewModal } = useAppSelector((state) => state.modal);
 
   const [isTyping, setIsTyping] = useState<any>({ id: "", isTyping: false });
+  useEffect(() => {
+    async function sendPublicKey() {
+      try {
+        const { publicKey, rawKeyPair } = await generateUserKeyPairs();
+        storePrivateKey(rawKeyPair.privateKey)
+        await axiosInstance.post("/users/publicKey", { publicKey });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    sendPublicKey();
+    
+  }, []);
 
   useChatUsers();
 
@@ -40,9 +60,11 @@ export default function Home() {
         <div className="Header">
           <h1 className="Heading">Messages</h1>
         </div>
-      
+
         <Search />
-        <Friends />
+        <BoundaryWrapper>
+          <Friends />
+        </BoundaryWrapper>
         <button
           className="Create_Group_Btn"
           aria-label="Create Group"
@@ -56,11 +78,13 @@ export default function Home() {
 
       <section className="Chat_Space ">
         {selectedUser ? (
-          <MessageMain isTyping={isTyping} />
+          <BoundaryWrapper>
+            <MessageMain isTyping={isTyping} />
+          </BoundaryWrapper>
         ) : (
           <div className="NoChats">
             <FontAwesomeIcon id="NoChat_icon" icon={faMessage} />
-            <span >No Chats Selected</span>
+            <span>No Chats Selected</span>
           </div>
         )}
       </section>

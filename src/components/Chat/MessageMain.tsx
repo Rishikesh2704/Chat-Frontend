@@ -9,11 +9,10 @@ import { useAppSelector } from "../../redux/hooks";
 import MessageHeader from "./Header/MessageHeader";
 import MessageForm from "./MessageForm/MessageForm";
 
-
-const Messages = lazy(() => import("./MessageSpace/Messages"))
+const Messages = lazy(() => import("./MessageSpace/Messages"));
 
 type MessageSpaceProps = {
-  isTyping:any;
+  isTyping: any;
 };
 
 export default function MessageSpace(props: MessageSpaceProps) {
@@ -22,14 +21,16 @@ export default function MessageSpace(props: MessageSpaceProps) {
 
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [isTop, setIsTop] = useState<boolean>(false);
-  
 
   const MessageSpaceRef = useRef<HTMLDivElement | null>(null);
   const scrollPosRef = useRef<number | null>(null);
   const lastMessageRef = useRef(null);
 
-
-  useChatMessages(MessageSpaceRef, scrollPosRef, setIsTop);
+  const { isLoading, isError } = useChatMessages(
+    MessageSpaceRef,
+    scrollPosRef,
+    setIsTop,
+  );
 
   useMessagesSeen(lastMessageRef);
 
@@ -51,16 +52,22 @@ export default function MessageSpace(props: MessageSpaceProps) {
     setIsTop(false);
   }, [allMessages, selectedUser]);
 
+  if (isError) {
+    throw isError;
+  }
   return (
     <>
-      <MessageHeader  />
+      <MessageHeader />
 
       <div className="chat_messages">
         <div className="Messages" ref={MessageSpaceRef}>
-          <Messages
-            lastMessageRef={lastMessageRef}
-            groupMembers={groupMembers}
-          />
+            <Messages
+              lastMessageRef={lastMessageRef}
+              groupMembers={groupMembers}
+              isLoading={isLoading}
+              isError={isError}
+            />
+          
 
           {isTyping.isTyping && (
             <div className="Typing_Wrapper">

@@ -5,7 +5,7 @@ import { useAppSelector } from "../../../redux/hooks";
 import EmojiPicker from "emoji-picker-react";
 import { toLocaleTime } from "../../../utils/MessagesTime";
 import { getGroupSeenMembers } from "../../../utils/getGroupSeenMembers";
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { useOutsideElement } from "../../../hooks/useOutsideElement";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFaceGrin } from "@fortawesome/free-regular-svg-icons";
@@ -21,7 +21,7 @@ type propsType = {
     messageId: string,
   ) => void;
 };
-export default function ReceivedMessages(props: propsType) {
+export default memo( function ReceivedMessages(props: propsType) {
   const {
     messages,
     previousMessageTime,
@@ -71,8 +71,10 @@ export default function ReceivedMessages(props: propsType) {
     const hoverdMessage = e.currentTarget.children[0];
     hoverdMessage.classList.remove("displayReactionBtn");
   };
+
+  
   return (
-    <div key={messages._id}>
+    <div className="ReceivedDiv" key={messages._id}>
       <h2 className="Messages_Day">
         {getDayOfMessages(messages.createdAt, previousMessageTime)}
         <p className="visually-hidden">day</p>
@@ -120,14 +122,11 @@ export default function ReceivedMessages(props: propsType) {
           )}
           {
             <p className="GroupMessage_Username">
-              {groupMembers?.get(messages.senderId)?.username ||
-                (selectedUser &&
-                  !isGroup(selectedUser) &&
-                  selectedUser?.username)}
+              {groupMembers?.get(messages.senderId)?.username}
             </p>
           }
           <div className="messageStyle received">
-            { messages.messageContent}
+            {messages.messageContent}
             {!Array.isArray(messages.reactions) && messages.reactions && (
               <p
                 className="PrivateMessage_reaction"
@@ -187,4 +186,4 @@ export default function ReceivedMessages(props: propsType) {
       </div>
     </div>
   );
-}
+})

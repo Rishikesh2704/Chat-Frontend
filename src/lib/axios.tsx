@@ -9,7 +9,6 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
   async (response) => response,
   async (error) => {
-    console.log(error);
     const originalRequest = error.config;
     if (!originalRequest) return error;
     if (error.response.status === 401 && !originalRequest._retry) {
@@ -41,8 +40,8 @@ export const axiosBaseQuery =
       return {
         data: result?.data,
       };
-    } catch (error) {
-      console.log("Axios Error: ", error);
+    } catch (error:any) {
+      console.log("Axios Error: ", error.payload.response.data);
       return { error: error };
     }
   };
