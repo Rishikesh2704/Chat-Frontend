@@ -9,7 +9,8 @@ import {
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { useUser } from "../lib/context";
 import { isGroup } from "../utils/IsGroup";
-import { decryptMessage } from "../utils/End2End";
+import { decryptMessage, deriveSharedKey } from "../utils/End2End";
+import axiosInstance from "../lib/axios";
 
 export default function useChatSocket(setIsTyping: any) {
   const { currentUser } = useAppSelector((state) => state.auth);
@@ -68,12 +69,18 @@ export default function useChatSocket(setIsTyping: any) {
       ack: any,
     ) => {
       ack(true);
-
+      console.log("Message: ", message);
+      const senderId = message.savedMessage.senderId;
+      const getPublicKey = await axiosInstance.get(
+        `/users/publicKey/${senderId}`,
+      );
+      const publicKey = getPublicKey.data.publicKey;
+      const sharedSecret = await deriveSharedKey(publicKey.publicKey);
+      if(!sharedSecret)return;
       const decryptedMessage = await decryptMessage(
         message.savedMessage.messageContent,
-        message.key,
+        sharedSecret,
         message.iv,
-        message.savedMessage.senderId,
       );
       if (!decryptedMessage) return;
       const decryptedMessagObject = {

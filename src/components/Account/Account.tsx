@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { setCurrentUser } from "../../redux/Auth/AuthSlice";
 import { useSetProfileMutation } from "../../redux/Chat/chatQuerySlice";
+import { toast } from "react-toastify";
 
 function toLocaleTime(time: string) {
   const date = new Date(time);
@@ -25,7 +26,7 @@ export default function Account() {
   const groupMembers = useGroupMembers();
 
   const dispatch = useAppDispatch();
-  const [ setProfile ] = useSetProfileMutation();
+  const [setProfile] = useSetProfileMutation();
 
   const handleUpdateProfile = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -37,14 +38,19 @@ export default function Account() {
 
         if (file) form.append("profile", file);
         current_user && form.append("oldProfile", current_user.profile);
-     
-        const response = await setProfile(form).unwrap();
+
+        const response = await toast.promise(setProfile(form).unwrap(), {
+          pending: "Updating Profile",
+          success: "Updated Profile",
+          error: "Failed to Update Profile",
+        });
         console.log("Response: ", response);
         dispatch(setCurrentUser(response.user));
         const stringUser = JSON.stringify(response.user);
         localStorage.setItem("Current_User", stringUser);
       };
       uploadProfile();
+      setPreview("")
     } catch (error) {
       console.log("Error", error);
     }
@@ -94,7 +100,10 @@ export default function Account() {
             </label>
           </div>
           <figcaption id="Profile_Username">
-            {current_user &&( !isGroup(current_user) ? current_user.username : current_user?.groupName)}
+            {current_user &&
+              (!isGroup(current_user)
+                ? current_user.username
+                : current_user?.groupName)}
           </figcaption>
         </figure>
         {preview && (
@@ -113,7 +122,10 @@ export default function Account() {
         {currentUser && !isGroup(currentUser) && (
           <div className="rows">
             <h2>Email</h2>
-            <span> {current_user && (!isGroup(current_user) && current_user.email)}</span>
+            <span>
+              {" "}
+              {current_user && !isGroup(current_user) && current_user.email}
+            </span>
           </div>
         )}
         <div className="rows">

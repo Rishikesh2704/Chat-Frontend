@@ -2,7 +2,8 @@ import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { prependMessages, setAllMessages } from "../redux/Chat/ChatSlice";
 import { useGetMessagesMutation } from "../redux/Chat/chatQuerySlice";
-import { decryptMessage, getSharedKey } from "../utils/End2End";
+import { decryptMessage, deriveSharedKey } from "../utils/End2End";
+import { isGroup } from "../utils/IsGroup";
 
 export default function useChatMessages(
   MessageSpaceRef: React.RefObject<HTMLDivElement | null>,
@@ -44,24 +45,30 @@ export default function useChatMessages(
           skipMessages: skipMessages.current,
         }).unwrap();
         [];
-        const sharedKey= await getSharedKey(selectedUser._id)
-        let decryptedMessages = data.map(
-          async (encryptedMessage: AllMessageType) => {
-            const decryptedMessage = await decryptMessage(
-              encryptedMessage.messageContent,
-              sharedKey,
-              encryptedMessage.iv,
-              selectedUser._id
-            );
-            const decryptedMessageObject = {
-              ...encryptedMessage,
-              messageContent: decryptedMessage,
-            };
-            return decryptedMessageObject;
-          },
-        );
-        const messages = await Promise.all(decryptedMessages);
-        dispatch(setAllMessages(messages));
+        if (!isGroup(selectedUser) && selectedUser.publicKey) {
+        let sharedSecret = await deriveSharedKey(
+            selectedUser.publicKey.publicKey,
+          );
+          if (!sharedSecret) return;
+          let decryptedMessages = data.map(
+            async (encryptedMessage: AllMessageType) => {
+              const decryptedMessage = await decryptMessage(
+                encryptedMessage.messageContent,
+                sharedSecret,
+                encryptedMessage.iv,
+              );
+              const decryptedMessageObject = {
+                ...encryptedMessage,
+                messageContent: decryptedMessage,
+              };
+              return decryptedMessageObject;
+            },
+          );
+          let messages = await Promise.all(decryptedMessages);
+          dispatch(setAllMessages(messages));
+          return;
+        }
+        dispatch(setAllMessages(data));
       } catch (error) {
         console.log("Failed to fetch recent messages: ", error);
       }

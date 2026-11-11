@@ -30,10 +30,11 @@ export default function Home() {
 
   const [isTyping, setIsTyping] = useState<any>({ id: "", isTyping: false });
   useEffect(() => {
+    //Will fix later
     async function sendPublicKey() {
       try {
         const { publicKey, rawKeyPair } = await generateUserKeyPairs();
-        storePrivateKey(rawKeyPair.privateKey)
+        storePrivateKey(rawKeyPair.privateKey);
         await axiosInstance.post("/users/publicKey", { publicKey });
       } catch (error) {
         console.log(error);
@@ -41,10 +42,9 @@ export default function Home() {
     }
 
     sendPublicKey();
-    
   }, []);
 
-  useChatUsers();
+  const { error } = useChatUsers();
 
   useChatSocket(setIsTyping);
 
@@ -63,7 +63,7 @@ export default function Home() {
 
         <Search />
         <BoundaryWrapper>
-          <Friends />
+          <Friends error={error}  />
         </BoundaryWrapper>
         <button
           className="Create_Group_Btn"

@@ -7,7 +7,8 @@ import { setAllMessages, setSelectedUser } from "../../../redux/Chat/ChatSlice";
 
 import { toLocaleTime } from "../../../utils/MessagesTime";
 import axiosInstance from "../../../lib/axios";
-import { generateSharedKey, storeSharedKey } from "../../../utils/End2End";
+import { deriveSharedKey } from "../../../utils/End2End";
+// import { generateSharedKey, storeSharedKey } from "../../../utils/End2End";
 
 async function getUserPublicKey(userId: string) {
   try {
@@ -19,7 +20,7 @@ async function getUserPublicKey(userId: string) {
   }
 }
 
-export default function Friends() {
+export default function Friends({error}:{error:any}) {
   const { users, selectedUser, onlineUsers } = useAppSelector(
     (state) => state.chat,
   );
@@ -57,17 +58,20 @@ export default function Friends() {
     e.currentTarget.classList.add("selectedUser");
     mobileChatSpace?.classList.add("mobileChat");
     const publicKey = await getUserPublicKey(user._id);
-    const sharedKey = await generateSharedKey(publicKey.publicKey,user._id);
-    if (!sharedKey) return;
-    await storeSharedKey(sharedKey.rawSharedKey,sharedKey.encryptedSharedKeyString, user._id);
+    const derivedSecret = await deriveSharedKey(publicKey.publicKey);
+    if(!derivedSecret) return;
     const newUser = {
       ...user,
       publicKey,
-      encryptedSharedKey: sharedKey?.encryptedSharedKeyString,
+      sharedSecret:JSON.stringify(derivedSecret),
     };
     dispatch(setSelectedUser(newUser));
     dispatch(setAllMessages([]));
   };
+
+  if(error){
+    throw error
+  }
 
   if (users.length < 1) {
     return (

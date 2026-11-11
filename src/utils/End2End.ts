@@ -4,41 +4,85 @@ const DB_VR = 1;
 export const generateUserKeyPairs = async () => {
   const keyPair = await window.crypto.subtle.generateKey(
     {
-      name: "RSA-OAEP",
-      modulusLength: 2048,
-      publicExponent: new Uint8Array([1, 0, 1]),
-      hash: { name: "SHA-256" },
+      name: "ECDH",
+      namedCurve: "P-256",
     },
     true,
-    ["wrapKey", "unwrapKey"],
+    ["deriveKey", "deriveBits",],
   );
 
-  const jwkPublicKey = await window.crypto.subtle.exportKey(
-    "jwk",
+  const publicKeyBuffer = await crypto.subtle.exportKey(
+    "raw",
     keyPair.publicKey,
   );
   const jwkPrivateKey = await window.crypto.subtle.exportKey(
     "jwk",
     keyPair.privateKey,
-  );
-
+  ); 
   return {
-    publicKey: jwkPublicKey,
-    privateKey: jwkPrivateKey,
+    publicKey: btoa(String.fromCharCode(...new Uint8Array(publicKeyBuffer))),
+    privateKey:jwkPrivateKey,
     rawKeyPair: keyPair,
   };
 };
 
-export const generateSharedKey = async (
+// export const generateSharedKey = async (
+//   recipientPublicKey: string,
+//   // usersPrivateKey:CryptoKey
+//   userId: string,
+// ) => {
+//   try {
+//     const storedSharedKey = await getSharedKey(userId);
+//     if (storedSharedKey.rawSharedKey) {
+//       return storedSharedKey;
+//     }
+//     const sharedKey = await window.crypto.subtle.generateKey(
+//       {
+//         name: "AES-GCM",
+//         length: 256,
+//       },
+//       true,
+//       ["encrypt", "decrypt"],
+//     );
+
+//     const encryptedSharedKey = await encyptSharedKey(
+//       sharedKey,
+//       recipientPublicKey,
+//     );
+//     console.log("encyrptedSharedKey:", encryptedSharedKey);
+//     return {
+//       rawSharedKey: sharedKey,
+//       encryptedSharedKeyString: encryptedSharedKey,
+//     };
+//   } catch (error) {
+//     console.log("Failed to generate sharedKey: ", error);
+//   }
+// };
+
+export const deriveSharedKey = async (
   recipientPublicKey: string,
-  userId: string,
-) => {
+): Promise<CryptoKey | null> => {
   try {
-    const storedSharedKey = await getSharedKey(userId);
-    if (storedSharedKey.rawSharedKey) {
-      return storedSharedKey;
-    }
-    const sharedKey = await window.crypto.subtle.generateKey(
+    const parsedPublicKey = Uint8Array.from(atob(recipientPublicKey), (c) =>
+      c.charCodeAt(0),
+    );
+    const userPrivateKey = await getPrivateKey();
+    const importPublicKey = await window.crypto.subtle.importKey(
+      "raw",
+      parsedPublicKey,
+      {
+        name: "ECDH",
+        namedCurve: "P-256",
+      },
+      true,
+      [],
+    );
+    const derivedSecret = await window.crypto.subtle.deriveKey(
+      {
+        name: "ECDH",
+        public: importPublicKey,
+      },
+      userPrivateKey,
       {
         name: "AES-GCM",
         length: 256,
@@ -46,52 +90,75 @@ export const generateSharedKey = async (
       true,
       ["encrypt", "decrypt"],
     );
-
-    const encryptedSharedKey = await encyptSharedKey(
-      sharedKey,
-      recipientPublicKey,
-    );
-    console.log("encyrptedSharedKey:", encryptedSharedKey);
-    return {
-      rawSharedKey: sharedKey,
-      encryptedSharedKeyString: encryptedSharedKey,
-    };
+    return derivedSecret;
   } catch (error) {
-    console.log("Failed to generate sharedKey: ", error);
+    console.log("Failed to derive shared secret:", error);
+    return null;
   }
 };
 
-export const storeSharedKey = async (
-  rawSharedKey: CryptoKey,
-  encryptedSharedKey: string,
-  userId: string,
+export const generateKeyFromPassword = async (
+  password: string,
+  salt: any = null,
 ) => {
-  const req = indexedDB.open(DB_NAME, DB_VR);
+  const encodedPassword = new TextEncoder().encode(password);
+  const passwordKey = await window.crypto.subtle.importKey(
+    "raw",
+    encodedPassword,
+    "PBKDF2",
+    false,
+    ["deriveKey"],
+  );
+  const newSalt = salt || window.crypto.getRandomValues(new Uint8Array(16));
+  const masterKey = await window.crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: newSalt,
+      iterations: 600000,
+      hash: "SHA-256",
+    },
+    passwordKey,
+    {
+      name: "AES-GCM",
+      length: 256,
+    },
+    true,
+    ["encrypt", "decrypt", 'wrapKey', 'unwrapKey'],
+  );
 
-  req.onsuccess = (e: any) => {
-    const db = e?.target?.result;
-    const transaction = db.transaction("sharedKey", "readwrite");
-    const store = transaction.objectStore("sharedKey");
-    store.add({
-      userId: userId,
-      rawSharedKey: rawSharedKey,
-      encryptedSharedKey: encryptedSharedKey,
-      algorithm: "AES-GCM",
-    });
-  };
-
-  req.onerror = () => {
-    console.log("Error while storing private key: ", req.error);
-    req.error;
-  };
+  return { masterKey: masterKey, salt: btoa(String.fromCharCode(...newSalt)) };
 };
+
+// export const storeSharedKey = async (
+//   rawSharedKey: CryptoKey,
+//   encryptedSharedKey: string,
+//   userId: string,
+// ) => {
+//   const req = indexedDB.open(DB_NAME, DB_VR);
+
+//   req.onsuccess = (e: any) => {
+//     const db = e?.target?.result;
+//     const transaction = db.transaction("sharedKey", "readwrite");
+//     const store = transaction.objectStore("sharedKey");
+//     store.add({
+//       userId: userId,
+//       rawSharedKey: rawSharedKey,
+//       encryptedSharedKey: encryptedSharedKey,
+//       algorithm: "AES-GCM",
+//     });
+//   };
+
+//   req.onerror = () => {
+//     console.log("Error while storing private key: ", req.error);
+//     req.error;
+//   };
+// };
 
 export const storePrivateKey = async (privateKey: CryptoKey) => {
   const req = indexedDB.open(DB_NAME, DB_VR);
   req.onupgradeneeded = () => {
     const db = req.result;
     db.createObjectStore("privateKey", { keyPath: "id" });
-    db.createObjectStore("sharedKey", { keyPath: "userId" });
   };
   req.onsuccess = (e: any) => {
     const db = e?.target?.result;
@@ -100,7 +167,7 @@ export const storePrivateKey = async (privateKey: CryptoKey) => {
     store.add({
       id: "user-private-key",
       privateKey: privateKey,
-      algorithm: "RSA-OAEP",
+      algorithm: "ECDH",
     });
   };
 
@@ -111,56 +178,148 @@ export const storePrivateKey = async (privateKey: CryptoKey) => {
   // const db:any = await indexDb();
 };
 
-export const encyptSharedKey = async (sharedKey: CryptoKey, key: any) => {
-  const parsedKey = JSON.parse(key);
-  console.log("Parsed Key: ", parsedKey);
-  const importedRecipientPublicKey = await window.crypto.subtle.importKey(
-    "jwk",
-    parsedKey,
-    { name: "RSA-OAEP", hash: { name: "SHA-256" } },
+// export const encyptSharedKey = async (sharedKey: CryptoKey, key: any) => {
+//   const parsedKey = JSON.parse(key);
+//   console.log("Parsed Key: ", parsedKey);
+//   const importedRecipientPublicKey = await window.crypto.subtle.importKey(
+//     "jwk",
+//     parsedKey,
+//     { name: "RSA-OAEP", hash: { name: "SHA-256" } },
+//     true,
+//     ["wrapKey"],
+//   );
+//   console.log("Imported Public Key: ", importedRecipientPublicKey);
+//   const encryptedSharedKey = await window.crypto.subtle.deriveKey(
+//     {
+//       name:'ECDH',
+//       publicKey:importedRecipientPublicKey
+//     },sharedKey,
+//     {
+//       name
+//     }
+
+//   );
+
+//   return btoa(String.fromCharCode(...new Uint8Array(encryptedSharedKey)));
+// };
+
+export const encryptPrivateKey = async (
+  jwkPrivateKey: JsonWebKey,
+  masterKey: CryptoKey,
+) => {
+  const iv = crypto.getRandomValues(new Uint8Array(16));
+  const privateKey = await window.crypto.subtle.importKey(
+    'jwk',
+    jwkPrivateKey,
+    {
+      name:"ECDH",
+      namedCurve:'P-256',
+    },
     true,
-    ["wrapKey"],
-  );
-  console.log("Imported Public Key: ", importedRecipientPublicKey);
-  const encryptedSharedKey = await window.crypto.subtle.wrapKey(
-    "jwk",
-    sharedKey,
-    importedRecipientPublicKey,
-    { name: "RSA-OAEP" },
-  );
-
-  return btoa(String.fromCharCode(...new Uint8Array(encryptedSharedKey)));
+    ['deriveKey','deriveBits']
+  )
+  // const encryptedPrivateKey = await window.crypto.subtle.encrypt(
+  //   {
+  //     name: "AES-GCM",
+  //     length: 256,
+  //     iv: iv,
+  //   },
+  //   masterKey,
+  //   privateKey,
+  // );
+  const encryptedPrivateKey = await window.crypto.subtle.wrapKey(
+    'jwk',
+    privateKey,
+    masterKey,
+    {
+      name:"AES-GCM",
+      length:256,
+      iv:iv,
+    }
+  )
+  return {
+    encryptedPrivateKey: btoa(
+      String.fromCharCode(...new Uint8Array(encryptedPrivateKey)),
+    ),
+    iv: btoa(String.fromCharCode(...new Uint8Array(iv))),
+  };
 };
 
-export const getSharedKey = async (
-  userId: string,
-): Promise<{ rawSharedKey: CryptoKey; encryptedSharedKeyString: string }> => {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VR);
-    req.onsuccess = () => {
-      const db = req.result;
-      const transaction = db.transaction("sharedKey", "readwrite");
-      const store = transaction.objectStore("sharedKey").get(userId);
-      store.onsuccess = () =>
-        resolve({
-          rawSharedKey: store.result?.rawSharedKey,
-          encryptedSharedKeyString: store.result?.encryptedSharedKey,
-        });
-    };
-    req.onerror = () => {
-      console.log("Failed retrieve sharedKey");
-      reject(req.error);
-    };
-  });
-};
+export const decryptEncryptedPrivate = async(encryptedPrivateKey:string, password:string, salt:string, iv:string) => {
+  const saltBuffer = Uint8Array.from(atob(salt), (c) => c.charCodeAt(0));
+  const privateKeyArrayBuffer = Uint8Array.from(atob(encryptedPrivateKey), (c) => c.charCodeAt(0));
+  const { masterKey } = await generateKeyFromPassword(password, saltBuffer);
+  const ivBuffer = Uint8Array.from(atob(iv), (c) => c.charCodeAt(0));
+  // const decryptedPrivateKey = await window.crypto.subtle.u(
+  //   {
+  //     name:"AES-GCM",
+  //     length:256,
+  //     iv:ivBuffer
+  //   },
+  //   masterKey,
+  //   privateKeyArrayBuffer
+  // )
+  // const importprivateKey = await window.crypto.subtle.importKey(
+  //   'pkcs8',
+  //   decryptedPrivateKey,
+  //   {
+  //     name:"ECDH",
+  //     namedCurve:"P-256"
+  //   },
+  //   true,
+  //   ['deriveKey']
+  // )
+  const decryptedPrivateKey= await window.crypto.subtle.unwrapKey(
+    'jwk',
+    privateKeyArrayBuffer,
+    masterKey,
+    {
+      name:"AES-GCM",
+      length:256,
+      iv:ivBuffer
+    },{
+      name:"ECDH",
+      namedCurve:'P-256'
+    },
+    true,
+    ['deriveKey', 'deriveBits']
+  )
+  return decryptedPrivateKey
+}
 
-export const encryptMessage = async (message: string, userId: string) => {
+// export const getSharedKey = async (
+//   userId: string,
+// ): Promise<{ rawSharedKey: CryptoKey; encryptedSharedKeyString: string }> => {
+//   return new Promise((resolve, reject) => {
+//     const req = indexedDB.open(DB_NAME, DB_VR);
+//     req.onsuccess = () => {
+//       const db = req.result;
+//       const transaction = db.transaction("sharedKey", "readwrite");
+//       const store = transaction.objectStore("sharedKey").get(userId);
+//       store.onsuccess = () =>
+//         resolve({
+//           rawSharedKey: store.result?.rawSharedKey,
+//           encryptedSharedKeyString: store.result?.encryptedSharedKey,
+//         });
+//     };
+//     req.onerror = () => {
+//       console.log("Failed retrieve sharedKey");
+//       reject(req.error);
+//     };
+//   });
+// };
+
+export const encryptMessage = async (
+  message: string,
+  recipientPublicKey: string,
+) => {
   const encodedMessage = new TextEncoder().encode(message);
-  const { rawSharedKey: sharedKey } = await getSharedKey(userId);
+  const sharedSecret = await deriveSharedKey(recipientPublicKey);
+  if (!sharedSecret) return;
   const iv = window.crypto.getRandomValues(new Uint8Array(12));
   const encrypt = await window.crypto.subtle.encrypt(
     { name: "AES-GCM", length: 256, iv },
-    sharedKey,
+    sharedSecret,
     encodedMessage,
   );
   return {
@@ -169,7 +328,7 @@ export const encryptMessage = async (message: string, userId: string) => {
   };
 };
 
-const getPrivateKey = async (): Promise<CryptoKey> => {
+export const getPrivateKey = async (): Promise<CryptoKey> => {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VR);
     req.onsuccess = (e: any) => {
@@ -189,39 +348,14 @@ const getPrivateKey = async (): Promise<CryptoKey> => {
 
 export const decryptMessage = async (
   message: any,
-  key: any,
+  sharedSecret:CryptoKey,
   iv: any,
-  userId: string,
 ) => {
   try {
-    let sharedKey;
-    let privateKey = await getPrivateKey();
-    const { rawSharedKey } = await getSharedKey(userId);
-    sharedKey = rawSharedKey;
-    if (!rawSharedKey) {
-      const sharedKeyArrayBuffer = Uint8Array.from(atob(key), (c) =>
-        c.charCodeAt(0),
-      );
-      sharedKey = await window.crypto.subtle.unwrapKey(
-        "jwk",
-        sharedKeyArrayBuffer,
-        privateKey,
-        {
-          name: "RSA-OAEP",
-        },
-        {
-          name: "AES-GCM",
-          length: 256,
-        },
-        true,
-        ["encrypt", "decrypt"],
-      );
-      await storeSharedKey(sharedKey, key, userId);
-    }
-
     const messageBinaryArray = Uint8Array.from(atob(message), (c) =>
       c.charCodeAt(0),
     );
+
     const ivArrayBuffer = Uint8Array.from(atob(iv), (c) => c.charCodeAt(0));
     const decryptedMessage = await window.crypto.subtle.decrypt(
       {
@@ -229,7 +363,7 @@ export const decryptMessage = async (
         length: 256,
         iv: ivArrayBuffer,
       },
-      sharedKey,
+      sharedSecret,
       messageBinaryArray,
     );
 

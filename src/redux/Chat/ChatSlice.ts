@@ -107,7 +107,7 @@ const chatSlicer = createSlice({
         }
         return u;
       });
-
+      console.log("Redux-users", state.users)
       return {
         ...state,
         users: updatedUserConversation,

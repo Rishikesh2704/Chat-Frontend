@@ -22,9 +22,10 @@ import {
 } from "../../../redux/Chat/chatQuerySlice";
 import {
   decryptMessage,
+  deriveSharedKey,
   encryptMessage,
-  getSharedKey,
 } from "../../../utils/End2End";
+import axiosInstance from "../../../lib/axios";
 
 type propsType = {
   message: string | undefined;
@@ -101,7 +102,6 @@ export default function MessageForm(props: propsType) {
     const form = new FormData();
     form.append("image", file || "");
     form.append("message", message);
-    form.append("key", selectedUser.encryptedSharedKey);
     form.append("iv", iv);
     form.append("conversationId", conversationId);
     form.append("receiverSocketId", userSocketId);
@@ -143,9 +143,11 @@ export default function MessageForm(props: propsType) {
     if (message == undefined) return;
     const messageSpaceDiv = document.getElementsByClassName("Messages")[0];
     let encryptedData;
-
-    if (!isGroup(selectedUser)) {
-      encryptedData = await encryptMessage(message, selectedUser?._id);
+    if (!isGroup(selectedUser) && selectedUser.publicKey) {
+      encryptedData = await encryptMessage(
+        message,
+        selectedUser.publicKey?.publicKey,
+      );
     }
     try {
       const messageRequest = !isGroup(selectedUser)
@@ -206,15 +208,20 @@ export default function MessageForm(props: propsType) {
       console.log("Conversation is undefined");
       return null;
     }
-    const sharedKey = await getSharedKey(userId);
+    const getPublicKey = await axiosInstance.get(`/users/publicKey/${userId}`);
+    const publicKey = getPublicKey.data.publicKey.publicKey;
+    const sharedKey = await deriveSharedKey(publicKey);
+    if (!sharedKey) return;
     const { lastMessage } = Conversation;
     const decryptedMessage = await decryptMessage(
       lastMessage.message,
       sharedKey,
       lastMessage.messageIv,
-      userId,
     );
-    const updatedLastMessage = { ...lastMessage, message: decryptedMessage|| "" };
+    const updatedLastMessage = {
+      ...lastMessage,
+      message: decryptedMessage || "",
+    };
     const updatedConversation = {
       ...Conversation,
       lastMessage: updatedLastMessage,

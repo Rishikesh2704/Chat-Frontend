@@ -4,16 +4,14 @@ import { useNavigate } from "react-router";
 
 import { setCurrentUser } from "../../redux/Auth/AuthSlice.js";
 import { useAppDispatch } from "../../redux/hooks.js";
-import {
-  useSignUpMutation,
-} from "../../redux/Auth/authQuerySlice.js";
+import { useSignUpMutation } from "../../redux/Auth/authQuerySlice.js";
 
 export default function SignUp() {
   const dispatch = useAppDispatch();
   const [email, setEmail] = useState<string>();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
-  
+
   const navigate = useNavigate();
 
   const [signup, { isLoading, error }] = useSignUpMutation();
@@ -31,6 +29,10 @@ export default function SignUp() {
         password: password || null,
       }).unwrap();
       const user = response.user;
+      // const { publicKey, rawKeyPair } = await generateUserKeyPairs();
+      // // storePrivateKey(rawKeyPair.privateKey);
+      // await axiosInstance.post("/users/publicKey", { publicKey });
+
       dispatch(setCurrentUser(user));
       navigate("/");
     } catch (error) {

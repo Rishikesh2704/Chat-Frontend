@@ -16,7 +16,7 @@ export const authApi = createApi({
       }),
     }),
 
-    login: build.mutation<any, { email: string | null; password: string | null }>({
+    login: build.mutation<any, { email: string | null; password: string | null}>({
       query: (userCreds) => ({
         url: "/auth/login",
         method: "POST",

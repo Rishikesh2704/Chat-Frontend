@@ -2,12 +2,13 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { setUsers } from "../redux/Chat/ChatSlice";
 import { useGetUsersQuery } from "../redux/Chat/chatQuerySlice";
-import { decryptMessage, getSharedKey } from "../utils/End2End";
+import { decryptMessage, deriveSharedKey } from "../utils/End2End";
+import axiosInstance from "../lib/axios";
 
 export default function useChatUser() {
   const dispatch = useAppDispatch();
   const { currentUser } = useAppSelector((state) => state.auth);
-  const { data, isSuccess, refetch } = useGetUsersQuery();
+  const { data, isSuccess, error } = useGetUsersQuery();
 
   async function transformConversation(
     friendsConvos: Conversation[],
@@ -62,10 +63,11 @@ export default function useChatUser() {
           console.log("Conversation is undefined");
           return;
       }
-      const sharedKey = await getSharedKey(conversation._id)
+      const getPublicKey = await axiosInstance.get(`/users/publicKey/${conversation._id}`)
+      const sharedSecret = await deriveSharedKey(getPublicKey.data.publicKey.publicKey)
+      if(!sharedSecret) return 
       const {lastMessage} = conversation
-      console.log("conversation: ", conversation,"\n sharedKey:", sharedKey)
-      const decryptedMessage = await decryptMessage(lastMessage.message, sharedKey, lastMessage.messageIv, conversation._id)
+      const decryptedMessage = await decryptMessage(lastMessage.message, sharedSecret, lastMessage.messageIv)
       const updatedLastMessage = {...lastMessage, message:decryptedMessage}
       const updatedConversation = {...conversation, lastMessage:updatedLastMessage}
       return updatedConversation
@@ -88,5 +90,5 @@ export default function useChatUser() {
     Users();
   }, [isSuccess]);
 
-  return { refetch };
+  return { error };
 }
