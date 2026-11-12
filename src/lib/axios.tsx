@@ -41,8 +41,7 @@ export const axiosBaseQuery =
         data: result?.data,
       };
     } catch (error:any) {
-      console.log("Axios Error: ", error.payload.response.data);
-      return { error: error };
+      return { error: error.response.data  };
     }
   };
 

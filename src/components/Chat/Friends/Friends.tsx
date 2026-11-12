@@ -73,13 +73,7 @@ export default function Friends({error}:{error:any}) {
     throw error
   }
 
-  if (users.length < 1) {
-    return (
-      <div className="Chat_Friends">
-        <div className="FriendsLoader blackloader"></div>
-      </div>
-    );
-  }
+  
   return (
     <div className="Chat_Friends">
       {isFriendsOrSearch().map((user: any) => {

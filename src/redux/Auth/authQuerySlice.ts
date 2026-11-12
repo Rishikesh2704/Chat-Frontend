@@ -7,7 +7,15 @@ export const authApi = createApi({
   endpoints: (build) => ({
     signUp: build.mutation<
       any,
-      { email: string | null; username: string | null; password: string | null }
+      {
+        email: string;
+        username: string;
+        password: string;
+        publicKey: string;
+        encryptedPrivateKey: string;
+        salt: string;
+        iv: string;
+      }
     >({
       query: (userCreds) => ({
         url: "/auth/signup",
@@ -16,7 +24,10 @@ export const authApi = createApi({
       }),
     }),
 
-    login: build.mutation<any, { email: string | null; password: string | null}>({
+    login: build.mutation<
+      any,
+      { email: string ; password: string  }
+    >({
       query: (userCreds) => ({
         url: "/auth/login",
         method: "POST",
@@ -33,4 +44,5 @@ export const authApi = createApi({
   }),
 });
 
-export const { useSignUpMutation, useLoginMutation, useLogoutMutation } = authApi;
+export const { useSignUpMutation, useLoginMutation, useLogoutMutation } =
+  authApi;

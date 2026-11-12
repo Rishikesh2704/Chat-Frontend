@@ -100,6 +100,7 @@ export default function MessageForm(props: propsType) {
       ? onlineUsers[selectedUser._id as any]
       : "";
     const form = new FormData();
+   
     form.append("image", file || "");
     form.append("message", message);
     form.append("iv", iv);

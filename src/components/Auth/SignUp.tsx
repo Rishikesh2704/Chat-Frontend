@@ -5,12 +5,21 @@ import { useNavigate } from "react-router";
 import { setCurrentUser } from "../../redux/Auth/AuthSlice.js";
 import { useAppDispatch } from "../../redux/hooks.js";
 import { useSignUpMutation } from "../../redux/Auth/authQuerySlice.js";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
+import {
+  encryptPrivateKey,
+  generateKeyFromPassword,
+  generateUserKeyPairs,
+  storePrivateKey,
+} from "../../utils/End2End.js";
 
 export default function SignUp() {
   const dispatch = useAppDispatch();
   const [email, setEmail] = useState<string>();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -22,17 +31,31 @@ export default function SignUp() {
 
   const handleSignUpSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!email || !username || !password) {
+      console.log("Fill all the fields");
+      return;
+    }
     try {
+      const { masterKey, salt } = await generateKeyFromPassword(password);
+
+      const { publicKey, privateKey, rawKeyPair } =
+        await generateUserKeyPairs();
+      await storePrivateKey(rawKeyPair.privateKey);
+      const { encryptedPrivateKey, iv } = await encryptPrivateKey(
+        privateKey,
+        masterKey,
+      );
+    
       const response = await signup({
-        email: email || null,
-        username: username || null,
-        password: password || null,
+        email: email ,
+        username: username ,
+        password: password ,
+        publicKey:publicKey,
+        encryptedPrivateKey,
+        salt,
+        iv,
       }).unwrap();
       const user = response.user;
-      // const { publicKey, rawKeyPair } = await generateUserKeyPairs();
-      // // storePrivateKey(rawKeyPair.privateKey);
-      // await axiosInstance.post("/users/publicKey", { publicKey });
-
       dispatch(setCurrentUser(user));
       navigate("/");
     } catch (error) {
@@ -76,11 +99,16 @@ export default function SignUp() {
           <div className="fields">
             <label>Password</label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Rajesh1234..."
               onChange={(e) => setPassword(e.target.value)}
               value={password}
               required
+            />
+            <FontAwesomeIcon
+              id="showPassword_btn"
+              icon={showPassword ? faEyeSlash : faEye}
+              onClick={() => setShowPassword((prev) => !prev)}
             />
           </div>
           <p id="CreateAccount">

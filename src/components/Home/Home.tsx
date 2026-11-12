@@ -1,6 +1,6 @@
 import "./Home.css";
 
-import { lazy, useEffect, useState } from "react";
+import { lazy, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMessage } from "@fortawesome/free-solid-svg-icons";
 
@@ -15,8 +15,6 @@ import Account from "../Account/Account.js";
 import { Search } from "../Search/Search.js";
 
 import BoundaryWrapper from "../../lib/BoundaryWrapper.js";
-import axiosInstance from "../../lib/axios.js";
-import { generateUserKeyPairs, storePrivateKey } from "../../utils/End2End.js";
 
 const Modal = lazy(() =>
   import("../Modal/Modal.js").then((m) => ({ default: m.Modal })),
@@ -29,20 +27,7 @@ export default function Home() {
   const { viewModal } = useAppSelector((state) => state.modal);
 
   const [isTyping, setIsTyping] = useState<any>({ id: "", isTyping: false });
-  useEffect(() => {
-    //Will fix later
-    async function sendPublicKey() {
-      try {
-        const { publicKey, rawKeyPair } = await generateUserKeyPairs();
-        storePrivateKey(rawKeyPair.privateKey);
-        await axiosInstance.post("/users/publicKey", { publicKey });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    sendPublicKey();
-  }, []);
+ 
 
   const { error } = useChatUsers();
 

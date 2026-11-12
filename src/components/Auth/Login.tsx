@@ -24,30 +24,15 @@ export default function Login() {
     e.preventDefault();
     if (!email || !password) return;
     try {
-    //   const { masterKey, salt } = await generateKeyFromPassword(password);
-    //   // const { publicKey, privateKey, rawKeyPair } = await generateUserKeyPairs();
-    //   const privateKey = await getPrivateKey();
-    //  const exportPrivateKey= await window.crypto.subtle.exportKey(
-    //   'jwk',
-    //   privateKey
-    //  )
-    //  console.log("Salt" , salt)
-    //   const { encryptedPrivateKey, iv } = await encryptPrivateKey(
-    //     exportPrivateKey,
-    //     masterKey,
-    //   );
-      // await decryptEncryptedPrivate(encryptedPrivateKey, password, salt, iv)
       const response = await login({
         email: email,
         password: password
       }).unwrap();
       const user = response.user;
-      console.log("User: ", user);  
       const { encryptedKey } = user
       const { key, salt, iv } = encryptedKey
       const decryptedPrivateKey = await decryptEncryptedPrivate(key, password, salt,iv);
       await storePrivateKey(decryptedPrivateKey);
-      console.log('Decrypted Private Key:', decryptedPrivateKey);
       dispatch(setCurrentUser(user));
       navigate("/");
     } catch (err) {
