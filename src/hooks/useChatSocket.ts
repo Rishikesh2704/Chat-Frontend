@@ -153,7 +153,6 @@ export default function useChatSocket(setIsTyping: any) {
       console.log("No Users Found: ");
       return;
     }
-
     const groupRoomIds = users
       .filter((user) => isGroup(user))
       .map((group) => group.roomId);

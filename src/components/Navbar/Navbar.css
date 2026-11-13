@@ -131,9 +131,9 @@ nav {
   }
 }
 
-#navbar_profileImg{
-  height:2rem;
-  width:2rem;
+#navbar_profileImg {
+  height: 2rem;
+  width: 2rem;
   border-radius: 50%;
 }
 
@@ -147,16 +147,26 @@ nav {
     transform: translateX(-50%);
   }
 
-  .Nav_Options{
-    width:96%;
+  .Nav_Options {
+    width: 96%;
   }
 
   .Icons_Wrapper {
-    width: 15%;
-    gap:1rem;
+    width: 25%;
+    gap: 1rem;
+    --icons-width: 2.4rem;
+    --icons-height: 2.4rem;
   }
 
-  .Anchor{
+  .Anchor {
     font-size: 2.3vmax;
+    border-radius: 50%;
   }
+
+  
+#navbar_profileImg {
+  height: 1.8rem;
+  width: 1.8rem;
+  border-radius: 50%;
+}
 }

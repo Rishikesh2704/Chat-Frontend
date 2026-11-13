@@ -20,7 +20,7 @@ async function getUserPublicKey(userId: string) {
   }
 }
 
-export default function Friends({error}:{error:any}) {
+export default function Friends({error, isLoading}:{error:any, isLoading:any}) {
   const { users, selectedUser, onlineUsers } = useAppSelector(
     (state) => state.chat,
   );

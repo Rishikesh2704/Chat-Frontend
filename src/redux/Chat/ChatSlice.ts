@@ -60,7 +60,6 @@ const chatSlicer = createSlice({
     },
 
     addNewMessage: (state, action: PayloadAction<any>) => {
-      
       return {
         ...state,
         allMessages: [...state.allMessages, action.payload],
@@ -100,17 +99,23 @@ const chatSlicer = createSlice({
         lastMessage: conversation.lastMessage,
         updatedAt: conversation.updatedAt,
       };
-
-      const updatedUserConversation = state.users.map((u: any) => {
-        if (u._id === transformedConversation._id) {
-          return transformedConversation;
-        }
-        return u;
-      });
-      console.log("Redux-users", state.users)
+      const doesExist = state.users.find(
+        (l) => l._id === transformedConversation._id,
+      );
+      let updatedUserConversations;
+      if (doesExist) {
+        updatedUserConversations = state.users.map((u: any) => {
+          if (u._id === transformedConversation._id) {
+            return transformedConversation;
+          }
+          return u;
+        });
+      }
+      else updatedUserConversations = [...state.users, transformedConversation]
+      
       return {
         ...state,
-        users: updatedUserConversation,
+        users: updatedUserConversations,
       };
     },
 

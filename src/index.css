@@ -74,7 +74,7 @@ main {
 
 .loader {
   width: 35px;
-  aspect-ratio: 1;
+  aspect-ratio: 1/1;
   border-radius: 50%;
   background:
     radial-gradient(farthest-side, #fdfcfc 94%, #0000) top/8px 8px no-repeat,

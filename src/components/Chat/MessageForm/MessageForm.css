@@ -72,8 +72,8 @@
 }
 
 #sendMessage_button {
-  height: 85%;
-  width: 5%;
+  height: 75%;
+  width: 7.5%;
   color: rgb(6, 6, 6);
   transform: scale(1.1);
   position: relative;
@@ -84,17 +84,17 @@
   border: none;
   background: var(--primary-gradient);
   cursor: pointer;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   &:hover {
     background-color: var(--primary-hover-color);
   }
 }
 
-.SendMessageLoader{
-  height:70%;
-  width:70%;  
+.SendMessageLoader {
+  width: 50%;
+  aspect-ratio: 1/1;
 }
 
 @keyframes slideInPreview {
@@ -239,6 +239,9 @@
   #message_input {
     height: 70%;
   }
+   .SendMessageLoader {
+    width: 3vmin;
+  }
 }
 
 @media only screen and (max-width: 1000px) {
@@ -255,6 +258,10 @@
 
   #message_input {
     height: 70%;
+  }
+
+  .SendMessageLoader {
+    width: 2.8vmin;
   }
 }
 
@@ -289,5 +296,8 @@
     position: absolute;
     bottom: -0.5rem;
     right: -100%;
+  }
+  .SendMessageLoader {
+    width: 5vmin;
   }
 }

@@ -29,7 +29,7 @@ export default function Home() {
   const [isTyping, setIsTyping] = useState<any>({ id: "", isTyping: false });
  
 
-  const { error } = useChatUsers();
+  const { error, isLoading, refetch } = useChatUsers();
 
   useChatSocket(setIsTyping);
 
@@ -47,8 +47,8 @@ export default function Home() {
         </div>
 
         <Search />
-        <BoundaryWrapper>
-          <Friends error={error}  />
+        <BoundaryWrapper >
+          <Friends error={error} isLoading={isLoading} />
         </BoundaryWrapper>
         <button
           className="Create_Group_Btn"

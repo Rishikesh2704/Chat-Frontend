@@ -134,6 +134,15 @@
     padding-bottom: 0;
   }
 
+  
+.User_Details_Username  {
+  font-size: 1.3vmax;
+}
+.User_Details_Username > h2 {
+  font-size: inherit;
+}
+
+
   .profile_picture {
     height: 2.5rem;
     width: 2.5rem;

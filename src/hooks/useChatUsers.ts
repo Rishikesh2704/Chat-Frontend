@@ -8,7 +8,7 @@ import axiosInstance from "../lib/axios";
 export default function useChatUser() {
   const dispatch = useAppDispatch();
   const { currentUser } = useAppSelector((state) => state.auth);
-  const { data, isSuccess, error } = useGetUsersQuery();
+  const { data, isSuccess, error, isLoading, refetch } = useGetUsersQuery();
 
   async function transformConversation(
     friendsConvos: Conversation[],
@@ -90,5 +90,5 @@ export default function useChatUser() {
     Users();
   }, [isSuccess]);
 
-  return { error };
+  return { error, isLoading, refetch };
 }
