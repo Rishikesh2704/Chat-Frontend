@@ -57,7 +57,7 @@
 //   return { videoRef, remoteVideoRef, streamRef, peerRef, createPeerConnection };
 // };
 
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useUser } from "../lib/context";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { setVideoCallModal } from "../redux/Modal/ModalSlice";
@@ -131,10 +131,10 @@ export default function usePeerToPeer(roomId: any) {
           username: currentUser?.username,
         });
       })
-      .catch((err) => console.log("Access denied."));
+      .catch((err) => console.log("Access denied.", err));
 
     const handleUserJoined = async (data: any) => {
-      const { socketId, user } = data;
+      const { socketId } = data;
       const pc = createPeerConnection(socketId);
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
@@ -150,18 +150,18 @@ export default function usePeerToPeer(roomId: any) {
       socket.emit("answer", { to: from, sdp: answer });
     };
     const handleAnswer = async (data: any) => {
-      const { from, sdp } = data;
+      const { sdp } = data;
       const pc = peersRef.current;
       if (pc) await pc.setRemoteDescription(new RTCSessionDescription(sdp));
     };
     const handleIceCandidate = async (data: any) => {
-      const { from, candidate } = data;
+      const { candidate } = data;
       const pc = peersRef.current;
       if (pc && candidate)
         await pc.addIceCandidate(new RTCIceCandidate(candidate));
     };
 
-    const handleEndCall = (m: any) => {
+    const handleEndCall = () => {
       cleanUp();
       dispatch(setVideoCallModal(false));
     };

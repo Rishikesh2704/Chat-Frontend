@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import {
   addNewMessage,
   setOnlineUsers,
-  setSelectedUser,
   updateReaction,
   updateSeenMessage,
   updateUserConversation,
@@ -196,10 +195,9 @@ export default function useChatSocket(setIsTyping: any) {
       console.log("Empty Socket");
       return;
     }
-    let toastId;
     const handleVideoCallRequest = (data: any) => {
       const { from, roomId, user } = data;
-      toastId = toast(`Call from ${user.username}`, {
+      toast(`Call from ${user.username}`, {
         position: "top-center",
         autoClose: false,
         closeButton: (

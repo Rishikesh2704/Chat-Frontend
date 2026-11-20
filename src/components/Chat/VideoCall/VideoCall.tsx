@@ -4,7 +4,6 @@ import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { setVideoCallModal } from "../../../redux/Modal/ModalSlice";
 import "./VideoCall.css";
 import {
-  faMessage,
   faMicrophone,
   faMicrophoneSlash,
   faPhoneSlash,
@@ -18,7 +17,7 @@ export default function VideoCallModal() {
   const ROOM_ID = 1;
   const { socket } = useUser();
   const { videoCallModal } = useAppSelector((state) => state.modal);
-  const { remoteVideoRef, remoteAudioRef, localVideoRef, cleanUp } = usePeerToPeer(ROOM_ID);
+  const { remoteVideoRef, localVideoRef, cleanUp } = usePeerToPeer(ROOM_ID);
   const dispatch = useAppDispatch();
 
   const handleEndCall = () => {
