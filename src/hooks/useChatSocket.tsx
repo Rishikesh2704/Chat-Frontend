@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import {
   addNewMessage,
   setOnlineUsers,
+  setSelectedUser,
   updateReaction,
   updateSeenMessage,
   updateUserConversation,
@@ -11,7 +12,10 @@ import { useUser } from "../lib/context";
 import { isGroup } from "../utils/IsGroup";
 import { decryptMessage, deriveSharedKey } from "../utils/End2End";
 import axiosInstance from "../lib/axios";
-
+import { toast } from "react-toastify";
+import { setVideoCallModal } from "../redux/Modal/ModalSlice";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPhone, faPhoneSlash } from "@fortawesome/free-solid-svg-icons";
 export default function useChatSocket(setIsTyping: any) {
   const { currentUser } = useAppSelector((state) => state.auth);
   const { users, selectedUser } = useAppSelector((state) => state.chat);
@@ -19,6 +23,45 @@ export default function useChatSocket(setIsTyping: any) {
   const { socket } = useUser();
 
   const dispatch = useAppDispatch();
+
+  const VideoCallAcceptBtn = ({
+    from,
+    roomId,
+    user,
+    closeToast,
+  }: {
+    from: any;
+    roomId: any;
+    user: any;
+    closeToast: () => void;
+  }) => (
+    <div className="call_btns">
+      <button
+        className="btn answerCall"
+        onClick={() => {
+          socket.emit("join_videoRoom", { roomId, username: user.username });
+          closeToast();
+          dispatch(setVideoCallModal(true));
+        }}
+      >
+        <FontAwesomeIcon icon={faPhone} />
+      </button>
+      <button
+        className="btn cancelCall"
+        onClick={() => {
+          const user = {
+            _id: currentUser?._id,
+            username: currentUser?.username,
+            profile: currentUser?.profile,
+          };
+          socket.emit("CallRequest_Rejected", { to: from, user });
+          closeToast();
+        }}
+      >
+        <FontAwesomeIcon icon={faPhoneSlash} />
+      </button>
+    </div>
+  );
 
   useEffect(() => {
     if (!socket || !currentUser) return;
@@ -75,7 +118,7 @@ export default function useChatSocket(setIsTyping: any) {
       );
       const publicKey = getPublicKey.data.publicKey;
       const sharedSecret = await deriveSharedKey(publicKey.publicKey);
-      if(!sharedSecret)return;
+      if (!sharedSecret) return;
 
       const decryptedMessage = await decryptMessage(
         message.savedMessage.messageContent,
@@ -147,6 +190,35 @@ export default function useChatSocket(setIsTyping: any) {
       socket.off("Deleted_GroupMessage_Reaction", handleDeleteGroupReaction);
     };
   }, [socket, currentUser?._id, selectedUser?._id]);
+
+  useEffect(() => {
+    if (!socket) {
+      console.log("Empty Socket");
+      return;
+    }
+    let toastId;
+    const handleVideoCallRequest = (data: any) => {
+      const { from, roomId, user } = data;
+      toastId = toast(`Call from ${user.username}`, {
+        position: "top-center",
+        autoClose: false,
+        closeButton: (
+          <VideoCallAcceptBtn
+            from={from}
+            roomId={roomId}
+            user={user}
+            closeToast={() => close()}
+          ></VideoCallAcceptBtn>
+        ),
+      });
+    };
+
+    socket.on("VideoCall_Request", handleVideoCallRequest);
+
+    return () => {
+      socket.off("VideoCall_Request", handleVideoCallRequest);
+    };
+  }, [socket, currentUser]);
 
   useEffect(() => {
     if (!users) {

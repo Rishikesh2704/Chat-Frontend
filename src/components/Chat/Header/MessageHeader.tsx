@@ -2,26 +2,32 @@ import "./MessageHeader.css";
 import profile from "../../../assets/profile.jpg";
 
 import { useRef, useState } from "react";
-import { faArrowLeft, faEllipsis } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowLeft,
+  faEllipsis,
+  faPhone,
+  faVideo,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { setModalType, setViewModal } from "../../../redux/Modal/ModalSlice";
+import { setModalType, setVideoCallModal, setViewModal } from "../../../redux/Modal/ModalSlice";
 import { setSelectedUser, setShowDetails } from "../../../redux/Chat/ChatSlice";
 import { useOutsideElement } from "../../../hooks/useOutsideElement";
 import { isGroup } from "../../../utils/IsGroup";
+import { useUser } from "../../../lib/context";
 
 export default function MessageHeader() {
   const { currentUser } = useAppSelector((state) => state.auth);
-  const { selectedUser } = useAppSelector((state) => state.chat);
-
+  const { selectedUser, onlineUsers } = useAppSelector(state => state.chat);
+  const { socket } = useUser();
   const dispatch = useAppDispatch();
 
   const [showOptions, setShowOptions] = useState(false);
   let optionsRef = useRef<any>(null);
 
-  if (!selectedUser) {
-    console.log("No selected User");
+  if (!selectedUser|| !currentUser) {
+    console.log("No selected or current User");
     return;
   }
 
@@ -54,6 +60,41 @@ export default function MessageHeader() {
     console.log("Clicked Back Button");
   };
 
+  const handleVideoModal = () => {
+    const user = {
+      _id: currentUser._id,
+      username: currentUser.username,
+      profile: currentUser.profile,
+    };
+    const recipientSocketId = onlineUsers[selectedUser._id];
+    socket.emit("VideoCall_Request", {
+      to: recipientSocketId,
+      roomId: 1,
+      user,
+    });
+    dispatch(setVideoCallModal(true));
+  };
+
+  const handleAudioCall = () => {
+    const user = {
+      _id: currentUser._id,
+      username: currentUser.username,
+      profile: currentUser.profile,
+    };
+    const recipientSocketId = onlineUsers[selectedUser._id];
+    socket.emit("VideoCall_Request", {
+      to: recipientSocketId,
+      roomId: 1,
+      user,
+    });
+    const call = {
+      view:true,
+      isAudio:true,
+      isVideo:false,
+    }
+    dispatch(setVideoCallModal(call));
+  };
+
   return (
     <div className="Chat_header">
       <div className="profile">
@@ -72,36 +113,47 @@ export default function MessageHeader() {
             : selectedUser.username}
         </h1>
       </div>
-
-      <div className="Private_Options">
-        <button
-          className="options_button"
-          aria-label="options"
-          onClick={(e) => handleShowOptions(e)}
-        >
-          <FontAwesomeIcon icon={faEllipsis} />
-        </button>
-        {showOptions && (
-          <div className="options" onClick={() => setShowOptions(false)}>
-            <button
-              onClick={() =>
-                dispatch(setShowDetails({ currentUser: false, state: true }))
-              }
-            >
-              Details
-            </button>
-            {isGroup(selectedUser) &&
-              currentUser &&
-              selectedUser.admins.includes(currentUser?._id) && (
-                <>
-                  <button onClick={() => handleAddMember()}>Add Member</button>
-                  <button onClick={() => handleRemoveMember()}>
-                    Remove Member
-                  </button>
-                </>
-              )}
-          </div>
-        )}
+      <div className="Features">
+        <div className="Call_Options">
+          <button className="voiceCall_btn" onClick={handleAudioCall}>
+            <FontAwesomeIcon icon={faPhone} />
+          </button>
+          <button className="videoCall_btn" onClick={handleVideoModal}>
+            <FontAwesomeIcon icon={faVideo} />
+          </button>
+        </div>
+        <div className="Private_Options">
+          <button
+            className="options_button"
+            aria-label="options"
+            onClick={(e) => handleShowOptions(e)}
+          >
+            <FontAwesomeIcon icon={faEllipsis} />
+          </button>
+          {showOptions && (
+            <div className="options" onClick={() => setShowOptions(false)}>
+              <button
+                onClick={() =>
+                  dispatch(setShowDetails({ currentUser: false, state: true }))
+                }
+              >
+                Details
+              </button>
+              {isGroup(selectedUser) &&
+                currentUser &&
+                selectedUser.admins.includes(currentUser?._id) && (
+                  <>
+                    <button onClick={() => handleAddMember()}>
+                      Add Member
+                    </button>
+                    <button onClick={() => handleRemoveMember()}>
+                      Remove Member
+                    </button>
+                  </>
+                )}
+            </div>
+          )}
+        </div>
       </div>
       <div className="line"></div>
     </div>

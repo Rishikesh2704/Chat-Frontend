@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import ProtectedRoute from "./lib/protectedRoute.tsx";
 import { lazy } from "react";
 
+
 const Home = lazy(() => import("./components/Home/Home.tsx"));
 const Login = lazy(() => import("./components/Auth/Login.tsx"));
 const SignUp = lazy(() => import("./components/Auth/SignUp.tsx"));

@@ -3,7 +3,7 @@
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content:space-between;
   position: relative;
 }
 
@@ -43,6 +43,29 @@
   width: 100%;
   display: flex;
   justify-content: center;
+}
+
+.Features{
+  width: fit-content;
+  display: flex;
+  align-items:center;
+  justify-content: center;
+  gap:1.5rem;
+  margin-right:0.7rem;
+}
+
+.Call_Options{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:1.2rem;
+}
+
+.voiceCall_btn, .videoCall_btn{
+  background:none;
+  border:none;
+  font-size:1.01rem;
+  cursor: pointer;
 }
 
 .Private_Options {

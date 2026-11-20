@@ -10,9 +10,9 @@ function fallbackComponent({ error, resetErrorBoundary }:{ error:any, resetError
   );
 }
 
-export default function BoundaryWrapper({ children }:{children:React.ReactNode}){
+export default function BoundaryWrapper({ children, resetFunction }:{children:React.ReactNode, resetFunction?:() => any}){
   return (
-    <ErrorBoundary FallbackComponent={fallbackComponent}>
+    <ErrorBoundary FallbackComponent={fallbackComponent} onReset={() =>resetFunction?resetFunction():null }>
       {children}
     </ErrorBoundary>
   );

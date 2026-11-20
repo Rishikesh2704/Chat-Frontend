@@ -73,6 +73,14 @@ export default function Friends({error, isLoading}:{error:any, isLoading:any}) {
     throw error
   }
 
+  if(isLoading){
+    return (
+         <div className="Chat_Friends">
+          <div className="blackloader"></div>
+         </div>
+    )
+  }
+
   
   return (
     <div className="Chat_Friends">

@@ -33,7 +33,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
   );
 
   useMessagesSeen(lastMessageRef);
-
+  
   const groupMembers = useGroupMembers();
 
   useLayoutEffect(() => {
@@ -51,6 +51,7 @@ export default function MessageSpace(props: MessageSpaceProps) {
     }
     setIsTop(false);
   }, [allMessages, selectedUser]);
+
 
   if (isError) {
     throw isError;

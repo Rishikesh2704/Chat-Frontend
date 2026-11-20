@@ -7,7 +7,6 @@ import { faMessage } from "@fortawesome/free-solid-svg-icons";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks.js";
 import { setModalType, setViewModal } from "../../redux/Modal/ModalSlice.js";
 import useChatUsers from "../../hooks/useChatUsers.js";
-import useChatSocket from "../../hooks/useChatSocket.js";
 
 import Friends from "../Chat/Friends/Friends.js";
 import MessageMain from "../Chat/MessageMain.js";
@@ -15,6 +14,8 @@ import Account from "../Account/Account.js";
 import { Search } from "../Search/Search.js";
 
 import BoundaryWrapper from "../../lib/BoundaryWrapper.js";
+import useChatSocket from "../../hooks/useChatSocket.js";
+import VideoCallModal from "../Chat/VideoCall/VideoCall.js";
 
 const Modal = lazy(() =>
   import("../Modal/Modal.js").then((m) => ({ default: m.Modal })),
@@ -24,7 +25,7 @@ export default function Home() {
   const dispatch = useAppDispatch();
 
   const { selectedUser, showDetails } = useAppSelector((state) => state.chat);
-  const { viewModal } = useAppSelector((state) => state.modal);
+  const { viewModal, videoCallModal } = useAppSelector((state) => state.modal);
 
   const [isTyping, setIsTyping] = useState<any>({ id: "", isTyping: false });
  
@@ -38,7 +39,6 @@ export default function Home() {
     dispatch(setViewModal(true));
     document.getElementsByTagName("main")[0].style.alignItems = "initial";
   };
-
   return (
     <div className="Home_Wrapper">
       <section className="ContentSection">
@@ -47,7 +47,7 @@ export default function Home() {
         </div>
 
         <Search />
-        <BoundaryWrapper >
+        <BoundaryWrapper resetFunction={refetch}>
           <Friends error={error} isLoading={isLoading} />
         </BoundaryWrapper>
         <button
@@ -60,10 +60,11 @@ export default function Home() {
       </section>
 
       {viewModal && <Modal />}
+      {videoCallModal.view && <VideoCallModal />}
 
       <section className="Chat_Space ">
         {selectedUser ? (
-          <BoundaryWrapper>
+          <BoundaryWrapper >
             <MessageMain isTyping={isTyping} />
           </BoundaryWrapper>
         ) : (
