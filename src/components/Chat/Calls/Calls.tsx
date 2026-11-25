@@ -3,9 +3,6 @@ import "./Call.css";
 import {
   faArrowLeftLong,
   faArrowRightLong,
-  faPhone,
-  faUser,
-  faVideo,
 } from "@fortawesome/free-solid-svg-icons";
 import { useGetCallLogQuery } from "../../../redux/Modal/modalQuerySlice";
 import { useAppSelector } from "../../../redux/hooks";

@@ -5,20 +5,16 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { useSearchMutation } from "../../redux/Modal/modalQuerySlice";
 import { useCreateGroupMutation } from "../../redux/Group/groupQuerySlice";
 import { toast } from "react-toastify";
-import { useAppSelector } from "../../redux/hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faUser } from "@fortawesome/free-solid-svg-icons";
 
 export const CreateGroupModal = () => {
   const [preview, setPreview] = useState<string>("");
-  const [file, setFile] = useState<File>();
   const [groupName, setGroupName] = useState<string>("");
   const [searchResults, setSearchResults] = useState<User[] | null>(null);
   const [query, setQuery] = useState<string>();
   const [selected, setSelected] = useState<User[]>([]);
-  // const [groupMembers, setGroupMembers] = useState<Pick<User, "_id">[] | null>(
-  //   [],
-  // );
+
   const searchQuery = useDebounce(query, 500);
 
   const [createGroup] = useCreateGroupMutation();
@@ -64,7 +60,6 @@ export const CreateGroupModal = () => {
   ) => {
     if (e.target.files) {
       const blob = URL.createObjectURL(e.target.files[0]);
-      setFile(e.target.files[0]);
       setPreview(blob);
     }
   };

@@ -41,13 +41,15 @@ export default function Login() {
       await storePrivateKey(decryptedPrivateKey);
       dispatch(setCurrentUser(user));
       navigate("/");
-    } catch (err:any) {
-        console.log("Error while login: ", err.message === 'wrong password');
-        if(err.message === 'wrong password'){
-          document.getElementsByClassName('Form_Password')[0]?.style.setProperty('--borderColor', 'red')
-        }
-        setErrorMessage(err.message);
-      
+    } catch (err: any) {
+      console.log("Error while login: ", err.message === "wrong password");
+      if (err.message === "wrong password") {
+        const ele = document.getElementsByClassName(
+          "Form_Password",
+        )[0] as HTMLInputElement;
+        ele?.style.setProperty("--borderColor", "red");
+      }
+      setErrorMessage(err.message);
     }
   };
 
@@ -76,7 +78,7 @@ export default function Login() {
           <div className="fields">
             <label>Password</label>
             <input
-            className='Form_Password'
+              className="Form_Password"
               type={showPassword ? "text" : "password"}
               placeholder="Rajesh1234..."
               onChange={(e) => setPassword(e.target.value)}
@@ -88,9 +90,13 @@ export default function Login() {
               icon={showPassword ? faEyeSlash : faEye}
               onClick={() => setShowPassword((prev) => !prev)}
             />
-            {errorMessage === 'wrong password' && <p id="Form_PasswordError">{errorMessage}</p>}
+            {errorMessage === "wrong password" && (
+              <p id="Form_PasswordError">{errorMessage}</p>
+            )}
           </div>
-          {errorMessage==="user doesn't exist" &&<span className="Form_ErrorMessage">{errorMessage}</span>}
+          {errorMessage === "user doesn't exist" && (
+            <span className="Form_ErrorMessage">{errorMessage}</span>
+          )}
 
           <p id="CreateAccount">
             Create an Account.{" "}
