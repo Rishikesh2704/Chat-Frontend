@@ -1,0 +1,114 @@
+.CallSection {
+  height: 90%;
+  width: 94%;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: start;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+
+.callLoader{
+  position:absolute;
+  top:50%;
+  left:42%;
+}
+
+.CallLog_Wrapper {
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap:0.1rem;
+}
+
+.CallSection_Day {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom:0.5rem;
+  position:relative;
+  right:33%;
+}
+
+.CallSection_Wrapper {
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid gainsboro;
+}
+
+.CallSection_log {
+  width: 100%;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.CallSection_log:hover {
+  background: var(--primary-gradient);
+  cursor: pointer;
+}
+
+.CallLog_ProfileWrapper {
+  width: 2.3rem;
+  height: 2.3rem;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  background-color: gainsboro;
+  border: 1px solid rgb(199, 199, 199);
+}
+
+#CallLog_ProfileIcon {
+  height: inherit;
+  width: inherit;
+  font-size: 1.5rem;
+}
+
+.CallLog_Details {
+  width: 80%;
+  font-size: 0.9vmax;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: start;
+  gap: 0.3rem;
+}
+
+.CallLog_username {
+  font-weight: 700;
+}
+
+.CallLog_type {
+  font-size: 0.87vmax;
+  color: rgb(133, 133, 133);
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+}
+.CallLog_time {
+  font-size: 0.8vmax;
+  color: rgb(133, 133, 133);
+  width: 48%;
+}
+
+#CallLog_calltype {
+  font-size: 0.8vmax;
+}
+
+#CallLog_incomingSign {
+  font-size: 0.78vmax;
+  transform: rotate(-45deg);
+  color: red;
+}
+#CallLog_outgoingSign {
+  font-size: 0.78vmax;
+  transform: rotate(-45deg);
+  color: rgb(19, 218, 33);
+}

@@ -11,22 +11,30 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { setModalType, setVideoCallModal, setViewModal } from "../../../redux/Modal/ModalSlice";
+import {
+  setCallId,
+  setModalType,
+  setVideoCallModal,
+  setViewModal,
+} from "../../../redux/Modal/ModalSlice";
 import { setSelectedUser, setShowDetails } from "../../../redux/Chat/ChatSlice";
 import { useOutsideElement } from "../../../hooks/useOutsideElement";
 import { isGroup } from "../../../utils/IsGroup";
 import { useUser } from "../../../lib/context";
+import { useCallMutation } from "../../../redux/Modal/modalQuerySlice";
 
 export default function MessageHeader() {
   const { currentUser } = useAppSelector((state) => state.auth);
-  const { selectedUser, onlineUsers } = useAppSelector(state => state.chat);
+  const { selectedUser, onlineUsers } = useAppSelector((state) => state.chat);
   const { socket } = useUser();
   const dispatch = useAppDispatch();
+
+  const [makeCall] = useCallMutation();
 
   const [showOptions, setShowOptions] = useState(false);
   let optionsRef = useRef<any>(null);
 
-  if (!selectedUser|| !currentUser) {
+  if (!selectedUser || !currentUser) {
     console.log("No selected or current User");
     return;
   }
@@ -60,38 +68,65 @@ export default function MessageHeader() {
     console.log("Clicked Back Button");
   };
 
-  const handleVideoModal = () => {
-    const user = {
-      _id: currentUser._id,
-      username: currentUser.username,
-      profile: currentUser.profile,
-    };
-    const recipientSocketId = onlineUsers[selectedUser._id];
-    socket.emit("VideoCall_Request", {
-      to: recipientSocketId,
-      roomId: 1,
-      user,
-    });
+  const handleVideoModal = async () => {
+    try {
+      const {
+        data: { callId },
+      } = await makeCall({
+        receiverId: selectedUser._id,
+        conversationId: selectedUser.conversationId || null,
+        callType: "video",
+      });
+
+      dispatch(setCallId(callId));
+      const user = {
+        _id: currentUser._id,
+        username: currentUser.username,
+        profile: currentUser.profile,
+      };
+      const recipientSocketId = onlineUsers[selectedUser._id];
+      socket.emit("Call_Request", {
+        to: recipientSocketId,
+        roomId: 1,
+        user,
+      });
+    } catch (error) {
+         console.log("audio Call error", error);
+    }
+
     dispatch(setVideoCallModal(true));
   };
 
-  const handleAudioCall = () => {
-    const user = {
-      _id: currentUser._id,
-      username: currentUser.username,
-      profile: currentUser.profile,
-    };
-    const recipientSocketId = onlineUsers[selectedUser._id];
-    socket.emit("VideoCall_Request", {
-      to: recipientSocketId,
-      roomId: 1,
-      user,
-    });
-    const call = {
-      view:true,
-      isAudio:true,
-      isVideo:false,
+  const handleAudioCall = async () => {
+    try {
+      const {
+        data: { callId },
+      } = await makeCall({
+        receiverId: selectedUser._id,
+        conversationId: selectedUser.conversationId || null,
+        callType: "audio",
+      });
+      const user = {
+        _id: currentUser._id,
+        username: currentUser.username,
+        profile: currentUser.profile,
+      };
+      const recipientSocketId = onlineUsers[selectedUser._id];
+      dispatch(setCallId(callId));
+      socket.emit("Call_Request", {
+        to: recipientSocketId,
+        roomId: 1,
+        user,
+        callId,
+      });
+    } catch (error) {
+      console.log("audio Call error", error);
     }
+    const call = {
+      view: true,
+      isAudio: true,
+      isVideo: false,
+    };
     dispatch(setVideoCallModal(call));
   };
 

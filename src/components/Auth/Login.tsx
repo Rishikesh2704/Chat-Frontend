@@ -16,6 +16,7 @@ export default function Login() {
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const navigate = useNavigate();
 
   const [login, { isLoading }] = useLoginMutation();
@@ -26,17 +27,27 @@ export default function Login() {
     try {
       const response = await login({
         email: email,
-        password: password
+        password: password,
       }).unwrap();
       const user = response.user;
-      const { encryptedKey } = user
-      const { key, salt, iv } = encryptedKey
-      const decryptedPrivateKey = await decryptEncryptedPrivate(key, password, salt,iv);
+      const { encryptedKey } = user;
+      const { key, salt, iv } = encryptedKey;
+      const decryptedPrivateKey = await decryptEncryptedPrivate(
+        key,
+        password,
+        salt,
+        iv,
+      );
       await storePrivateKey(decryptedPrivateKey);
       dispatch(setCurrentUser(user));
       navigate("/");
-    } catch (err) {
-      console.log("Error while login: ", err);
+    } catch (err:any) {
+        console.log("Error while login: ", err.message === 'wrong password');
+        if(err.message === 'wrong password'){
+          document.getElementsByClassName('Form_Password')[0]?.style.setProperty('--borderColor', 'red')
+        }
+        setErrorMessage(err.message);
+      
     }
   };
 
@@ -65,6 +76,7 @@ export default function Login() {
           <div className="fields">
             <label>Password</label>
             <input
+            className='Form_Password'
               type={showPassword ? "text" : "password"}
               placeholder="Rajesh1234..."
               onChange={(e) => setPassword(e.target.value)}
@@ -76,7 +88,9 @@ export default function Login() {
               icon={showPassword ? faEyeSlash : faEye}
               onClick={() => setShowPassword((prev) => !prev)}
             />
+            {errorMessage === 'wrong password' && <p id="Form_PasswordError">{errorMessage}</p>}
           </div>
+          {errorMessage==="user doesn't exist" &&<span className="Form_ErrorMessage">{errorMessage}</span>}
 
           <p id="CreateAccount">
             Create an Account.{" "}

@@ -28,21 +28,8 @@
   display: flex;
 }
 
-.Header {
-  height: 6%;
-  width: 100%;
-  font-size: 1.6rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
 
-.Heading {
-  font-size: 1.1rem;
-  position: relative;
-  right: 28%;
-}
+
 
 .NoChats {
   height: 100%;

@@ -1,4 +1,5 @@
 type User = {
+  conversationId?:string,
   _id: string;
   email: string;
   username: string;
@@ -17,6 +18,7 @@ type User = {
 };
 
 type Group = {
+  conversationId?:string,
   _id: string;
   groupName: string;
   admins: string[];
@@ -55,7 +57,7 @@ type groupMembersType = {
 
 type Conversation = {
   _id: string;
-  participants: { _id: string; username: string; profile: string }[];
+  participants: { _id: string; username: string; profile: string, email:string, createdAt:string, updatedAt:string }[];
   isGroup: boolean;
   unreadMessagesCount: {
     [key in User["_id"]]: Number;

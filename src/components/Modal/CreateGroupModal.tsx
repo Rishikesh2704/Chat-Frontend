@@ -5,8 +5,13 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { useSearchMutation } from "../../redux/Modal/modalQuerySlice";
 import { useCreateGroupMutation } from "../../redux/Group/groupQuerySlice";
 import { toast } from "react-toastify";
+import { useAppSelector } from "../../redux/hooks";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCamera, faUser } from "@fortawesome/free-solid-svg-icons";
 
 export const CreateGroupModal = () => {
+  const [preview, setPreview] = useState<string>("");
+  const [file, setFile] = useState<File>();
   const [groupName, setGroupName] = useState<string>("");
   const [searchResults, setSearchResults] = useState<User[] | null>(null);
   const [query, setQuery] = useState<string>();
@@ -54,6 +59,16 @@ export const CreateGroupModal = () => {
     }
   };
 
+  const handleUploadFile = (
+    e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+  ) => {
+    if (e.target.files) {
+      const blob = URL.createObjectURL(e.target.files[0]);
+      setFile(e.target.files[0]);
+      setPreview(blob);
+    }
+  };
+
   const handleCreateGroup = async () => {
     try {
       const userId = JSON.parse(
@@ -64,38 +79,95 @@ export const CreateGroupModal = () => {
         members: selected,
         admin: userId,
       };
-      console.log("Selected ", selected)
-      // const request = await axios.post(
-      //   `${import.meta.env.VITE_API}/group/createGroup`,
-      //   group,
-      // );
-      const request = await toast.promise( createGroup(group).unwrap(), {
-        pending:'Creating Group',
-        success:'Created Group',
-        error:'Failed to create Group'
-      } );
+      console.log("Selected ", selected);
+      const request = await toast.promise(createGroup(group).unwrap(), {
+        pending: "Creating Group",
+        success: "Created Group",
+        error: "Failed to create Group",
+      });
       console.log("Request", request);
     } catch (error) {
       console.log(error);
     }
   };
   return (
-    <>
-      <div className="GroupName">
-        <label htmlFor="GroupName_Input" id="GroupName_Label">
-          Group Name
-        </label>
-        <input
-          id="GroupName_Input"
-          type="text"
-          maxLength={10}
-          placeholder="Group Name"
-          onChange={(e) => setGroupName(e.target.value)}
-        />
+    <div className="Group_Wrapper">
+      <div className="Group_Details">
+        <div className="Group_nameProfileWrapper">
+          <div className="Group_Profile">
+            {preview?(<img
+              id="Group_ProfileImg"
+              src={preview}
+              alt=""
+            ></img>):(
+              <FontAwesomeIcon id="Group_ProfileIcon" icon={faUser}/>
+            )
+            }
+
+            <label
+              htmlFor="Group_ProfileUpload"
+              className="Group_ProfileUploadBtn"
+              aria-label="Upload Profile"
+            >
+              <FontAwesomeIcon icon={faCamera} />
+              <input
+                id="Group_ProfileUpload"
+                type="file"
+                onChange={(e) => handleUploadFile(e)}
+              />
+            </label>
+          </div>
+          <div className="GroupName">
+            <label htmlFor="GroupName_Input" id="GroupName_Label">
+              Group Name
+            </label>
+            <input
+              id="GroupName_Input"
+              type="text"
+              maxLength={10}
+              onChange={(e) => setGroupName(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="GroupMembers">
+          <h1 className="GroupMembers_H1">Group Members</h1>
+          <div className="GroupMembers_Selected">
+            {selected.length > 0 ? (
+              selected.map((user: any) => {
+                if (Object.hasOwn(user, "roomId")) return;
+                return (
+                  <div
+                    key={user._id}
+                    className="Selecetd_User_Wrapper"
+                    onClick={(e) => handleClick(e, user)}
+                  >
+                    <figure>
+                      <div className="profile_picture">
+                        <img src={user.profile} />
+                      </div>
+                    </figure>
+                    <div className="ModalUser_Details">
+                      <h2>{user.username}</h2>
+                      <div
+                        // className={`${Object.keys(onlineUsers).includes(user._id) ? "online" : ""}`}
+                        className="Modal_online"
+                      >
+                        online
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <p id="GroupMembers_NoMembers">No members added</p>
+            )}
+          </div>
+        </div>
       </div>
-      <h1 className="Members_H1">Group Members</h1>
-      <div className="GroupMembers">
-        <div className="Search_Users">
+
+      <div className="MembersSelection">
+        <h1 id="MemeberSelection_H1">Search Members</h1>
+        <div className="Search_Users ModalSearch">
           <form className="Search_Form">
             <label id="search_label" htmlFor="search_input">
               Search
@@ -111,32 +183,7 @@ export const CreateGroupModal = () => {
             </button>
           </form>
         </div>
-
         <div className="Search_Results">
-          {selected &&
-            selected.map((user: any) => {
-              if (Object.hasOwn(user, "roomId")) return;
-              return (
-                <div
-                  key={user._id}
-                  className="Selecetd_User_Wrapper"
-                  onClick={(e) => handleClick(e, user)}
-                >
-                  <figure>
-                    <div className="profile_picture">
-                      <img src={user.profile} />
-                    </div>
-                    <div
-                    // className={`${Object.keys(onlineUsers).includes(user._id) ? "online" : ""}`}
-                    ></div>
-                  </figure>
-                  <div className="User_Details">
-                    <h2>{user.username}</h2>
-                  </div>
-                </div>
-              );
-            })}
-
           {isLoading && <div className="blackloader"> </div>}
           {searchResults &&
             searchResults
@@ -160,8 +207,14 @@ export const CreateGroupModal = () => {
                       // className={`${Object.keys(onlineUsers).includes(user._id) ? "online" : ""}`}
                       ></div>
                     </figure>
-                    <div className="User_Details">
+                    <div className="ModalUser_Details">
                       <h2>{user.username}</h2>
+                      <div
+                        // className={`${Object.keys(onlineUsers).includes(user._id) ? "online" : ""}`}
+                        className="Modal_online"
+                      >
+                        online
+                      </div>
                     </div>
                   </div>
                 );
@@ -174,6 +227,6 @@ export const CreateGroupModal = () => {
       >
         Create Group
       </button>
-    </>
+    </div>
   );
 };

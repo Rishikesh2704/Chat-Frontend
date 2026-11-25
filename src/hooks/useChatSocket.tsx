@@ -12,7 +12,7 @@ import { isGroup } from "../utils/IsGroup";
 import { decryptMessage, deriveSharedKey } from "../utils/End2End";
 import axiosInstance from "../lib/axios";
 import { toast } from "react-toastify";
-import { setVideoCallModal } from "../redux/Modal/ModalSlice";
+import { setCallId, setVideoCallModal } from "../redux/Modal/ModalSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPhone, faPhoneSlash } from "@fortawesome/free-solid-svg-icons";
 export default function useChatSocket(setIsTyping: any) {
@@ -27,18 +27,20 @@ export default function useChatSocket(setIsTyping: any) {
     from,
     roomId,
     user,
+    callId,
     closeToast,
   }: {
     from: any;
     roomId: any;
     user: any;
+    callId:any,
     closeToast: () => void;
   }) => (
     <div className="call_btns">
       <button
         className="btn answerCall"
         onClick={() => {
-          socket.emit("join_videoRoom", { roomId, username: user.username });
+          socket.emit("join_callRoom", { roomId, username: user.username, callId });
           closeToast();
           dispatch(setVideoCallModal(true));
         }}
@@ -53,7 +55,7 @@ export default function useChatSocket(setIsTyping: any) {
             username: currentUser?.username,
             profile: currentUser?.profile,
           };
-          socket.emit("CallRequest_Rejected", { to: from, user });
+          socket.emit("CallRequest_Rejected", { to: from, user, callId });
           closeToast();
         }}
       >
@@ -196,7 +198,9 @@ export default function useChatSocket(setIsTyping: any) {
       return;
     }
     const handleVideoCallRequest = (data: any) => {
-      const { from, roomId, user } = data;
+      const { from, roomId, user, callId } = data;
+      dispatch(setCallId(callId));
+      console.log("CallId ", callId)
       toast(`Call from ${user.username}`, {
         position: "top-center",
         autoClose: false,
@@ -205,16 +209,17 @@ export default function useChatSocket(setIsTyping: any) {
             from={from}
             roomId={roomId}
             user={user}
+            callId={callId}
             closeToast={() => close()}
           ></VideoCallAcceptBtn>
         ),
       });
     };
 
-    socket.on("VideoCall_Request", handleVideoCallRequest);
+    socket.on("Call_Request", handleVideoCallRequest);
 
     return () => {
-      socket.off("VideoCall_Request", handleVideoCallRequest);
+      socket.off("Call_Request", handleVideoCallRequest);
     };
   }, [socket, currentUser]);
 

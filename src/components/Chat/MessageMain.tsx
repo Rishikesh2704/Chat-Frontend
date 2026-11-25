@@ -6,7 +6,7 @@ import useGroupMembers from "../../hooks/useGroupMembers";
 import useChatMessages from "../../hooks/useChatMessages";
 import useMessagesSeen from "../../hooks/useMessagesSeen";
 import { useAppSelector } from "../../redux/hooks";
-import MessageHeader from "./Header/MessageHeader";
+import MessageHeader from "./ChatHeader/MessageHeader";
 import MessageForm from "./MessageForm/MessageForm";
 
 const Messages = lazy(() => import("./MessageSpace/Messages"));

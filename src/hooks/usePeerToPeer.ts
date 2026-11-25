@@ -1,62 +1,3 @@
-// import { useEffect, useRef, useState } from "react";
-// import type { Socket } from "socket.io-client";
-
-// const ICE_CONFIG = {
-//   iceServers: [
-//     {
-//       urls: "stun:stun.l.google.com:19302",
-//     },
-//   ],
-// };
-
-// export const usePeerToPeer = () => {
-//   const videoRef = useRef<HTMLVideoElement>(null);
-//   const remoteVideoRef = useRef<HTMLVideoElement>(null);
-//   const streamRef = useRef<MediaStream| null>(null);
-//   const peerRef = useRef<RTCPeerConnection | {}>({});
-
-//   useEffect(() => {
-//      navigator.mediaDevices.getUserMedia({audio:true, video:true})
-//     .then((stream) => {
-//       streamRef.current = stream
-//       if(videoRef.current) videoRef.current.srcObject = stream;
-//     })
-//   }, [])
-
-//   const createPeerConnection = (peerId: any, socket: Socket) => {
-//     if (!streamRef.current || !peerRef.current) {
-//       console.log("streamRef : ", streamRef);
-//       console.log("PeerRef : ", peerRef);
-//       return;
-//     }
-//     const pc = new RTCPeerConnection(ICE_CONFIG);
-
-//     streamRef.current.getTracks().forEach((track: any) => {
-//       if(streamRef.current){
-
-//         pc.addTrack(track, streamRef.current);
-//       }
-//     });
-
-//     pc.onicecandidate = ({ candidate }) => {
-//       if (candidate) socket.emit("iceCandidate", { to: peerId, candidate });
-//     };
-
-//     pc.ontrack = ({streams}) => {
-//       console.log("Inside ontrack - peerRef:", peerRef.current);
-//       const remoteStreams = streams[0];
-//       if(remoteVideoRef.current && remoteStreams){
-//         remoteVideoRef.current.srcObject = remoteStreams;
-//       }
-//     };
-//     peerRef.current = {...(peerRef.current || {}), connection: pc }
-//     console.log("Connection: ", pc)
-//     return pc;
-//   };
-
-//   return { videoRef, remoteVideoRef, streamRef, peerRef, createPeerConnection };
-// };
-
 import { useEffect, useRef } from "react";
 import { useUser } from "../lib/context";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
@@ -116,6 +57,8 @@ export default function usePeerToPeer(roomId: any) {
   };
 
   useEffect(() => {
+    
+
     navigator.mediaDevices
       .getUserMedia({
         video: videoCallModal.isVideo,
@@ -123,13 +66,15 @@ export default function usePeerToPeer(roomId: any) {
       })
       .then((stream) => {
         cleanUp();
+      
         localStreamRef.current = stream;
         if (localVideoRef.current) localVideoRef.current.srcObject = stream;
 
-        socket.emit("join_videoRoom", {
+        socket.emit("join_callRoom", {
           roomId,
           username: currentUser?.username,
         });
+      
       })
       .catch((err) => console.log("Access denied.", err));
 
@@ -167,10 +112,10 @@ export default function usePeerToPeer(roomId: any) {
     };
 
     const handleCallRejected = () => {
-       cleanUp();
-       dispatch(setVideoCallModal(false))
-       toast('Call Rejected')
-    } 
+      cleanUp();
+      dispatch(setVideoCallModal(false));
+      toast("Call Rejected");
+    };
 
     socket.on("user_joined", handleUserJoined);
 
@@ -180,7 +125,7 @@ export default function usePeerToPeer(roomId: any) {
 
     socket.on("iceCandidate", handleIceCandidate);
 
-    socket.on("end_videoCall", handleEndCall);
+    socket.on("end_Call", handleEndCall);
 
     socket.on("CallRequest_Rejected", handleCallRejected);
 

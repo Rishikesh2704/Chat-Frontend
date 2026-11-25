@@ -1,0 +1,33 @@
+
+.Header {
+  height: 6%;
+  width: 90%;
+  font-size: 1.6rem;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: relative;
+}
+
+.Section{
+    border:none;
+    background:none;
+    width:calc(100%/2);
+    cursor:pointer;
+}
+
+.Heading {
+  font-size: 1.1rem;
+  font-family: SF-Pro;
+}
+
+.Marked{
+    height: 10%;
+    width:calc(100%/2);
+    position:absolute;
+    bottom:0;
+    left:var(--markedPos, 0);
+    background:var(--primary-gradient);
+    border-radius:2.5rem;
+    transition:0.2s ease-out;
+}

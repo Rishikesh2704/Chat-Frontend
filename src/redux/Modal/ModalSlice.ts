@@ -8,6 +8,7 @@ type initialState = {
     isAudio: boolean;
     isVideo: boolean;
   };
+  callId: string | undefined;
   viewSearchModal: boolean;
   searchResults: User[] | [];
 };
@@ -20,6 +21,7 @@ const initialState = {
     isAudio: false,
     isVideo: false,
   },
+  callId: "",
   viewSearchModal: false,
   searchResults: [],
 };
@@ -54,7 +56,7 @@ const modalSlicer = createSlice({
           isAudio: false,
           isVideo: false,
         };
-      } else if ((call === true)) {
+      } else if (call === true) {
         call = {
           view: true,
           isAudio: true,
@@ -65,6 +67,13 @@ const modalSlicer = createSlice({
       return {
         ...state,
         videoCallModal: call,
+      };
+    },
+
+    setCallId: (state, action: PayloadAction<string>) => {
+      return {
+        ...state,
+        callId: action.payload,
       };
     },
 
@@ -81,6 +90,7 @@ export const {
   setViewModal,
   setModalType,
   setVideoCallModal,
+  setCallId,
   setSearchResults,
 } = modalSlicer.actions;
 

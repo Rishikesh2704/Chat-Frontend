@@ -5,17 +5,19 @@
   display: flex;
   position: relative;
   flex-direction: column;
+  justify-content: start;
   background: var(--secondary-color);
   transition: 0.1s ease-in;
   gap: 1rem;
 }
 
 #Heading {
-  font-size: 0.9rem;
+  font-size: 1rem;
   width: 97%;
   height: fit-content;
   top: 0.5rem;
   position: relative;
+  margin-bottom: 0.6rem;
 }
 
 .Close_Details {
@@ -45,27 +47,25 @@
 }
 
 .Profile_Wrapper {
-  height: 4rem;
-  width: 4rem;
-  border-radius: 50%;
+  width: 5.3rem;
   font-size: 2.4vmax;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   object-fit: fill;
-  border-radius: 50%;
 }
 .Profile_Wrapper > img {
-  height: 100%;
   width: 100%;
+  aspect-ratio: 1/1;
   border-radius: 50%;
   border: 2px solid rgb(30, 30, 30);
   position: relative;
 }
 
 #Profile_Username {
-  font-size: 1vmax;
+  font-size: 1.1vmax;
+  font-weight: 800;
 }
 
 .Upload_Button {
@@ -89,6 +89,40 @@
   visibility: hidden;
 }
 
+.ChatOptions {
+  width: 100%;
+  height: 9%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.8rem;
+}
+.ChatOptions_Btns {
+  width: calc(100% / 4);
+  height: 3.7rem;
+  border: none;
+  background: none;
+  font-size: 1.3rem;
+  /* padding-top: 0.8rem; */
+  border-radius: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+}
+
+.Btns_tag {
+  font-size: 0.9rem;
+  font-family: SF-Bold;
+}
+
+.ChatOptions_Btns:hover {
+  background: var(--primary-gradient);
+  color: white;
+}
+
 .Account_Info {
   width: 95%;
   display: flex;
@@ -96,18 +130,20 @@
   justify-content: start;
   align-items: start;
   border-radius: 0.5rem;
-  gap: 2rem;
+  gap: 1.2rem;
 }
 
 .rows {
   width: 100%;
   font-size: 0.9rem;
+  font-weight: 700;
   display: flex;
   justify-content: space-between;
 }
 .rows > h2 {
   color: rgb(88, 87, 87);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 .rows > h2 > span {
   color: black;
@@ -134,6 +170,59 @@
   width: 95%;
   display: flex;
   flex-direction: column;
+}
+
+.Settings {
+  width: 95%;
+  height: 35%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.Setting_Heading {
+  font-size: 1.1rem;
+  width: 97%;
+  height: fit-content;
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.Setting_Options{
+  height:100%;
+  width:100%;
+  display:flex;
+  flex-direction: column;
+  align-items:center;
+  justify-content:start;
+  gap:1rem;
+}
+
+.Setting_Options-btns{
+  border:none;
+  height:25%;
+  width:100%;
+  /* background:rgb(244, 244, 244); */
+  /* border:1px solid gainsboro; */
+  border-radius:0.38rem;
+  display:flex;
+  align-items:center; 
+  padding:0rem 1rem;
+  gap:1.3rem;
+  font-size:1rem;
+  cursor:pointer;
+}
+
+.Setting_Options-btns:hover{
+  background:var(--primary-gradient)
+}
+
+.OptionBtn_tag{
+  font-size:0.9rem;
+  font-weight:700;
+  font-family: SF-Pro;
 }
 
 @media only screen and (max-width: 500px) {

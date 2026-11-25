@@ -24,7 +24,7 @@ export const getDayOfMessages = (
     const formattedDate =
       date.getDate() +
       " " +
-      date.toLocaleString("default", { month: "long" }) +
+      date.toLocaleString("default", { month: "short" }) +
       " " +
       date.getFullYear();
     return formattedDate;

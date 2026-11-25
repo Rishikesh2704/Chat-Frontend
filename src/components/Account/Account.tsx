@@ -6,10 +6,12 @@ import { isGroup } from "../../utils/IsGroup";
 import useGroupMembers from "../../hooks/useGroupMembers";
 import { setShowDetails } from "../../redux/Chat/ChatSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCamera, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRightFromBracket, faCamera, faKey, faMessage, faPhone, faVideo, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { setCurrentUser } from "../../redux/Auth/AuthSlice";
 import { useSetProfileMutation } from "../../redux/Chat/chatQuerySlice";
 import { toast } from "react-toastify";
+import { useLogoutMutation } from "../../redux/Auth/authQuerySlice";
+import { useNavigate } from "react-router";
 
 function toLocaleTime(time: string) {
   const date = new Date(time);
@@ -24,9 +26,12 @@ export default function Account() {
   const { selectedUser, showDetails } = useAppSelector((state) => state.chat);
   const current_user = showDetails.currentUser ? currentUser : selectedUser;
   const groupMembers = useGroupMembers();
-
+  console.log("Profile : ", current_user)
   const dispatch = useAppDispatch();
   const [setProfile] = useSetProfileMutation();
+  const [ logout ] = useLogoutMutation();
+  
+  const navigate = useNavigate();
 
   const handleUpdateProfile = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -50,7 +55,7 @@ export default function Account() {
         localStorage.setItem("Current_User", stringUser);
       };
       uploadProfile();
-      setPreview("")
+      setPreview("");
     } catch (error) {
       console.log("Error", error);
     }
@@ -77,6 +82,7 @@ export default function Account() {
       >
         <FontAwesomeIcon icon={faXmark} className="Close_Icon" />
       </div>
+
       <div className="Account_Profile">
         <figure className="Account_Image">
           <div className="Profile_Wrapper">
@@ -106,6 +112,7 @@ export default function Account() {
                 : current_user?.groupName)}
           </figcaption>
         </figure>
+
         {preview && (
           <button
             onClick={(e) => handleUpdateProfile(e)}
@@ -116,6 +123,22 @@ export default function Account() {
         )}
       </div>
 
+      {current_user !== currentUser &&<div className="ChatOptions">
+       
+          <button className="ChatOptions_Btns">
+            <FontAwesomeIcon icon={faPhone} />
+            <p className="Btns_tag">call</p>
+          </button>
+          <button className="ChatOptions_Btns">
+            <FontAwesomeIcon icon={faVideo} />
+            <p className="Btns_tag">video call</p>
+          </button>
+          <button className="ChatOptions_Btns">
+            <FontAwesomeIcon icon={faMessage} />
+            <p className="Btns_tag">message</p>
+          </button>
+      </div>}
+
       <div className="Account_Info">
         <h1 id="Heading">Account Details</h1>
 
@@ -123,7 +146,7 @@ export default function Account() {
           <div className="rows">
             <h2>Email</h2>
             <span>
-              {" "}
+            
               {current_user && !isGroup(current_user) && current_user.email}
             </span>
           </div>
@@ -137,6 +160,7 @@ export default function Account() {
           <span>{current_user && toLocaleTime(current_user.updatedAt)}</span>
         </div>
       </div>
+
       {groupMembers && (
         <div className="GroupMembers_Info">
           <h1 id="Heading">Members</h1>
@@ -161,6 +185,22 @@ export default function Account() {
               );
             },
           )}
+        </div>
+      )}
+
+      {current_user === currentUser && (
+        <div className="Settings">
+          <h1 className="Setting_Heading">Settings</h1>
+          <div className="Setting_Options">
+            <button className="Setting_Options-btns">
+              <FontAwesomeIcon icon={faKey}/>
+              <p className="OptionBtn_tag">Change Password</p>
+            </button>
+            <button className="Setting_Options-btns" onClick={async() => {await logout(); navigate("/");}}>
+              <FontAwesomeIcon icon={faArrowRightFromBracket}/>
+              <p className="OptionBtn_tag">Logout</p>
+            </button>
+          </div>
         </div>
       )}
     </main>

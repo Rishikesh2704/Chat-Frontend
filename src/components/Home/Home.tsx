@@ -16,6 +16,8 @@ import { Search } from "../Search/Search.js";
 import BoundaryWrapper from "../../lib/BoundaryWrapper.js";
 import useChatSocket from "../../hooks/useChatSocket.js";
 import VideoCallModal from "../Chat/VideoCall/VideoCall.js";
+import { ChatNavbar } from "../Chat/Navbar/ChatNavbar.js";
+import { Calls } from "../Chat/Calls/Calls.js";
 
 const Modal = lazy(() =>
   import("../Modal/Modal.js").then((m) => ({ default: m.Modal })),
@@ -26,11 +28,10 @@ export default function Home() {
 
   const { selectedUser, showDetails } = useAppSelector((state) => state.chat);
   const { viewModal, videoCallModal } = useAppSelector((state) => state.modal);
-
+  const [section, setSection] = useState<string | null>("messages");
   const [isTyping, setIsTyping] = useState<any>({ id: "", isTyping: false });
- 
 
-  const { error, isLoading, refetch } = useChatUsers();
+  const { isError, isLoading, refetch } = useChatUsers();
 
   useChatSocket(setIsTyping);
 
@@ -42,14 +43,18 @@ export default function Home() {
   return (
     <div className="Home_Wrapper">
       <section className="ContentSection">
-        <div className="Header">
-          <h1 className="Heading">Messages</h1>
-        </div>
-
-        <Search />
-        <BoundaryWrapper resetFunction={refetch}>
-          <Friends error={error} isLoading={isLoading} />
-        </BoundaryWrapper>
+        <ChatNavbar setSection={setSection} />
+        {section == "messages" && (
+          <BoundaryWrapper resetFunction={refetch}>
+            <Search />
+            <Friends error={isError} isLoading={isLoading} />
+          </BoundaryWrapper>
+        )}
+        {section == "calls" && (
+          <BoundaryWrapper resetFunction={refetch}>
+           <Calls/>
+          </BoundaryWrapper>
+        )}
         <button
           className="Create_Group_Btn"
           aria-label="Create Group"
@@ -64,7 +69,7 @@ export default function Home() {
 
       <section className="Chat_Space ">
         {selectedUser ? (
-          <BoundaryWrapper >
+          <BoundaryWrapper>
             <MessageMain isTyping={isTyping} />
           </BoundaryWrapper>
         ) : (

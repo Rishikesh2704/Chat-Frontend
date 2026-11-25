@@ -16,14 +16,14 @@ import userProfile from "../../../assets/user.png";
 export default function VideoCallModal() {
   const ROOM_ID = 1;
   const { socket } = useUser();
-  const { videoCallModal } = useAppSelector((state) => state.modal);
+  const { videoCallModal, callId } = useAppSelector((state) => state.modal);
   const { remoteVideoRef, localVideoRef, cleanUp } = usePeerToPeer(ROOM_ID);
   const dispatch = useAppDispatch();
 
   const handleEndCall = () => {
     cleanUp();
     dispatch(setVideoCallModal(false));
-    socket.emit("end_videoCall", { roomId: ROOM_ID });
+    socket.emit("end_Call", { roomId: ROOM_ID, callId });
   };
 
   const handleCloseModal = (

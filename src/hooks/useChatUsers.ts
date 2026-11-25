@@ -8,7 +8,7 @@ import axiosInstance from "../lib/axios";
 export default function useChatUser() {
   const dispatch = useAppDispatch();
   const { currentUser } = useAppSelector((state) => state.auth);
-  const { data, isSuccess, error, isLoading, refetch } = useGetUsersQuery();
+  const { data, isSuccess, isError, isLoading, refetch } = useGetUsersQuery();
 
   async function transformConversation(
     friendsConvos: Conversation[],
@@ -21,9 +21,12 @@ export default function useChatUser() {
           (parti) => parti._id !== currentUser._id,
         );
         return {
+          conversationId:convos._id,
           _id: participants[0]?._id,
           username: participants[0]?.username,
           profile: participants[0]?.profile,
+          email:participants[0]?.email,
+          createdAt:participants[0]?.createdAt,
           messagesCount: convos.unreadMessagesCount[currentUser._id],
           lastMessage: convos.lastMessage,
           updatedAt: convos.updatedAt,
@@ -90,5 +93,5 @@ export default function useChatUser() {
     Users();
   }, [isSuccess]);
 
-  return { error, isLoading, refetch };
+  return { isError, isLoading, refetch };
 }
