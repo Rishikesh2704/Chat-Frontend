@@ -41,7 +41,7 @@ export const Calls = () => {
             <div className="CallSection_log">
               <div className="CallLog_ProfileWrapper">
                 {/* <FontAwesomeIcon id="CallLog_ProfileIcon" icon={faUser} /> */}
-                <img src={log.receiverId.profile} />
+                <img id="CallLog_ProfileIcon" src={log.receiverId.profile} />
               </div>
               <div className="CallLog_Details">
                 <p className="CallLog_username">

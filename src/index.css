@@ -20,7 +20,7 @@
 @font-face {
   font-family: SF-Bold;
   src: url(../src/assets/SFPRODISPLAYREGULAR.OTF) format("woff2");
-  /* font-display: swap; */
+  font-display: swap;
 }
 
 * {
@@ -101,8 +101,6 @@ main {
   }
 }
 
-
-
 .call_btns{
   display:flex;
   align-items:center;
@@ -128,4 +126,12 @@ main {
   background-color: rgb(255, 28, 28);
   border:1px solid rgb(229, 9, 9);
 
+}
+
+@media only screen and (max-width:500px){
+  main{
+    gap:0;
+    justify-content: normal;
+    align-items: normal;
+  }
 }

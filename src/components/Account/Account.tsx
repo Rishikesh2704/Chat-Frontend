@@ -6,7 +6,15 @@ import { isGroup } from "../../utils/IsGroup";
 import useGroupMembers from "../../hooks/useGroupMembers";
 import { setShowDetails } from "../../redux/Chat/ChatSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRightFromBracket, faCamera, faKey, faMessage, faPhone, faVideo, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowRightFromBracket,
+  faCamera,
+  faKey,
+  faMessage,
+  faPhone,
+  faVideo,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { setCurrentUser } from "../../redux/Auth/AuthSlice";
 import { useSetProfileMutation } from "../../redux/Chat/chatQuerySlice";
 import { toast } from "react-toastify";
@@ -26,11 +34,11 @@ export default function Account() {
   const { selectedUser, showDetails } = useAppSelector((state) => state.chat);
   const current_user = showDetails.currentUser ? currentUser : selectedUser;
   const groupMembers = useGroupMembers();
-  console.log("Profile : ", current_user)
+  console.log("Profile : ", current_user);
   const dispatch = useAppDispatch();
   const [setProfile] = useSetProfileMutation();
-  const [ logout ] = useLogoutMutation();
-  
+  const [logout] = useLogoutMutation();
+
   const navigate = useNavigate();
 
   const handleUpdateProfile = (
@@ -84,7 +92,9 @@ export default function Account() {
       </div>
 
       <div className="Account_Profile">
+
         <figure className="Account_Image">
+        <h1 id="Profile_Heading">Profile</h1>
           <div className="Profile_Wrapper">
             <img
               className="Profile"
@@ -121,10 +131,14 @@ export default function Account() {
             <p>Update Profile</p>
           </button>
         )}
+
+       
+
       </div>
 
-      {current_user !== currentUser &&<div className="ChatOptions">
-       
+
+      {current_user !== currentUser && (
+        <div className="ChatOptions">
           <button className="ChatOptions_Btns">
             <FontAwesomeIcon icon={faPhone} />
             <p className="Btns_tag">call</p>
@@ -137,29 +151,26 @@ export default function Account() {
             <FontAwesomeIcon icon={faMessage} />
             <p className="Btns_tag">message</p>
           </button>
-      </div>}
-
-      <div className="Account_Info">
-        <h1 id="Heading">Account Details</h1>
-
-        {currentUser && !isGroup(currentUser) && (
+        </div>
+      )}
+       <div className="Account_Info">
+          {currentUser && !isGroup(currentUser) && (
+            <div className="rows">
+              <h2>Email</h2>
+              <span>
+                {current_user && !isGroup(current_user) && current_user.email}
+              </span>
+            </div>
+          )}
           <div className="rows">
-            <h2>Email</h2>
-            <span>
-            
-              {current_user && !isGroup(current_user) && current_user.email}
-            </span>
+            <h2>Created At</h2>
+            <span> {current_user && toLocaleTime(current_user.createdAt)}</span>
           </div>
-        )}
-        <div className="rows">
-          <h2>Created At</h2>
-          <span> {current_user && toLocaleTime(current_user.createdAt)}</span>
+          <div className="rows">
+            <h2>Updated At</h2>
+            <span>{current_user && toLocaleTime(current_user.updatedAt)}</span>
+          </div>
         </div>
-        <div className="rows">
-          <h2>Updated At</h2>
-          <span>{current_user && toLocaleTime(current_user.updatedAt)}</span>
-        </div>
-      </div>
 
       {groupMembers && (
         <div className="GroupMembers_Info">
@@ -193,11 +204,17 @@ export default function Account() {
           <h1 className="Setting_Heading">Settings</h1>
           <div className="Setting_Options">
             <button className="Setting_Options-btns">
-              <FontAwesomeIcon icon={faKey}/>
+              <FontAwesomeIcon icon={faKey} />
               <p className="OptionBtn_tag">Change Password</p>
             </button>
-            <button className="Setting_Options-btns" onClick={async() => {await logout(); navigate("/");}}>
-              <FontAwesomeIcon icon={faArrowRightFromBracket}/>
+            <button
+              className="Setting_Options-btns"
+              onClick={async () => {
+                await logout();
+                navigate("/");
+              }}
+            >
+              <FontAwesomeIcon icon={faArrowRightFromBracket} />
               <p className="OptionBtn_tag">Logout</p>
             </button>
           </div>

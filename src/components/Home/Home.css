@@ -102,14 +102,17 @@
 
 @media only screen and (max-width: 500px) {
   .Home_Wrapper {
-    height: 90vh;
-    width: 99vw;
+    height: 95vh;
+    width: 100vw;
     display: block;
   }
 
   .ContentSection {
-    height: 100vh;
+    height: 100%;
     max-width: 100%;
+    overflow:scroll;
+    border-radius: 0;
+    gap:0.95rem;
   }
 
   .Chat_Space {
@@ -124,14 +127,5 @@
     display: flex !important;
   }
 
-  .Header {
-    justify-content: start;
-    font-size: 2.5vmax;
-  }
-
-  .Heading {
-    right: 0%;
-    left: 5%;
-    font-size: 0.9em;
-  }
+  
 }

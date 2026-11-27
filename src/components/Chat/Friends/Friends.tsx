@@ -1,5 +1,4 @@
 import "./Friends.css";
-import profile from "../../../assets/profile.jpg";
 
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
@@ -8,6 +7,8 @@ import { setAllMessages, setSelectedUser } from "../../../redux/Chat/ChatSlice";
 import { toLocaleTime } from "../../../utils/MessagesTime";
 import axiosInstance from "../../../lib/axios";
 import { deriveSharedKey } from "../../../utils/End2End";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import { generateSharedKey, storeSharedKey } from "../../../utils/End2End";
 
 async function getUserPublicKey(userId: string) {
@@ -93,13 +94,16 @@ export default function Friends({error, isLoading}:{error:boolean, isLoading:any
           >
             <figure>
               <div className="profile_picture">
-                <img
+              {user.profile ?(  <img
                   height={37}
                   width={37}
-                  src={user?.profile || profile}
+                  src={user.profile}
                   loading="lazy"
                   alt=""
-                />
+                />):(
+                  <FontAwesomeIcon id="profile_icon" icon={faUser}/>
+                )
+                }
               </div>
               <div
                 className={`${onlineUsersIds.includes(user?._id) ? "online" : ""}`}

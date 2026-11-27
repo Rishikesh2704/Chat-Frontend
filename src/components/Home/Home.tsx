@@ -16,7 +16,7 @@ import { Search } from "../Search/Search.js";
 import BoundaryWrapper from "../../lib/BoundaryWrapper.js";
 import useChatSocket from "../../hooks/useChatSocket.js";
 import VideoCallModal from "../Chat/VideoCall/VideoCall.js";
-import { ChatNavbar } from "../Chat/Navbar/ChatNavbar.js";
+import { ChatNavbar } from "../Chat/ChatNavbar/ChatNavbar.js";
 import { Calls } from "../Chat/Calls/Calls.js";
 
 const Modal = lazy(() =>
@@ -52,16 +52,18 @@ export default function Home() {
         )}
         {section == "calls" && (
           <BoundaryWrapper resetFunction={refetch}>
-           <Calls/>
+            <Calls />
           </BoundaryWrapper>
         )}
-        <button
-          className="Create_Group_Btn"
-          aria-label="Create Group"
-          onClick={() => handleCreateGroup()}
-        >
-          +
-        </button>
+        {section === "messages" && (
+          <button
+            className="Create_Group_Btn"
+            aria-label="Create Group"
+            onClick={() => handleCreateGroup()}
+          >
+            +
+          </button>
+        )}
       </section>
 
       {viewModal && <Modal />}
