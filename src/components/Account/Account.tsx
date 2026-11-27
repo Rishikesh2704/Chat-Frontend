@@ -153,6 +153,7 @@ export default function Account() {
           </button>
         </div>
       )}
+
        <div className="Account_Info">
           {currentUser && !isGroup(currentUser) && (
             <div className="rows">
@@ -211,7 +212,7 @@ export default function Account() {
               className="Setting_Options-btns"
               onClick={async () => {
                 await logout();
-                navigate("/");
+                navigate("/authentication/login");
               }}
             >
               <FontAwesomeIcon icon={faArrowRightFromBracket} />

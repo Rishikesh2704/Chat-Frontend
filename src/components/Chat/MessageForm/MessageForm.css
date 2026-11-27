@@ -266,16 +266,25 @@
 }
 
 @media only screen and (max-width: 500px) {
+
+  .SendMessageFrom_Wrapper {
+  height: 12%;
+ 
+}
   .message_form {
-    width: 95%;
+    width: 96%;
+    height: 100%;
+    gap:0.7rem;
   }
 
   #message_input {
     width: 100%;
+    font-size: 0.9rem;
   }
 
   #sendMessage_button {
-    width: 16%;
+    width: 3rem;
+    aspect-ratio: 1/1;
     font-size: 1.5vmax;
   }
 
@@ -284,11 +293,11 @@
   }
 
   #ImageIcon {
-    font-size: 1rem;
+    font-size: 1.3rem;
   }
 
   #Emojis {
-    font-size: 2.3vmax;
+    font-size: 2.8vmax;
   }
 
   #Seen_Message {
